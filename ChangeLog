@@ -1,0 +1,4 @@
+This is the first version after removing 99% of junk from the original orpara
+project.  Only useful classes are retained. Furthermore, seqana and seqconv
+modules are included.  These are usually tools for working with biological
+sequence.

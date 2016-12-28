@@ -1,0 +1,3 @@
+The algorithm has been tested. There is no memory leak.
+The paramer has a big influence on the performance and the final 
+identity of the aligment in difficult cases.

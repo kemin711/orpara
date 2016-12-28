@@ -1,0 +1,37 @@
+src/seqconv/fishing.cpp is an example of using the new template version 
+of dynaln.t.h
+No need for linking.
+
+
+Dec 17, 2013
+Replacing the dynaln with the template version. The header file is now
+dynalnt.h, and there is no cpp file with it. Everything is just template.
+
+Matrix is replaced with scorematrix.  Now the ScoreMethod has several different
+kinds. This provides with the dynaln class the compile time polymorphism
+through templates.
+
+
+This directory contains my own implementation of the dynamic alignment
+algorithm both global and local are implemented.  I also implemented the
+linear memory version.
+
+Testing and is still needed.
+
+The strategy is to write specialized program for different 
+purposes using the same libraries.
+
+dbaln is suited for chimera detections.
+dbaln_cds is suited for genewise cds self alignment step.
+
+mysql connection with the C++ native interface has always 
+caused problems. The main problem is the dynamic linking
+with *.so libraries.  First it is the problems of different
+kind of machines.  I should have two sets of libraries for
+different kinds of machines. Then the location of the 
+mysql++.so should be forced somehow.
+
+
+
+Kemin
+

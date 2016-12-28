@@ -1,0 +1,28 @@
+Code  	Amino Acid
+A	alanine
+B	aspartate or asparagine
+C	cysteine
+D	aspartate
+E	glutamate
+F	phenylalanine
+G	glycine
+H	histidine
+I	isoleucine
+K	lysine
+L	leucine
+M	methionine
+N	asparagine
+P	proline
+Q	glutamine
+R	arginine
+S	serine
+T	threonine
+U	selenocysteine
+V	valine
+W	tryptophan
+Y	tyrosine
+
+BLAST and FASTA also accept
+X	any
+*	translation stop
+

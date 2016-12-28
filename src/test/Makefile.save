@@ -1,0 +1,10 @@
+CXX = g++
+CXXFLAGS = -g -std=c++11 -Wall -I/usr/local/include/orpara -I/usr/local/include
+LDFLAGS = -L/usr/local/lib -lgtest -lgtest_main -lpthread -lkemin
+
+all : testAll
+
+OBJECTS=bioseq_test.o main_testall.o
+
+testAll : $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)

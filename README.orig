@@ -1,0 +1,33 @@
+Note: This project belongs to Orpara.
+You are allowed to copy it and modify it, and Orpara will not be responsible
+for any consequences of using programs and source in this directory.
+
+All software were based on GNU Opensource (http://www.gnu.org/copyleft/gpl.html)
+and thus we adhere to the same policies as states by GNU.
+
+hgweb is giving authentication failure:
+Not sure how to solve the problem.
+
+the order of running make should be
+
+1. util
+2. dbutil
+
+to generate documents do
+
+doxygen projconfig
+to install into the web directory
+copy doc/html directory to 
+cp -r doc/html/* /home/www/html/kzcppdochtml/
+
+For libdirs, I made one lib64p for SGE cluster and pipeline
+Codes compiled on adhoc1 is compatible with all SGE nodes
+mysqlpp is also lib64p for SGE
+
+quarter node is different from all other nodes.
+
+run make doc to generate document
+
+BOOST requirement
+	Boost came with Redhat 6.4 is too old and needs to download and install the
+	most current version, which is 1.54 on July 10, 2013.

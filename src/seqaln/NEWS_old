@@ -1,0 +1,76 @@
+What's New:
+
+Version 2.0: Coming in 1997.
+             Added SHELL=/bin/sh in Makefiles for SGI's
+             Added conservative subsititions, printed as `:' in alignment
+             First sequence file can now contain a database of FASTA sequences.
+             Added xlate() routine to translate nucleotides to proteins.
+             Added simplified load_seq() for standalone apps: load_seq_lite().
+             Added P-value self-repeat programs: pvsrlocalS, mpvsrlocalS.
+             Reports empty sequence files and empty substitution matrix errors.
+             Reverse-complements second sequence now, rather than the first.
+             Small changes made to facilitate running through our web server,
+                http://www-hto.usc.edu/software/seqaln/seqaln-query.html
+             Fixed problem with tandem repeat alignments using linear mode.
+
+Version 1.16: July 1996.
+             Supports BLAST-format penalty matrices from the NCBI.
+             Loads p-value distribution files again.
+
+Version 1.15: June 1996.
+             Modified make files to work with Gnu make.
+             HTML versions of the man pages, cross-linked to each other,
+                are now available: see seqaln-1.15/doc/html.
+             Added standalone utility programs to convert Genbank, PIR and
+                Swissprot to FASTA format, for universal handling of databases.
+                Note: these are not fully tested -- watch for version 1.2.
+             Added structure elements in seqaln.h to handle multiple sequences
+                (e.g., from a mini-database).
+             Added linear memory model, keeping 2 rows of score matrix
+                (declumping and tracebacks not available with linear model).
+             Added separate routine for profile score matrix printing.
+             Added rpt_row() routine to print one row of scoring matrix.
+             Moved matrix printing into score matrix loop, for linear support.
+             Replaced indexing the scoring matrix by subscripts with pointers.
+             Tandem repeat score output now contains score's # of wraparounds.
+             Maintained identical output to Version 1.0 for old flags,
+                except with improved tandem repeat reporting.
+             Changed seqaln-1.15/test/Makefile to test square & linear models.
+
+             New flags supported:
+                +L  perform computations with linear-space scoring matrix.
+                -L  same as +L.
+
+Version 1.1: January 1996.
+             Sequence files in the Pearson/FASTA format are now supported.
+             A fifth main structure, io, has been added to hold stdout, stderr.
+
+             New flags supported:
+                -Ofile  sends stdout to file, truncated.
+                +Ofile  appends stdout to file.
+                -Efile  sends stderr to file, truncated.
+                +Efile  appends stdout to file.
+                        Note: errors from memory allocation are still
+                              printed to stderr.
+                +V      prints version # of programs.
+                -V      turns off printing version #.
+
+             INCDIR added to Makefile for location of include files.
+             The call to anint(x) was replaced with a call to floor(x+0.5).
+             `inline' was changed to `INLINE' wherever it appeared.
+             If alpha == beta, E and F scoring matrices are not used.
+             All demo programs print errors to stderr.
+             Matrix, profile and distribution files may be loaded with or
+                without the suffixes `.mat', `.pro' or `.dis', respectively.
+             The revcomp() routine now calls two routines in revcomp.c:
+                a routine to reverse a sequence, and a routine to complement
+                a sequence; there is still just one flag, `-r', for
+                reverse complement but one or the other can be had with
+                custom software.
+             Variables reverse, complement, and revcomp have been added to
+                the SEQALN_SEQUENCE data structure to denote the state of
+                the sequence being used vs. the original sequence.  This
+                appears on output as rev(seqname), comp(seqname), or
+                revcomp(seqname).
+
+Version 1.0: The first release.

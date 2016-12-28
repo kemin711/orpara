@@ -1,0 +1,6 @@
+Only basic class will reside in this directory. Othere gene model related code
+will go to genemodel directory.
+
+Interval
+Range 
+Will be the only two classes residing in this directory.
