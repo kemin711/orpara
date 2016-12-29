@@ -24,20 +24,14 @@ AC_LANG_POP([C++])
 save_LDFLAGS=$LDFLAGS
 save_LIBS=$LIBS
 LDFLAGS="-L/usr/lib/x86_64-linux-gnu $LDFLAGS"
-LIBS="-lpthread $LIBS"
-AX_PTHREAD([
-  AC_DEFINE([HAVE_PTHREAD], [1], [Define if you have POSIX threads libraries and headers])
-  gtest_LIBS="$PTHREAD_LIBS $LIBS"
-  gtest_CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-  gtest_CXXFLAGS="$CXXFLAGS $PTHREAD_CXXFLAGS"
-  gtest_CC="$PTHREAD_CC"
-  gtest_CXX="$PTHREAD_CXX"])
-AC_SUBST([gtest_CFLAGS])
-AC_SUBST([gtest_CXXFLAGS])
-AC_SUBST([gtest_CC])
-AC_SUBST([gtest_CXX])
+LIBS="$LIBS -lpthread"
+AX_PTHREAD([AC_DEFINE([HAVE_PTHREAD], [1], [Define if you have POSIX threads libraries and headers])
+	AC_MSG_NOTICE([pthread_libs: $PTHREAD_LIBS $PTHREAD_LDFLAGS])]
+	,[AC_MSG_ERROR([could not find pthread])])
+AC_SUBST([PTHREAD_LIBS])
 LDFLAGS=$save_LDFLAGS
 LIBS=$save_LIBS
+# could not figure out why PTHREAD_xxx variables are set to empty string!
 
 AC_ARG_VAR([GTESTINC], [gtest PATH for gtest include dir])
 AC_ARG_VAR([GTESTLIB], [gtest PATH for gtest lib dir])
@@ -45,25 +39,32 @@ if (test -n "$GTESTINC" && test -z "$GTESTLIB") || \
 	(test -z "$GTESTINC" && test -n "$GTESTLIB"); then 
    AC_MSG_ERROR([please specify both lib and include dir for gtest])
 fi
+if test "$prefix" = "NONE"; then
+	prefix=$ac_default_prefix
+fi
 AC_LANG_PUSH([C++])
 save_LIBS=$LIBS
 save_LDFLAGS=$LDFLAGS
 save_CXXFLAGS=$CXXFLAGS
-LDFLAGS="-L/usr/local/lib $LDFLAGS"
-CXXFLAGS="-I/usr/local/include $CXXFLAGS"
+LDFLAGS="-L$prefix/lib $LDFLAGS"
+CXXFLAGS="-I$prefix/include $CXXFLAGS"
 LIBS="$LIBS -lgtest -lgtest_main -lgmock -lgmock_main -lpthread"
 if test -n "$GTESTINC"; then
 	LDFLAGS="-L$GTESTLIB $LDFLAGS"
 	CXXFLAGS="-I$GTESTINC $CXXFLAGS"
 fi
+CXXFLAGS="$PTHREAD_CXXFLAGS $CXXFLAGS"
+LDFLAGS="$PTHREAD_LDFLAGS $LDFLAGS"
 AC_LINK_IFELSE(
 	[AC_LANG_PROGRAM([#include <gmock/gmock.h>], [testing::Cardinality dummy])],
-	[gtest_LIBS="$gtest_LIBS $LIBS"] [HAVE_GTEST=1] [HAVE_GMOCK=1],
+	[gtest_LIBS=$LIBS] [gtest_CXXFLAGS=$CXXFLAGS] [gtest_LDFLAGS=$LDFLAGS] [HAVE_GTEST=1] [HAVE_GMOCK=1],
 	[AC_MSG_WARN([libgtest and libgmock not found, will not be able to make check.])])
+AC_SUBST([gtest_CFLAGS])
+AC_SUBST([gtest_CXXFLAGS])
+AC_SUBST([gtest_LIBS])
 LIBS=$save_LIBS
 LDFLAGS=$save_LDFLAGS
 CXXFLAGS=$save_CXXFLAGS
-AC_SUBST([gtest_LIBS])
 AC_LANG_POP([C++])
 
 # Checks for typedefs, structures, and compiler characteristics.

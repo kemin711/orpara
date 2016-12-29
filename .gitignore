@@ -1,6 +1,9 @@
 Makefile
-
+*.la
+*.lo
 *.o
+*.log
+.libs
 doc/
 fastqreduceid
 fastqpick

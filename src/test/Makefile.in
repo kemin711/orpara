@@ -114,7 +114,7 @@ am__v_lt_0 = --silent
 am__v_lt_1 = 
 testAll_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(testAll_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+	$(CXXFLAGS) $(testAll_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -481,9 +481,7 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
-gtest_CC = @gtest_CC@
 gtest_CFLAGS = @gtest_CFLAGS@
-gtest_CXX = @gtest_CXX@
 gtest_CXXFLAGS = @gtest_CXXFLAGS@
 gtest_LIBS = @gtest_LIBS@
 host = @host@
@@ -517,6 +515,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 testAll_SOURCES = main_testall.cpp bioseq_test.cpp
 testAll_CXXFLAGS = -I.. -I../seqaln $(gtest_CXXFLAGS)
+testAll_LDFLAGS = $(gtest_LDFLAGS)
 testAll_LDADD = $(gtest_LIBS) ../libkemin.la
 all: all-am
 

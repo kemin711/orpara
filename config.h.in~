@@ -18,6 +18,9 @@
 /* Define if you have POSIX threads libraries and headers */
 #undef HAVE_PTHREAD
 
+/* Have PTHREAD_PRIO_INHERIT. */
+#undef HAVE_PTHREAD_PRIO_INHERIT
+
 /* Define to 1 if you have the `sqrt' function. */
 #undef HAVE_SQRT
 

@@ -637,12 +637,10 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
 gtest_LIBS
-GTESTLIB
-GTESTINC
-gtest_CXX
-gtest_CC
 gtest_CXXFLAGS
 gtest_CFLAGS
+GTESTLIB
+GTESTINC
 PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
@@ -17375,7 +17373,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 save_LDFLAGS=$LDFLAGS
 save_LIBS=$LIBS
 LDFLAGS="-L/usr/lib/x86_64-linux-gnu $LDFLAGS"
-LIBS="-lpthread $LIBS"
+LIBS="$LIBS -lpthread"
 
 
 
@@ -18003,18 +18001,15 @@ test -n "$PTHREAD_CC" || PTHREAD_CC="$CC"
 # Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
 if test "x$ax_pthread_ok" = "xyes"; then
 
-
 $as_echo "#define HAVE_PTHREAD 1" >>confdefs.h
 
-  gtest_LIBS="$PTHREAD_LIBS $LIBS"
-  gtest_CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-  gtest_CXXFLAGS="$CXXFLAGS $PTHREAD_CXXFLAGS"
-  gtest_CC="$PTHREAD_CC"
-  gtest_CXX="$PTHREAD_CXX"
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: pthread_libs: $PTHREAD_LIBS $PTHREAD_LDFLAGS" >&5
+$as_echo "$as_me: pthread_libs: $PTHREAD_LIBS $PTHREAD_LDFLAGS" >&6;}
+
         :
 else
         ax_pthread_ok=no
-
+        as_fn_error $? "could not find pthread" "$LINENO" 5
 fi
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -18024,17 +18019,18 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-
-
-
 LDFLAGS=$save_LDFLAGS
 LIBS=$save_LIBS
+# could not figure out why PTHREAD_xxx variables are set to empty string!
 
 
 
 if (test -n "$GTESTINC" && test -z "$GTESTLIB") || \
 	(test -z "$GTESTINC" && test -n "$GTESTLIB"); then
    as_fn_error $? "please specify both lib and include dir for gtest" "$LINENO" 5
+fi
+if test "$prefix" = "NONE"; then
+	prefix=$ac_default_prefix
 fi
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -18045,13 +18041,15 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 save_LIBS=$LIBS
 save_LDFLAGS=$LDFLAGS
 save_CXXFLAGS=$CXXFLAGS
-LDFLAGS="-L/usr/local/lib $LDFLAGS"
-CXXFLAGS="-I/usr/local/include $CXXFLAGS"
+LDFLAGS="-L$prefix/lib $LDFLAGS"
+CXXFLAGS="-I$prefix/include $CXXFLAGS"
 LIBS="$LIBS -lgtest -lgtest_main -lgmock -lgmock_main -lpthread"
 if test -n "$GTESTINC"; then
 	LDFLAGS="-L$GTESTLIB $LDFLAGS"
 	CXXFLAGS="-I$GTESTINC $CXXFLAGS"
 fi
+CXXFLAGS="$PTHREAD_CXXFLAGS $CXXFLAGS"
+LDFLAGS="$PTHREAD_LDFLAGS $LDFLAGS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <gmock/gmock.h>
@@ -18064,17 +18062,19 @@ testing::Cardinality dummy
 }
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-  gtest_LIBS="$gtest_LIBS $LIBS" HAVE_GTEST=1 HAVE_GMOCK=1
+  gtest_LIBS=$LIBS gtest_CXXFLAGS=$CXXFLAGS gtest_LDFLAGS=$LDFLAGS HAVE_GTEST=1 HAVE_GMOCK=1
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libgtest and libgmock not found, will not be able to make check." >&5
 $as_echo "$as_me: WARNING: libgtest and libgmock not found, will not be able to make check." >&2;}
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
+
+
+
 LIBS=$save_LIBS
 LDFLAGS=$save_LDFLAGS
 CXXFLAGS=$save_CXXFLAGS
-
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
