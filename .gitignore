@@ -4,6 +4,8 @@ Makefile
 *.o
 *.log
 .libs
+*.Plo
+
 doc/
 fastqreduceid
 fastqpick
