@@ -5,8 +5,11 @@
 #include <list>
 #include <vector>
 #include <cstdlib>
+#include <utility>
 
 using namespace std;
+
+namespace orpara {
 
 /** this file use the composition design pattern
  */
@@ -20,8 +23,6 @@ using namespace std;
  *
  * Represets [b, e] closed interval where b <= e
  */
-
-namespace orpara {
 
 class Interval {
    public:
@@ -40,6 +41,7 @@ class Interval {
        * You can use a,b, a-b, a:b formats
        */
       Interval(const string &str);
+      Interval(const pair<int,int> &p) : b(p.first), e(p.second) { }
       virtual ~Interval() { }
       /**
        * assignment operator
@@ -52,10 +54,18 @@ class Interval {
       friend ostream& operator<<(ostream& ous, const Interval& iv) {
          ous << iv.b << "-" << iv.e; return ous; }
 
+      /**
+       * @return a number representing the length of the 
+       *   return where two interval overlap.
+       *   if no overlap, then a negative number will be 
+       *   returned.
+       */
       int overlap(const Interval &i) const;
       int overlap(const int bb, const int ee) const;
       /** Merging two Intervals.
        * The merge only happens when the overlap > cut
+       * If this object is null, then the overlap will
+       * be the length of i and this object will become i.
        * @param cut the cutoff value for merging.
        * @return the overlapping value regardless of the merging 
        *    happened or not.
@@ -64,6 +74,15 @@ class Interval {
        * the merge method.
        */
       virtual int merge(Interval *i, const int cut=5);
+      /**
+       * Merge this interval with i; this object will
+       * be extended to include both the original and the
+       * input interval. If this object is Null then
+       * this object will become i.
+       * @return the overlap value. Negative indicates that
+       *   there is no overlap.
+       */
+      int extend(const Interval &i);
       virtual string toDelimitedString(const string &dl="\t") const;
       bool less(const Interval &iv) const { 
             return b<iv.b? true : (e<iv.e? true : false); }
@@ -82,7 +101,8 @@ class Interval {
       int begin() const { return b; }
       int getEnd() const { return e; }
       int end() const { return e; }
-      /** moew meaningful for composite classes derived from
+
+      /** more meaningful for composite classes derived from
        * this base class. Such as IntervalChain and IntervalPile
        * @return the number of elements inside this element.
        */
@@ -98,7 +118,7 @@ class Interval {
       int b, e;
 };
 
-/** represent all intervals that pile up on top of each other.
+/** Represents all intervals that pile up on top of each other.
  * It is used to give an average information of a cluster of 
  * overlapping intervals.
  *
@@ -322,5 +342,4 @@ class IntervalChain : public Interval {
       list<Interval*> chain;
 };
 }
-
 #endif

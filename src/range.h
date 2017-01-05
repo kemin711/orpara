@@ -7,6 +7,8 @@
 
 using namespace std;
 
+namespace orpara {
+
 /** The Range class for sequence alignment.
  * Abstraction of two numbers in one dimentional space.
  * Represent a line.
@@ -21,7 +23,7 @@ using namespace std;
  * [b,e] contain also the directional information.
  * with b<e as + and b>e as -
  */
-namespace orpara {
+
 class Range {
 	public:
       /** This is the default object
@@ -718,5 +720,4 @@ class RangeChain : public Range {
 		int sumolp; 
 };
 }
-
 #endif

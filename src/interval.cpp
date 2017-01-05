@@ -1,7 +1,9 @@
-#include "interval.h"
 #include <sstream>
 
+#include "interval.h"
+
 namespace orpara {
+
 /////// Interval Base class ///////////////////
 Interval& Interval::operator=(const Interval& other) {
    if (this != &other) {
@@ -54,6 +56,17 @@ int Interval::merge(Interval *i, const int cut)
    }
    return olp;
 }
+
+int Interval::extend(const Interval &i) {
+   if (isNull()) {
+      b=i.b; e=i.e;
+      return i.length();
+   }
+   b=min(b,i.b);
+   e=max(e, i.e);
+   return overlap(i);
+}
+
 
 string Interval::toDelimitedString(const string& dl) const {
    ostringstream ost;

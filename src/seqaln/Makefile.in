@@ -89,8 +89,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = alnlocal$(EXEEXT) alnglobal$(EXEEXT) \
-	alnlocalmany$(EXEEXT) alnglobalparam$(EXEEXT) bbaln$(EXEEXT) \
-	braboualnparam$(EXEEXT) checkpalindrome$(EXEEXT)
+	alnlocalmany$(EXEEXT) alnglobalparam$(EXEEXT)
 subdir = src/seqaln
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
@@ -128,20 +127,6 @@ am_alnlocalmany_OBJECTS = alnlocalmany.$(OBJEXT) scorematrix.$(OBJEXT)
 alnlocalmany_OBJECTS = $(am_alnlocalmany_OBJECTS)
 alnlocalmany_LDADD = $(LDADD)
 alnlocalmany_DEPENDENCIES = ../libkemin.la
-am_bbaln_OBJECTS = bbaln.$(OBJEXT) braboualn.$(OBJEXT)
-bbaln_OBJECTS = $(am_bbaln_OBJECTS)
-bbaln_LDADD = $(LDADD)
-bbaln_DEPENDENCIES = ../libkemin.la
-am_braboualnparam_OBJECTS = braboualnparam.$(OBJEXT) \
-	braboualn.$(OBJEXT)
-braboualnparam_OBJECTS = $(am_braboualnparam_OBJECTS)
-braboualnparam_LDADD = $(LDADD)
-braboualnparam_DEPENDENCIES = ../libkemin.la
-am_checkpalindrome_OBJECTS = checkpalindrome.$(OBJEXT) \
-	kmerhelper.$(OBJEXT) kmer.$(OBJEXT)
-checkpalindrome_OBJECTS = $(am_checkpalindrome_OBJECTS)
-checkpalindrome_LDADD = $(LDADD)
-checkpalindrome_DEPENDENCIES = ../libkemin.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -195,11 +180,9 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(alnglobal_SOURCES) $(alnglobalparam_SOURCES) \
-	$(alnlocal_SOURCES) $(alnlocalmany_SOURCES) $(bbaln_SOURCES) \
-	$(braboualnparam_SOURCES) $(checkpalindrome_SOURCES)
+	$(alnlocal_SOURCES) $(alnlocalmany_SOURCES)
 DIST_SOURCES = $(alnglobal_SOURCES) $(alnglobalparam_SOURCES) \
-	$(alnlocal_SOURCES) $(alnlocalmany_SOURCES) $(bbaln_SOURCES) \
-	$(braboualnparam_SOURCES) $(checkpalindrome_SOURCES)
+	$(alnlocal_SOURCES) $(alnlocalmany_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -357,6 +340,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+
+# useless program: bbaln braboualnparam 
 LDADD = ../libkemin.la
 AM_CXXFLAGS = -I..
 AM_LDFLAGS = -L..
@@ -364,9 +349,6 @@ alnlocal_SOURCES = alnlocal.cpp scorematrix.h scorematrix.cpp dynalnt.h
 alnlocalmany_SOURCES = alnlocalmany.cpp scorematrix.h scorematrix.cpp dynalnt.h
 alnglobal_SOURCES = alnglobal.cpp scorematrix.h scorematrix.cpp dynalnt.h
 alnglobalparam_SOURCES = alnglobalparam.cpp scorematrix.h scorematrix.cpp dynalnt.h
-bbaln_SOURCES = bbaln.cpp braboualn.h braboualn.cpp
-braboualnparam_SOURCES = braboualnparam.cpp braboualn.cpp braboualn.h
-checkpalindrome_SOURCES = checkpalindrome.cpp kmerhelper.cpp kmert.h kmer.h kmer.cpp
 all: all-am
 
 .SUFFIXES:
@@ -466,18 +448,6 @@ alnlocalmany$(EXEEXT): $(alnlocalmany_OBJECTS) $(alnlocalmany_DEPENDENCIES) $(EX
 	@rm -f alnlocalmany$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(alnlocalmany_OBJECTS) $(alnlocalmany_LDADD) $(LIBS)
 
-bbaln$(EXEEXT): $(bbaln_OBJECTS) $(bbaln_DEPENDENCIES) $(EXTRA_bbaln_DEPENDENCIES) 
-	@rm -f bbaln$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(bbaln_OBJECTS) $(bbaln_LDADD) $(LIBS)
-
-braboualnparam$(EXEEXT): $(braboualnparam_OBJECTS) $(braboualnparam_DEPENDENCIES) $(EXTRA_braboualnparam_DEPENDENCIES) 
-	@rm -f braboualnparam$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(braboualnparam_OBJECTS) $(braboualnparam_LDADD) $(LIBS)
-
-checkpalindrome$(EXEEXT): $(checkpalindrome_OBJECTS) $(checkpalindrome_DEPENDENCIES) $(EXTRA_checkpalindrome_DEPENDENCIES) 
-	@rm -f checkpalindrome$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(checkpalindrome_OBJECTS) $(checkpalindrome_LDADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -488,12 +458,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alnglobalparam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alnlocal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alnlocalmany.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bbaln.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/braboualn.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/braboualnparam.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/checkpalindrome.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmerhelper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scorematrix.Po@am__quote@
 
 .cpp.o:
@@ -730,6 +694,9 @@ uninstall-am: uninstall-binPROGRAMS
 
 .PRECIOUS: Makefile
 
+
+#bbaln_SOURCES = bbaln.cpp braboualn.h braboualn.cpp
+#braboualnparam_SOURCES = braboualnparam.cpp braboualn.cpp braboualn.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

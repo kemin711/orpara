@@ -3,11 +3,13 @@
 #include <functional>
 #include <limits>
 #include <cstdlib>
-#include "range.h"
-#include <strformat.h>
 #include <utility>
 
+#include "range.h"
+#include "strformat.h"
+
 namespace orpara {
+
 int Range::margin=16;
 float Range::marginFraction=0.1;
 
@@ -904,4 +906,4 @@ ostream& RangeChain::tableRows(ostream &ous, const string &prefix) const {
       ous << prefix << "\t" << cnt++ << "\t" << (*i)->begin() << "\t" << (*i)->end() << endl;;
    }
 }
-}
+} // orpara namespace

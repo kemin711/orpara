@@ -34,6 +34,7 @@ testcpp
 testseq
 teststd
 testfastq
+GrishinDistance
 
 # for bionj
 bionj 
