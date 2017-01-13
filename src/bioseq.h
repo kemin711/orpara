@@ -333,13 +333,17 @@ class bioseq {
        */
       virtual ostream& print(ostream &ous, int width=80) const;
 
-      /** The biologiest way of thinking.
+      /** The biologist way of thinking.
        * inclusive range [b,e], different from C++ substr!
        * 1-based index
+       * @return a copy of the underlying substring.
        */
       string substr(int b, int e) const; 
       /**
        * C-style index, same as C::substr() function
+       * @param b 0-based index of start
+       * @param len length of the string.
+       * @return a copy of the underlying substring.
        */
       string substring(const int b, const int len) const throw (bioseqexception); 
       /**
@@ -876,7 +880,9 @@ class DNAQual : public DNA {
       DNAQual(const string &n, const string &s) 
          : DNA(n,s), qual(0), rc(0)  {}
       /**
-       * @pram t is the title for the sequence.
+       * @param t is the title for the sequence.
+       * @param s DNA sequence string.
+       * @param n name of DNA sequence.
        * No quality is given.
        */
       DNAQual(const string &n, const string &s, const string &t) 
