@@ -553,10 +553,14 @@ string bioseq::substr(int b, int e) const {
 }
 
 string bioseq::substring(const int b, const int len) const throw (bioseqexception) {
-   if (b>= (int)length() || b < 0) {
-      cerr << "seq: " << seq << "\nb,len: " << b << ',' << len << endl;
+   if ((size_t)b >= length()) {
+      cerr << "seq: " << seq << "\nb,len: " << b << ',' << len 
+         << " b is greater than sequence length: " << length() << endl;
       throw bioseqexception("bioseq::substring start index: " + itos(b) 
-            + " out of range inside substring(b, len)");
+            + " greater than seqlength");
+   }
+   else if (b < 0) {
+      throw bioseqexception("b is negative inside bioseq::substring");
    }
    return seq.substr(b, len);
 }
