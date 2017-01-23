@@ -1,0 +1,61 @@
+All software were based on MIT Licesensing The project uses Gnu autotools.
+
+This core software bioinformatic package started from 1997 when I was in Charge
+of bioinformatic for the Fugu project in The Molecular Sciences Institute. 
+Nobody picked up this piece of work. During this time, I wrote code dealing
+with the ACEDB, including a C++ driver to this database. The ortholog/paralog
+work also started from this period of time. 
+
+July of 2000 I join Neomorphic and started to work on the annotation of the
+human genome where I mainly use Java to develope tools and optimize the
+accuracy of gene callers.  After neomorphic was acquired, I left Affimetrix and
+started a company orpara. In the next few months, there was heavy coding
+efforts to build a ortholog/paralog database to be used for multiple purposes.
+The objective of the company was to serve small to median sized company in
+their needs for bioinformatics with basic tools.  After thorough evaluation of
+the business model, we realized that the business enviornment at the moment for
+bioinformatic is not mature for service based business model.  
+
+I started working full time for Ferring on GPCR project and designing
+Affymetrix chips for discovering drugs related to urinary tracks from 2004.
+The main efforts at Ferring is to set up bioinformatics infrastructure, setting
+up databases (Postgres), and build web applications to support internal bioinformatics
+needs.  Another part of the job it to analyze results from Affymetrix chips.
+Orpara code development stop during this period.  
+
+After Ferring closed R&D for drug discovery projects in 2004, I started work
+for a financial Institute as a consultant.  The main job is to migrate perl and
+C code to other languages.  For the next few months I further developed the
+orpara code base before joining the the Joint Genome Institute (JGI) in 2005.
+The main componets of the library is to work with sequences and doing alignments
+with the sequences. Calculating phylogenetic trees and working with gene models.
+
+At JGI I started working on the genome annotation of eukaryotes. Here most of
+the development is in perl. The most important achievments is to have
+developped the COMBEST algorithm. The genmodel C++ components were further
+enhanced while working at JGI.  All the work done at JGI is funded by the US
+govenment and intended to be used by the public. At the end of 2011 I left JGI.
+The orpara library was used for some JGI projects and tested.  The gene model
+part of the orpara library got further developed.
+
+For the year of 2012 I work as a consultant to develop Java code for migrating
+one database schema to another.  And evaluating software packages for
+integrating bioinformatics workflows.
+
+From 2013 to 2015 I worked for BMS mainly in helping with using Ion Torrent in
+various projects: HCV typing and mutation call, sequencing plasmids (build a
+java based web interface for sequenceing and qc) the back end used MIRA 
+assembler.  Other projects are for helping TCGA data management, hairpin
+RNA analysis. I used the orpara library for these projects.
+
+From Feb to July 2015 I was finshing a paper I drafted around 2011 at JGI.
+
+Since 2002, I host the source code on orpara.com 2 day before Thanks Giving
+hard drive hosing the OS died (just little bit over one year, brand new
+machine purchased from Dell; I bought several Dell servers over the years
+for orpara.com.  This one has the shortest disk life).  This period
+coicide with my father-in-laws pass away.  The during Chrismas time
+my hand was broken.  I have not find time to brink up the server yet.
+Now I am hosting the orpara source in git hub.  
+
+Since July 13, 2015, I started to work for Roche.
