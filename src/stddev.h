@@ -1,6 +1,8 @@
 #ifndef STDDEV_H
 #define STDDEV_H
 
+// (c) 1997 Kemin Zhou at The Molecular Sciences Institute
+
 #include <utility>
 #include <cmath>
 #include <iostream>

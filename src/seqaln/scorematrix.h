@@ -1,6 +1,8 @@
 #ifndef SCOREMATRIX_H
 #define SCOREMATRIX_H
 
+// (c) 2012 Kemin Zhou at orpara.com
+
 #include <cstring>
 #include <string>
 #include <vector>

@@ -1,3 +1,4 @@
+// (c) 1997 Kemin Zhou at The Molecular Sciences Institute
 // strformat.h
 #ifndef STRFORMAT_H
 #define STRFORMAT_H

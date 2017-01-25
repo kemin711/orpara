@@ -1,6 +1,8 @@
 #ifndef ALNRESULT_H
 #define ALNRESULT_H
 
+// (c) 1997 Kemin Zhou at The Moclecular Sciences Institute
+
 namespace orpara {
 /**
  * Alignment Result for consumption by other programs

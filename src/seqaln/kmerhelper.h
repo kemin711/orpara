@@ -1,6 +1,8 @@
 #ifndef KMERHELPER_H
 #define KMERHELPER_H
 
+// (c) 2012 Kemin Zhou at orpara.com
+
 #include <vector>
 #include <string>
 #include <iostream>

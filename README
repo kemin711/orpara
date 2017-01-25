@@ -1,1 +1,8 @@
-this is the orpara core library
+This is a subset of the libraries from orpara that are only used by the 16S pipeline.
+All source codes were created by orpara.com from 2002 to July 12, 2015.
+
+It is free to use open source MIT license.
+
+The autoconf tool used has the GNU license.
+
+This library contains the basic functionality for doing basic bioinformatics.

@@ -1,6 +1,8 @@
 #ifndef CODON_H
 #define CODON_H
 
+// (c) 2002 Kemin Zhou at orapra.com
+
 #include <map>
 #include <string>
 #include <iostream>

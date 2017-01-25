@@ -1,6 +1,8 @@
 #ifndef DYNALN_H
 #define DYNALN_H
 
+// (c) 2002 Kemin Zhou at orpara.com
+
 #include "bioseq.h"
 #include "scorematrix.h"
 #include <list>

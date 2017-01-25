@@ -1,6 +1,8 @@
 #ifndef RANGE_H
 #define RANGE_H
 
+// (c) 2002 Kemin Zhou at orapra.com
+
 #include <iostream>
 #include <list>
 #include <utility>

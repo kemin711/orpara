@@ -1,6 +1,8 @@
 #ifndef GENTREE_H
 #define GENTREE_H
 
+// (c) 2002 Kemin Zhou at orapra.com
+
 //#include <iostream>
 //#include <fstream>
 //#include <string>

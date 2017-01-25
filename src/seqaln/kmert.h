@@ -1,4 +1,4 @@
- #ifndef KMER_H
+#ifndef KMER_H
 #define KMER_H
 
 #include <string>

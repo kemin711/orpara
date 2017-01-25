@@ -1,6 +1,8 @@
 #ifndef BIOSEQ_H
 #define BIOSEQ_H
 
+// (C) 2002 Kemin Zhou at orpara.com
+
 /** sequence is stored as string if needed can be converted to
  * different formats
  * Sequence id is also converted to string, even it could be
@@ -16,6 +18,7 @@
 #include <vector>
 #include <range.h>
 #include <interval.h>
+
 #include "codon.h"
 
 using namespace std;

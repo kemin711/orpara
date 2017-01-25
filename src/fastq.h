@@ -1,5 +1,8 @@
 #ifndef FASTQSEQ_H
 #define FASTQSEQ_H
+
+// (c) 2002 Kemin Zhou at orapra.com
+
 #include<string>
 #include<iostream>
 #include <vector>

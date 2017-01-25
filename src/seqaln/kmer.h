@@ -1,6 +1,8 @@
 #ifndef KMERMATCH_H
 #define KMERMATCH_H
 
+// (c) 2012 Kemin Zhou at orpara.com
+
 #include <string>
 #include <vector>
 #include <iostream>

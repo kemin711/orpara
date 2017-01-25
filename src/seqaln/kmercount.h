@@ -1,6 +1,8 @@
 #ifndef KMERCOUNT_H
 #define KMERCOUNT_H
 
+// (c) 2012 Kemin Zhou at orpara.com
+
 #include "kmerhelper.h"
 #include <vector>
 

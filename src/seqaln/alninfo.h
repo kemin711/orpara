@@ -1,6 +1,8 @@
 #ifndef ALIGNINFO_H
 #define ALIGNINFO_H
 
+// (c) 2002 Kemin Zhou at orpara.com
+
 #include <iostream>
 
 using namespace std;

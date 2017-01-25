@@ -1,6 +1,8 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+// (c) 1997 Kemin Zhou at The Moclecular Sciences Institute
+
 #include <string>
 #include <vector>
 #include <iostream>

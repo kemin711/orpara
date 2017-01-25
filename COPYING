@@ -1,3 +1,6 @@
+The autotools part of the project used the GPL license.  The the actual code was
+written to use the MIT license.  I use the autotool to package the project.
+
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 

@@ -1,6 +1,8 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 
+// (c) 2002 Kemin Zhou at orapra.com
+
 #include <iostream>
 #include <list>
 #include <vector>

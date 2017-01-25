@@ -1,6 +1,11 @@
 #ifndef DYNALN_H
 #define DYNALN_H
 
+// (c) 1997 Kemin Zhou at The Moclecular Sciences Institute
+// The original verson got significant improvements over the years
+// Added bioseq support over the original string based
+// sequence
+
 #include "bioseq.h"
 #include "matrix.h"
 #include <list>
