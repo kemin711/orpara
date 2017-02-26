@@ -75,6 +75,21 @@ AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_CHECK_FUNCS([pow sqrt strchr strstr])
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
+if test -z "$DOXYGEN"; then
+	AC_MSG_WARN([Doxygen not found - continue without Doxygen support])
+fi
+AC_CHECK_PROGS([DOT], [dot])
+if test -z "$DOT"; then
+	AC_MSG_ERROR([Doxygen needs dot, please install dot first])
+fi
+AC_CHECK_PROGS([PDFLATEX], [pdflatex])
+if test -z "$PDFLATEX"; then
+	AC_MSG_ERROR([Doxygen needs pdflatex program, it is part of TeX http://www.tug.org/texlive/acquire-netinstall.html])
+fi
+AM_CONDITIONAL([HAVE_DOXYGEN], [test -n "$DOXYGEN"])
+AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([docs/Doxyfile])])
+AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([docs/Makefile])])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile

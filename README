@@ -6,3 +6,9 @@ It is free to use open source MIT license.
 The autoconf tool used has the GNU license.
 
 This library contains the basic functionality for doing basic bioinformatics.
+
+to generate the doxygen document files run
+
+doxygen
+
+You can copy the doc directory content to a static web server.
