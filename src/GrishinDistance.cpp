@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "volution.h"
+#include "evolution/evolution.h"
 
 using namespace std;
 
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
    }
    else {
       for (double i=0.1; i<0.9999; i += 0.05) {
-         cerr << i << " " << numericFunc(i, err) << endl;
+         cerr << i << " " << GrishinDistance(i, err) << endl;
       }
    }
    return 0;

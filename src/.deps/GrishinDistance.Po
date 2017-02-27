@@ -112,7 +112,7 @@ GrishinDistance.o: GrishinDistance.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/nan.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
- /usr/include/x86_64-linux-gnu/bits/mathinline.h
+ /usr/include/x86_64-linux-gnu/bits/mathinline.h evolution/evolution.h
 
 /usr/include/stdc-predef.h:
 
@@ -415,3 +415,5 @@ GrishinDistance.o: GrishinDistance.cpp /usr/include/stdc-predef.h \
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathinline.h:
+
+evolution/evolution.h:
