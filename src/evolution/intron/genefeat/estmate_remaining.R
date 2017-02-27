@@ -1,0 +1,16 @@
+# Estimate remaining or missing parameter by plotting
+par(mfrow=c(2,2))
+param.gamma <- read.table("gamma_param_exlen.tab", header=T)
+plot(param.gamma$nx, param.gamma$alpha)
+lm.alpha <- lm(param.gamma$alpha ~ param.gamma$nx)
+abline(lm.alpha)
+plot(param.gamma$nx, param.gamma$lambda)
+lm.lambda <- lm(param.gamma$lambda ~ param.gamma$nx)
+abline(lm.lambda)
+plot(param.gamma$nx, param.gamma$mle.alpha)
+lm.mlea <- lm(param.gamma$mle.alpha ~ param.gamma$nx)
+abline(lm.mlea)
+plot(param.gamma$nx, param.gamma$mle.lambda)
+lm.mlel <- lm(param.gamma$mle.lambda ~ param.gamma$nx)
+abline(lm.mlel)
+

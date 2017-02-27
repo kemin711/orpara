@@ -1,0 +1,12 @@
+1. I first estimated the gamma distribution parameters:
+alpha (shape), lambda (rate) with the Moment method.
+
+This is done for each number of exons per gene
+Some genomes do not have enough data so that the parameters are not estimated.
+I have to estimated it somehow with curves.
+
+2. I also mnaully estimated a subset of the parameters with MLE method.
+
+The result will be written to a file: gamma_param_exlen.tab
+
+

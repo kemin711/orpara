@@ -1,0 +1,61 @@
+Only build_gene.R and loss.R are needed for
+simulation. All others are considered obsolete.
+
+
+Research: /work/fungalana/genefeat
+exlen_numex.R
+
+average exlen per gene against number of exons
+###### Final Results #################
+# study was done on coding exons only
+
+a <- 1057; b <- -0.5304;  c <- -1.4192; d <- 204
+## where x is number of exons per gene
+x <- 1:70
+avg.exlen <- 1057*exp(-0.5304*x) -1.4192*x + 204
+eqn <- function(x) {
+    a*exp(b*x)+c*x+d
+}
+enls <- read.table("exnumlen_summary.tab", header=T);
+plot(enls$numex, enls$meanlen)
+lines(x, eqn(x))
+
+1. Get parameters for number of exons
+	Gamma distribution based on Sporo1
+	I have tried this for various genomes, Sporo1 got the best
+	result. This is done ~/work/fungalana/numberexon/command.R
+	~/work/fungalana/simulation
+
+2. Get parameters for exon length per genes with N number of exons
+	Gamma distribution based on all Fungal genomes in this study
+	gamma_param_exlen.tab
+	I some how estimated the proper pairs of values for each 
+	number of exons to use.
+
+3. Simulate the gene
+
+4. Get parameter for RT fall off rate, assuming exponential distribution
+5. tabulate the intron position before RT action
+6. To reverse intron removal
+7. tabulate the intron position after removal
+
+### final R simulation #######
+#### files: build_gene.R, loss.R
+
+In build_gene.R I have implemented a simulation function
+build.gene(ng,nipar,csvp,elpf)
+this will simulated the genes with features that resemble the
+ancestor of fungus.
+
+The next step is to use the lose.intron(gm,b,nrt) implemented in loss.R file
+This function can be called multiple time to simulate the ongoing evolutionary
+process.
+
+This file will also plot the results.
+
+The gamma_param_exlen.tab contains parameters estimated from 16
+fungal genoems that reflect the current state of genomes and not 
+ancient genomes. Theus we have to make up a ancestral genome
+with 16 exon/gene and 60-75nt per exon both are gamma distributions.
+
+
