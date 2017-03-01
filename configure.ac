@@ -82,7 +82,7 @@ else
         AC_MSG_NOTICE([Doxygen installed check dot and pdflatex ...])
 	AC_CHECK_PROGS([DOT], [dot])
 	if test -z "$DOT"; then
-		AC_MSG_ERROR([Doxygen needs dot, please install dot first])
+		AC_MSG_ERROR([Doxygen needs dot part of graphviz, please install dot first])
 	fi
 	AC_CHECK_PROGS([PDFLATEX], [pdflatex])
 	if test -z "$PDFLATEX"; then
