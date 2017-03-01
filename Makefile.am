@@ -2,6 +2,8 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src
 if HAVE_DOXYGEN
-SUBDIRS = $(SUBDIRS) docs
+SUBDIRS = src docs
+else
+SUBDIRS = src
 endif
 
