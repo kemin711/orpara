@@ -13,6 +13,14 @@ Interval& Interval::operator=(const Interval& other) {
    return *this;
 }
 
+bool Interval::less(const Interval &iv) const { 
+   if (b < iv.b) return true;
+   if (b > iv.b) return false;
+   // now b and iv.b are the same, so compare e
+   if (e < iv.e) return true;
+   return false;
+}
+
 Interval::Interval(const string &str) {
    string::size_type i;
    i=str.find(",");

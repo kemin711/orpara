@@ -86,9 +86,20 @@ class Interval {
        */
       int extend(const Interval &i);
       virtual string toDelimitedString(const string &dl="\t") const;
-      bool less(const Interval &iv) const { 
-            return b<iv.b? true : (e<iv.e? true : false); }
+      /**
+       * This interval should be arranged before iv
+       * in sorted order.
+       * @return true if this object is before iv.
+       */
+      bool less(const Interval &iv) const;
+      /**
+       * Less operator.
+       */
       bool operator<(const Interval &iv) const { return less(iv); }
+      /**
+       * Equal operator.
+       */
+      bool operator==(const Interval &iv) const { return b==iv.b && e==iv.e; }
       bool before(const Interval &iv) const { return e < iv.b; }
       bool after(const Interval &iv) const { return b > iv.e; }
       bool isNull() const { return b==-1 && e==-1; }
