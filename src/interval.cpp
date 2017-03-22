@@ -70,9 +70,10 @@ int Interval::extend(const Interval &i) {
       b=i.b; e=i.e;
       return i.length();
    }
+   int olp = overlap(i);
    b=min(b,i.b);
    e=max(e, i.e);
-   return overlap(i);
+   return olp;
 }
 
 

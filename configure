@@ -18248,7 +18248,7 @@ if test -z "$DOXYGEN"; then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Doxygen not found - continue without Doxygen support" >&5
 $as_echo "$as_me: WARNING: Doxygen not found - continue without Doxygen support" >&2;}
 else
-        { $as_echo "$as_me:${as_lineno-$LINENO}: Doxygen installed check dot and pdflatex ..." >&5
+   { $as_echo "$as_me:${as_lineno-$LINENO}: Doxygen installed check dot and pdflatex ..." >&5
 $as_echo "$as_me: Doxygen installed check dot and pdflatex ..." >&6;}
 	for ac_prog in dot
 do

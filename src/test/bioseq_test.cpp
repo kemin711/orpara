@@ -4,6 +4,11 @@
 
 using namespace orpara;
 
+/**
+ * By the convention proposed by the original author
+ * Fixture should be named after OriginalClassNameTest,
+ * such as FooTest
+ */
 class BioseqTest : public testing::Test {
    protected:
       BioseqTest() 

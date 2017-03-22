@@ -81,8 +81,8 @@ class Interval {
        * be extended to include both the original and the
        * input interval. If this object is Null then
        * this object will become i.
-       * @return the overlap value. Negative indicates that
-       *   there is no overlap.
+       * @return the overlap value before the two objects merged. 
+       *    Negative indicates that there is no overlap.
        */
       int extend(const Interval &i);
       virtual string toDelimitedString(const string &dl="\t") const;

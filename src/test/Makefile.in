@@ -104,7 +104,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am_testAll_OBJECTS = testAll-main_testall.$(OBJEXT) \
-	testAll-bioseq_test.$(OBJEXT)
+	testAll-bioseq_test.$(OBJEXT) testAll-interval_test.$(OBJEXT)
 testAll_OBJECTS = $(am_testAll_OBJECTS)
 am__DEPENDENCIES_1 =
 testAll_DEPENDENCIES = $(am__DEPENDENCIES_1) ../libkemin.la
@@ -516,7 +516,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-testAll_SOURCES = main_testall.cpp bioseq_test.cpp
+testAll_SOURCES = main_testall.cpp bioseq_test.cpp interval_test.cpp
 testAll_CXXFLAGS = -I.. -I../seqaln $(gtest_CXXFLAGS)
 testAll_LDFLAGS = $(gtest_LDFLAGS)
 testAll_LDADD = $(gtest_LIBS) ../libkemin.la
@@ -574,6 +574,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testAll-bioseq_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testAll-interval_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testAll-main_testall.Po@am__quote@
 
 .cpp.o:
@@ -624,6 +625,20 @@ testAll-bioseq_test.obj: bioseq_test.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='bioseq_test.cpp' object='testAll-bioseq_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(testAll_CXXFLAGS) $(CXXFLAGS) -c -o testAll-bioseq_test.obj `if test -f 'bioseq_test.cpp'; then $(CYGPATH_W) 'bioseq_test.cpp'; else $(CYGPATH_W) '$(srcdir)/bioseq_test.cpp'; fi`
+
+testAll-interval_test.o: interval_test.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(testAll_CXXFLAGS) $(CXXFLAGS) -MT testAll-interval_test.o -MD -MP -MF $(DEPDIR)/testAll-interval_test.Tpo -c -o testAll-interval_test.o `test -f 'interval_test.cpp' || echo '$(srcdir)/'`interval_test.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/testAll-interval_test.Tpo $(DEPDIR)/testAll-interval_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='interval_test.cpp' object='testAll-interval_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(testAll_CXXFLAGS) $(CXXFLAGS) -c -o testAll-interval_test.o `test -f 'interval_test.cpp' || echo '$(srcdir)/'`interval_test.cpp
+
+testAll-interval_test.obj: interval_test.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(testAll_CXXFLAGS) $(CXXFLAGS) -MT testAll-interval_test.obj -MD -MP -MF $(DEPDIR)/testAll-interval_test.Tpo -c -o testAll-interval_test.obj `if test -f 'interval_test.cpp'; then $(CYGPATH_W) 'interval_test.cpp'; else $(CYGPATH_W) '$(srcdir)/interval_test.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/testAll-interval_test.Tpo $(DEPDIR)/testAll-interval_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='interval_test.cpp' object='testAll-interval_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(testAll_CXXFLAGS) $(CXXFLAGS) -c -o testAll-interval_test.obj `if test -f 'interval_test.cpp'; then $(CYGPATH_W) 'interval_test.cpp'; else $(CYGPATH_W) '$(srcdir)/interval_test.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

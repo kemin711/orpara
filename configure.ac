@@ -79,7 +79,7 @@ AC_CHECK_PROGS([DOXYGEN], [doxygen])
 if test -z "$DOXYGEN"; then
 	AC_MSG_WARN([Doxygen not found - continue without Doxygen support])
 else
-        AC_MSG_NOTICE([Doxygen installed check dot and pdflatex ...])
+   AC_MSG_NOTICE([Doxygen installed check dot and pdflatex ...])
 	AC_CHECK_PROGS([DOT], [dot])
 	if test -z "$DOT"; then
 		AC_MSG_ERROR([Doxygen needs dot part of graphviz, please install dot first])
