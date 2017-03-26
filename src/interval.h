@@ -115,7 +115,8 @@ class Interval {
       int getEnd() const { return e; }
       int end() const { return e; }
 
-      /** more meaningful for composite classes derived from
+      /** 
+       * more meaningful for composite classes derived from
        * this base class. Such as IntervalChain and IntervalPile
        * @return the number of elements inside this element.
        */
