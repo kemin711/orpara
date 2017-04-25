@@ -68,7 +68,7 @@
 #define PACKAGE_NAME "orpara"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "orpara 0.1.0"
+#define PACKAGE_STRING "orpara 0.1.1"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "orpara"
@@ -77,7 +77,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.1.0"
+#define PACKAGE_VERSION "0.1.1"
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -87,7 +87,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.1.0"
+#define VERSION "0.1.1"
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */

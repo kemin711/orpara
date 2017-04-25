@@ -30,6 +30,12 @@ class stddev {
 
 	public:
 		stddev() : var(0), avg(0), j(0), SS(0) {}
+      /**
+       * copy constructor. 
+       * Since all types are primitive, no need for 
+       * move constructor.  The default compiler generated
+       * move constructor should work fine.
+       */
       stddev(const stddev &other) : var(other.var), avg(other.avg), j(other.j),
          SS(other.SS) { }
       stddev& operator=(const stddev& other) {
