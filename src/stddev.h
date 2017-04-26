@@ -125,6 +125,12 @@ class stddev {
        * The object has any values accumulated.
        */
       bool empty() const { return j==0; }
+      void clear() {
+         j=0;
+         SS=0;
+         avg=0;
+		   var=0; 
+      }
 };
 }
 #endif
