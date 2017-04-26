@@ -29,7 +29,14 @@ class stddev {
 		double SS;  // sample variance
 
 	public:
+      /**
+       * Default constructor.
+       */
 		stddev() : var(0), avg(0), j(0), SS(0) {}
+      /**
+       * Constructor from one element.
+       */
+		stddev(double val) : var(0), avg(val), j(1), SS(0) {}
       /**
        * copy constructor. 
        * Since all types are primitive, no need for 
