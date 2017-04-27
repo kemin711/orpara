@@ -307,9 +307,11 @@ class bioseq {
        * makes a copy of the underlying sequence
        * and return the sequence as string
        *
-       * @return sequence as string reference
+       * @return a copy of the underlying sequence as string 
+       *    that can be altered without affecting this object.
+       * @see getSequence()
        */
-      const string toString() const { return seq; }
+      string toString() const { return seq; }
 
       /** 
        * use the name as identifier, no title information
@@ -415,6 +417,7 @@ class bioseq {
        * Note: you cannot modify the underlying sequence.
        * The toString() function return a copy.
        * @return the sequence as string reference
+       *   You cannot modify the string.
        */
       const string& getSequence() const { return seq; }
 
