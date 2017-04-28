@@ -111,25 +111,13 @@ class stddev {
          ous << "mean\tstddev\tcount\n" << s.avg << '\t' << sqrt(s.var) << '\t' << s.j; 
          return ous; 
       }
-      /**
-       * This object can be reused as empty after this operation.
-       */
-		void clear() {
-         var=0; 
-         avg=0;
-         j=0;
-         SS=0;
-      }
 
       /**
        * The object has any values accumulated.
        */
       bool empty() const { return j==0; }
       void clear() {
-         j=0;
-         SS=0;
-         avg=0;
-		   var=0; 
+         j=0; SS=0; avg=0; var=0; 
       }
 };
 }
