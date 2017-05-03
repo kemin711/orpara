@@ -294,7 +294,7 @@ class Stddev {
          array<double, N> sd=getStd();
          ous << getCount();
          for (size_t i=0; i<N; ++i) {
-            delim << avg[i] << delim << sd[i];
+            ous << delim << avg[i] << delim << sd[i];
          }
          return ous;
       }
