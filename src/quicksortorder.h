@@ -165,6 +165,23 @@ class FindMedian {
          return medianVal;
       }
 
+      T getMedianAndClear() {
+         T tmp = getMedian();
+         clear();
+         return tmp;
+      }
+
+      void clear() { data.clear(); }
+      bool empty() const { return data.empty(); }
+      int getN() const { return data.size(); }
+      int getUniqueCount() const {
+         set<T> tmp;
+         for (T& d : data) {
+            tmp.insert(d);
+         }
+         return tmp.size();
+      }
+
    private:
       vector<T> data;
 };

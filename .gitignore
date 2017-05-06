@@ -6,6 +6,7 @@ Makefile.in
 *.log
 .libs
 *.Plo
+*.Po
 
 doc/
 fastqreduceid
