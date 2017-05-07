@@ -49,7 +49,7 @@ TEST(QuicksortorderTest, RandomPartitionVector) {
    vector<int> input={13,19,9,35,12,8,7,4,11,2,6,21};
    cout << "Input vector\n";
    copy(input.begin(), input.end(), ostream_iterator<int>(cout, " | "));
-   int q_idx = randomPartition<int>(input, 0, input.size()-1);
+   int q_idx = RandomPartition<int>()(input, 0, input.size()-1);
    cout << "Random pivot element: " << q_idx << " " << input[q_idx] << endl;
    cout << "smaller portion:\n";
    for (size_t i=0; i<q_idx; ++i) {

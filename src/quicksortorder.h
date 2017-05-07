@@ -1,18 +1,17 @@
 #ifndef QUICKSORTORDER_H
 #define QUICKSORTORDER_H
 
-
 #include <iostream>
 #include <vector>
 #include <iterator>
 #include <algorithm>
 #include <random>
+#include <set>
 
 using namespace std;
 
 namespace orpara{
 
-std::random_device RandomDevice;
 /**
  * This function work on a range [p, r] p<r.
  *
@@ -49,12 +48,30 @@ int partition(vector<T> &arr, int p, int r) {
 }
 
 template<class T>
+class RandomPartition {
+   public:
+      static mt19937 generator_QSO;
+
+      RandomPartition() { }
+      int operator()(vector<T>& arr, int p, int r) {
+         uniform_int_distribution<int> unif_dist(p, r);
+         int i = unif_dist(generator_QSO);
+         swap(arr[i], arr[p]);
+         return partition<T>(arr, p, r);
+      }
+};
+
+template<class T>
+mt19937 RandomPartition<T>::generator_QSO=mt19937(random_device()());
+
+/*
+template<class T>
 int randomPartition(vector<T> &arr, int p, int r) {
    //default_random_engine generator;
-   std::mt19937 gen(RandomDevice());
+   //std::mt19937 gen(RandomDevice());
    uniform_int_distribution<int> unif_dist(p, r);
    //int i = unif_dist(generator);
-   int i = unif_dist(gen);
+   int i = unif_dist(generator_QSO);
    //cout << "randome idx: " << i << " in [" << p << ", " << r << "]\n";
    swap(arr[i], arr[p]);
    //cout << "after swap\n";
@@ -62,6 +79,7 @@ int randomPartition(vector<T> &arr, int p, int r) {
    //cout << endl;
    return partition<T>(arr, p, r);
 }
+*/
 
 template<class T>
 void quicksort(vector<T> &arr, int p, int r) {
@@ -93,7 +111,8 @@ void randomQuicksort(vector<T> &arr, int p, int r) {
          else swap(arr[p], arr[r]);
       }
       else {
-         int q = randomPartition(arr, p, r);
+         //int q = randomPartition(arr, p, r);
+         int q = RandomPartition<T>()(arr, p, r);
          randomQuicksort<T>(arr, p, q-1);
          randomQuicksort<T>(arr, q+1, r);
       }
@@ -117,7 +136,7 @@ int randomSelect(vector<T> &arr, int p, int r, int i) {
    //cout << __func__ << " picking " << i << "th element from "
    //   << " [" << p << ", " << r << "]\n";
    if (p == r) return arr[p];
-   int q = randomPartition<T>(arr, p, r);
+   int q = RandomPartition<T>()(arr, p, r);
    int k = q-p+1;
    if (i <= k) 
       return randomSelect<T>(arr, p, q, i);
@@ -132,7 +151,7 @@ int randomSelect(vector<T> &arr, int p, int r, int i) {
 template<class T>
 int randomSelectIterative(vector<T> &arr, int p, int r, int i) {
    while (p != r) {
-      int q = randomPartition<T>(arr, p, r);
+      int q = RandomPartition<T>()(arr, p, r);
       int k = q-p+1;
       if (i <= k) r = q;
       else {
@@ -176,10 +195,20 @@ class FindMedian {
       int getN() const { return data.size(); }
       int getUniqueCount() const {
          set<T> tmp;
-         for (T& d : data) {
+         for (const T& d : data) {
             tmp.insert(d);
          }
          return tmp.size();
+      }
+
+      pair<T, int> getMedianUnique() {
+         return make_pair(getMedian(), getUniqueCount());
+      }
+
+      pair<T, int> getMedianUniqueAndClear() {
+         pair<T, int> tmp = make_pair(getMedian(), getUniqueCount());
+         clear();
+         return tmp;
       }
 
    private:
