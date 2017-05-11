@@ -32,11 +32,18 @@ int partition(vector<T> &arr, int p, int r) {
    //copy(arr.begin(), arr.end(), ostream_iterator<T>(cout, " | "));
    //cout << endl;
    while (true) {
+      //cout << " i,j " << i << "=" << arr[i] << ", " << j << "=" << arr[j] << endl;
       while (arr[j] > x && j > p) --j;
-      while (arr[i] < x && i < r) ++i;
+      while (arr[i] <= x && i < r) ++i;
+      //cout << "after walk i,j: " << i << ", " << j << endl;
       if (i < j) {
          swap(arr[i], arr[j]);
       }
+      /* add this cause it to fail
+      else if (i == j) {
+         return j;
+      }
+      */
       else {
          swap(arr[p], arr[j]);
          //cout << "After partition: [" << p << ", " << r << "]\n";
@@ -64,14 +71,16 @@ class RandomPartition {
 template<class T>
 mt19937 RandomPartition<T>::generator_QSO=mt19937(random_device()());
 
-/*
+
 template<class T>
 int randomPartition(vector<T> &arr, int p, int r) {
-   //default_random_engine generator;
-   //std::mt19937 gen(RandomDevice());
+   //default_random_engine generator(random_device()());
+   std::random_device rd;
+   std::mt19937 gen(rd());
    uniform_int_distribution<int> unif_dist(p, r);
+   int i = unif_dist(gen); // the first number is always p
    //int i = unif_dist(generator);
-   int i = unif_dist(generator_QSO);
+   //int i = unif_dist(generator_QSO);
    //cout << "randome idx: " << i << " in [" << p << ", " << r << "]\n";
    swap(arr[i], arr[p]);
    //cout << "after swap\n";
@@ -79,7 +88,6 @@ int randomPartition(vector<T> &arr, int p, int r) {
    //cout << endl;
    return partition<T>(arr, p, r);
 }
-*/
 
 template<class T>
 void quicksort(vector<T> &arr, int p, int r) {
@@ -176,9 +184,9 @@ class FindMedian {
          if (data.size() == 1) return data[0];
          if (data.size() == 2) return (data[0]+data[1])/2;
          int Im = data.size()/2;
-         T medianVal = randomSelectIterative(data, 0, data.size()-1, Im+1);
+         T medianVal = randomselIterative(data, 0, data.size()-1, Im+1);
          if (data.size() % 2 == 0) {
-            T medianAfter = randomSelectIterative(data, 0, data.size()-1, Im);
+            T medianAfter = randomselIterative(data, 0, data.size()-1, Im);
             return (medianAfter + medianVal)/2;
          }
          return medianVal;
@@ -189,6 +197,8 @@ class FindMedian {
          clear();
          return tmp;
       }
+
+      void setData(const vector<T>& newdata) { data = newdata; }
 
       void clear() { data.clear(); }
       bool empty() const { return data.empty(); }
@@ -211,9 +221,64 @@ class FindMedian {
          return tmp;
       }
 
+      void showData(ostream &ous) const {
+         if (data.empty()) {
+            ous << "data empty\n";
+         }
+         else {
+            for (const T& d : data) {
+               ous << d << " | ";
+            }
+            ous << endl;
+         }
+      }
+      void show(ostream& ous) const {
+         ous << "FindMedian: ";
+         showData(ous);
+      }
+
    private:
       vector<T> data;
+
+      int randompart(vector<T> &arr, int p, int r) {
+         uniform_int_distribution<int> unif_dist(p, r);
+         int i = unif_dist(rand_engine);
+         //cout << __func__ << ": randome idx: " << i << " in [" << p << ", " << r << "]\n";
+         swap(arr[i], arr[p]);
+         return partition<T>(arr, p, r);
+      }
+
+      int randomselIterative(vector<T> &arr, int p, int r, int i) {
+         //showData(cout);
+         while (p != r) {
+            //cout << __func__ << ": p=" << p << ", r=" << r << " i=" << i << endl;
+            int q = randompart(arr, p, r);
+            //cout << "q returned by randompart() " << q << endl;
+            int k = q-p+1;
+            //cout << "k=" << k << endl;
+            if (i <= k) {
+               //cout << "i<=k" << endl;
+               if (arr[p] == arr[r]) {
+                  //cerr << "special case, median should be " << arr[r] << endl;
+                  return arr[i-1];
+                  //exit(1);
+               }
+               r = q;
+            }
+            else {
+               //cout << "i>k" << endl;
+               p = q+1;
+               i -= k;
+            }
+         }
+         //cout << "median value: " << arr[p] << endl;
+         return arr[p];
+      }
+      static mt19937 rand_engine;
 };
+
+template<class T>
+mt19937 FindMedian<T>::rand_engine = mt19937(random_device()());
 
 } // end of orpara namespace
 

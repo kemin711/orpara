@@ -66,6 +66,29 @@ TEST(QuicksortorderTest, RandomPartitionVector) {
          );
 }
 
+// test the function version
+TEST(QuicksortorderTest, RandomPartitionFunction) {
+   using namespace std::placeholders;
+   vector<int> input={13,19,9,35,12,8,7,4,11,2,6,21};
+   cout << "Input vector\n";
+   copy(input.begin(), input.end(), ostream_iterator<int>(cout, " | "));
+   int q_idx = randomPartition<int>(input, 0, input.size()-1);
+   cout << "Random pivot element: " << q_idx << " " << input[q_idx] << endl;
+   cout << "smaller portion:\n";
+   for (size_t i=0; i<q_idx; ++i) {
+      cout << input[i] << " ";
+   }
+   cout << "\nlarger portion:\n";
+   for (size_t i=q_idx+1; i<input.size(); ++i) {
+      cout << input[i] << " ";
+   }
+   cout << endl;
+   int pivotVal = input[q_idx];
+   ASSERT_TRUE(
+         any_of(input.begin(), input.end(), bind(equal_to<int>(), _1, pivotVal) )
+         );
+}
+
 TEST(QuicksortorderTest, QuicksortVector) {
    vector<int> input={13,19,9,5,12,38,7,4,11,2,6,21};
    cout << "vector before sort\n";
@@ -141,5 +164,51 @@ TEST(QuicksortorderTest, FindMedianVector) {
    medianVal = fm.getMedian();
    cout << "Median value after adding 35: " << medianVal << " should be 12" << endl;
    ASSERT_EQ(medianVal, 12);
+}
+
+TEST(QuicksortorderTest, FindMedianNewdata) {
+   vector<int> input={13,19,9,5,12,38,7,4,31,2,6,21};
+   cout << "vector before sort\n";
+   copy(input.begin(), input.end(), ostream_iterator<int>(cout, " | "));
+   cout << endl;
+   vector<int> sorted=input;
+   randomQuicksort<int>(sorted);
+   cout << "sorted vector:\n";
+   copy(sorted.begin(), sorted.end(), ostream_iterator<int>(cout, " | "));
+   cout << endl;
+   FindMedian<int> fm(input);
+   // median input : {13,19,9,5,12,38,7,4,31,2,6,21};
+   // after sort: {2,4,5,6,7,9,12,13,19,21,31,38};
+   // 2 | 4 | 5 | 6 | 7 | 9 | 12 | 13 | 19 | 21 | 31 | 38 |
+   int medianVal = fm.getMedian();
+   cout << "Median value: " << medianVal << " should be 10 " << endl;
+   ASSERT_EQ(medianVal, 10);
+   vector<int> newinput={23, 5, 25, 0, 42, 49, 8, 10, 11, 7, 58, 27, 0, 40, 0};
+   cout << "new input\n";
+   copy(newinput.begin(), newinput.end(), ostream_iterator<int>(cout, " | "));
+   cout << endl;
+   fm.setData(newinput);
+   // median       0  1  2     4     6   M   8       10      12      14
+   // after sort: {0, 0, 0, 5, 7, 8, 10, 11, 23, 25, 27, 40, 42, 49, 58};
+   medianVal = fm.getMedian();
+   cout << "Median value of new data: " << medianVal << " should be 11" << endl;
+   ASSERT_EQ(medianVal, 11);
+   newinput = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 40, 23, 58, 7, 11, 10, 8, 49, 42, 25, 27};
+   cout << "new input with a lots of zeros\n";
+   copy(newinput.begin(), newinput.end(), ostream_iterator<int>(cout, " | "));
+   cout << endl;
+   fm.setData(newinput);
+   medianVal = fm.getMedian();
+   cout << "Median value of many zeros: " << medianVal << " should be 2" << endl;
+   ASSERT_EQ(medianVal, 2);
+   // has a lot of more zeros than the median
+   newinput={23, 5, 25, 0, 42, 49, 8, 10, 11, 7, 58, 27, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+   copy(newinput.begin(), newinput.end(), ostream_iterator<int>(cout, " | "));
+   cout << endl;
+   fm.setData(newinput);
+   medianVal = fm.getMedian();
+   cout << "Median value of many zeros: " << medianVal << " should be 0" << endl;
+   ASSERT_EQ(medianVal, 0);
+
 }
 
