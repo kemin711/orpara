@@ -8,6 +8,8 @@
 #include <random>
 #include <set>
 
+//#define DEBUGLOG
+
 using namespace std;
 
 namespace orpara{
@@ -28,14 +30,23 @@ int partition(vector<T> &arr, int p, int r) {
    int x = arr[p];
    int i=p+1;
    int j=r;
-   //cout << "Before partition: [" << p << ", " << r << "]\n";
-   //copy(arr.begin(), arr.end(), ostream_iterator<T>(cout, " | "));
-   //cout << endl;
+#ifdef DEBUGLOG
+   cout << __func__ << ":" << __LINE__ << ": Before partition: [" << p << ", " << r << "]\n";
+   copy(arr.begin(), arr.end(), ostream_iterator<T>(cout, " | "));
+   cout << endl;
+   copy(arr.begin()+p, arr.begin()+r+1, ostream_iterator<T>(cout, " | "));
+   cout << endl;
+#endif
    while (true) {
-      //cout << " i,j " << i << "=" << arr[i] << ", " << j << "=" << arr[j] << endl;
+#ifdef DEBUGLOG
+      cout << " i=" << i << "(" << arr[i] << "), "
+         << " j=" << j << "(" << arr[j] << ")\n";
+#endif
       while (arr[j] > x && j > p) --j;
       while (arr[i] <= x && i < r) ++i;
-      //cout << "after walk i,j: " << i << ", " << j << endl;
+#ifdef DEBUGLOG
+      cout << "after walk i,j: " << i << ", " << j << endl;
+#endif
       if (i < j) {
          swap(arr[i], arr[j]);
       }
@@ -44,11 +55,18 @@ int partition(vector<T> &arr, int p, int r) {
          return j;
       }
       */
-      else {
+      else { // p could be the same as j
          swap(arr[p], arr[j]);
-         //cout << "After partition: [" << p << ", " << r << "]\n";
-         //copy(arr.begin(), arr.end(), ostream_iterator<T>(cout, " | "));
-         //cout << endl;
+#ifdef DEBUGLOG
+         cout << __func__ << ":" << __LINE__ << ": After partition: [" 
+            << p << ", " << r << "]\n";
+         copy(arr.begin(), arr.end(), ostream_iterator<T>(cout, " | "));
+         cout << endl;
+         cout << "sub range\n";
+         copy(arr.begin()+p, arr.begin()+r+1, ostream_iterator<T>(cout, " | "));
+         cout << endl;
+         cout << "pivot idx: " << j << endl;
+#endif
          return j;
       }
    }
@@ -185,8 +203,14 @@ class FindMedian {
          if (data.size() == 2) return (data[0]+data[1])/2;
          int Im = data.size()/2;
          T medianVal = randomselIterative(data, 0, data.size()-1, Im+1);
+#ifdef DEBUGLOG
+         cout << Im+1 << "th value: " << medianVal << endl;
+#endif
          if (data.size() % 2 == 0) {
             T medianAfter = randomselIterative(data, 0, data.size()-1, Im);
+#ifdef DEBUGLOG
+            cout << Im << "th value: " << medianAfter << endl;
+#endif
             return (medianAfter + medianVal)/2;
          }
          return medianVal;
@@ -243,35 +267,90 @@ class FindMedian {
       int randompart(vector<T> &arr, int p, int r) {
          uniform_int_distribution<int> unif_dist(p, r);
          int i = unif_dist(rand_engine);
-         //cout << __func__ << ": randome idx: " << i << " in [" << p << ", " << r << "]\n";
+#ifdef DEBUGLOG
+         cout << __func__ << ": random idx: " << i << " in [" << p << ", " << r << "]\n";
+#endif
          swap(arr[i], arr[p]);
          return partition<T>(arr, p, r);
       }
 
+      /**
+       * @param i is the ith starting from 1st, 2nd, ...
+       * @param arr input array
+       * @param p start of the array
+       * @param r end of the array [p, r] close range.
+       */
       int randomselIterative(vector<T> &arr, int p, int r, int i) {
-         //showData(cout);
+#ifdef DEBUGLOG
+         cout << __func__ << ": input selecting " << i << "th\n";
+         showData(cout);
+#endif
          while (p != r) {
-            //cout << __func__ << ": p=" << p << ", r=" << r << " i=" << i << endl;
-            int q = randompart(arr, p, r);
-            //cout << "q returned by randompart() " << q << endl;
-            int k = q-p+1;
-            //cout << "k=" << k << endl;
-            if (i <= k) {
-               //cout << "i<=k" << endl;
-               if (arr[p] == arr[r]) {
-                  //cerr << "special case, median should be " << arr[r] << endl;
-                  return arr[i-1];
-                  //exit(1);
+#ifdef DEBUGLOG
+            cout << endl << __func__ << "---: p=" << p << ", r=" << r << " i=" << i << endl;
+#endif
+            if (r-p == 1) {
+               if (arr[r] < arr[p]) {
+                  swap(arr[p], arr[r]);
                }
-               r = q;
+               if (i == 1) return arr[p];
+               if (i == 2) return arr[r];
+               cerr << "ERROR: i " << i << " can only be 1 or 2\n";
+               exit(1);
+            }
+            int q = randompart(arr, p, r);
+            if (q == p) {
+               if (i == 1) return arr[p];
+               ++p;
+               --i;
+               continue;
+            }
+            else if (q == r) {
+#ifdef DEBUGLOG
+               cout << __func__ << ":" << __LINE__ << ": " << q << " is the same as r\n";
+#endif
+               if (i == r-p+1)  {
+#ifdef DEBUGLOG
+                  cout << "last element: " << arr[r] << " is " << i << "th\n";
+#endif
+                  return arr[r];
+               }
+#ifdef DEBUGLOG
+               cout << "reduced range try again\n";
+#endif
+               --r;
+               continue;
+            }
+            int k = q-p+1;
+#ifdef DEBUGLOG
+            cout << __func__ << ": q returned by randompart() " << q 
+               << endl << "k=" << k << endl;
+#endif
+            if ( k == i) {
+#ifdef DEBUGLOG
+               cout << "pivot element (" << arr[q] 
+                  << ") is right at the the " << i << "th\n";
+#endif
+               return arr[q];
+            }
+            if (i < k) {
+#ifdef DEBUGLOG
+               cout << "i<k" << endl;
+#endif
+               r = q-1;
             }
             else {
-               //cout << "i>k" << endl;
+#ifdef DEBUGLOG
+               cout << "i>k" << endl;
+#endif
                p = q+1;
                i -= k;
             }
          }
-         //cout << "median value: " << arr[p] << endl;
+#ifdef DEBUGLOG
+         cout << __func__ << ":" << __LINE__
+            << " selected value: " << arr[p] << endl;
+#endif
          return arr[p];
       }
       static mt19937 rand_engine;
