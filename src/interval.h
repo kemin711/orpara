@@ -132,7 +132,8 @@ class Interval {
       int b, e;
 };
 
-/** Represents all intervals that pile up on top of each other.
+/** 
+ * Represents all intervals that pile up on top of each other.
  * It is used to give an average information of a cluster of 
  * overlapping intervals.
  *
