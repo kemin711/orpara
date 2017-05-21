@@ -183,8 +183,9 @@ class Stddev {
          }
       }
 
+      Stddev(Stddev &&other) = default;
       /* wrong syntax
-      Stddev(Stddev &&other) 
+      Stddev(Stddev &&other) = default;
          : var(std::move(other.var)), 
             avg(std::move(other.avg)), 
             j(j), SS(std::move(other.SS))
@@ -205,6 +206,7 @@ class Stddev {
          return *this;
       }
 
+      Stddev& operator=(Stddev&& other) = default;
       /*
       Stddev& operator=(Stddev&& other) {
          if (this != &other) {
