@@ -135,6 +135,7 @@ class stddev {
 
 /**
  * Useful for working with multiple numbers.
+ * Cannot have move constructor or operator
  */
 template<size_t N>
 class Stddev {
@@ -181,6 +182,17 @@ class Stddev {
             SS[i]=other.var[i];
          }
       }
+
+      /* wrong syntax
+      Stddev(Stddev &&other) 
+         : var(std::move(other.var)), 
+            avg(std::move(other.avg)), 
+            j(j), SS(std::move(other.SS))
+      {
+         other.j=0;
+      }
+      */
+
       Stddev& operator=(const Stddev& other) {
          if (this != &other) {
             for (size_t i=0; i<N; ++i) {
@@ -192,6 +204,19 @@ class Stddev {
          }
          return *this;
       }
+
+      /*
+      Stddev& operator=(Stddev&& other) {
+         if (this != &other) {
+            var = std::move(other.var);
+            avg = std::move(other.avg);
+            j = other.j;
+            other.j = 0;
+            SS = std::move(other.SS);
+         }
+         return *this;
+      }
+      */
 
       /**
        * To be used to accumulate input values.

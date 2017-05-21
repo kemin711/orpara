@@ -58,8 +58,8 @@ class Interval {
 
       /**
        * @return a number representing the length of the 
-       *   return where two interval overlap.
-       *   if no overlap, then a negative number will be 
+       *   overlap between the two intervals.
+       *   If there is no overlap, then a negative number will be 
        *   returned.
        */
       int overlap(const Interval &i) const;
