@@ -627,7 +627,7 @@ vector<string> split(const string &str, const char sep) {
 // will preserve the quote in the value
 vector<string> splitQuoted(const string &str, const char quote, const char sep) {
 	vector<string> tmp;
-	string::size_type i=0,ii, iq, iqq;
+	string::size_type i=0,ii, iq;
    bool quoted = false;
    if (str[0] == quote) {
       quoted=true;
@@ -639,7 +639,7 @@ vector<string> splitQuoted(const string &str, const char quote, const char sep) 
             cerr << "filed missing right quote!\n";
             throw runtime_error(string(__FILE__) + ":" + to_string(__LINE__) + ":ERROR: field missing right quote: " + str);
          }
-         tmp.push_back(str.substr(i, iq-i));
+         tmp.push_back(str.substr(i, iq-i+1));
          quoted = false;
          i = iq + 1;
          if (i < str.size()) ++i;
