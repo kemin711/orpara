@@ -623,6 +623,46 @@ vector<string> split(const string &str, const char sep) {
 	return tmp;
 }
 
+// optional quote
+// will preserve the quote in the value
+vector<string> splitQuoted(const string &str, const char quote, const char sep) {
+	vector<string> tmp;
+	string::size_type i=0,ii, iq, iqq;
+   bool quoted = false;
+   if (str[0] == quote) {
+      quoted=true;
+   }
+   do {
+      if (quoted) { // use quote
+         iq = str.find(quote, i+1);
+         if (iq == string::npos) {
+            cerr << "filed missing right quote!\n";
+            throw runtime_error(string(__FILE__) + ":" + to_string(__LINE__) + ":ERROR: field missing right quote: " + str);
+         }
+         tmp.push_back(str.substr(i, iq-i));
+         quoted = false;
+         i = iq + 1;
+         if (i < str.size()) ++i;
+      }
+      else { // not quoted string field<SEP>abcdef<SEP>
+         ii = str.find(sep, i);
+         if (ii == string::npos) {
+            tmp.push_back(str.substr(i));
+            i=ii;
+         }
+         else {
+            tmp.push_back(str.substr(i,ii-i));
+            i = ii + 1;
+         }
+      }
+      if (i != str.size() && i != string::npos && str[i] == quote) {
+         quoted = true;
+      }
+	}
+   while (i != str.size() && i != string::npos);
+	return tmp;
+}
+
 /* sep is a separator such as ',' or "..".  the location string can be used
  *  * as input
  *   * */

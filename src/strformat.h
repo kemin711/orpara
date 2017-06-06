@@ -221,6 +221,11 @@ void append(char *&head, const char *tail, int &len, int &maxlen);
  */
 vector<string> split(const string &str, const char sep='\t');
 
+/**
+ * Some fields may be double or single quoted
+ */
+vector<string> splitQuoted(const string &str, const char quote, const char sep='\t');
+
 /** separate str into an array of strings using sep as delimiter sep is a
  * string Same behavior as the char version seprator.  Anything in betwee sep
  * will be an array element.  For example, if sep is ??  then ??tabc??  will
