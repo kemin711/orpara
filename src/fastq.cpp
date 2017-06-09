@@ -378,4 +378,35 @@ double Fastq::getAverageQuality() const {
    return stat.getMean() - conv;
 }
 
+std::array<float, 5> Fastq::baseFraction() const {
+   array<int, 5> res = {0, 0, 0, 0, 0};
+   for (auto b : seq) {
+      switch(b) {
+         case 'A' :
+         case 'a' : ++res[0];
+                    break;
+         case 'C' :
+         case 'c' : ++res[1];
+                    break;
+         case 'G' :
+         case 'g' : ++res[2];
+                    break;
+         case 'T' :
+         case 't' : ++res[3];
+                    break;
+         case 'N' :
+         case 'n' : ++res[4];
+                    break;
+         default: cerr << "Wrong base: " << b << endl;
+                  throw runtime_error("Base not ACGTN");
+      }
+   }
+   array<float, 5> frac;
+   int total = accumulate(res.begin(), res.end(), 0);
+   for (size_t i=0; i<5; ++i) {
+      frac[i] = res[i]/float(total);
+   }
+   return frac;
+}
+
 }

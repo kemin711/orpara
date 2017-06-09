@@ -6,6 +6,7 @@
 #include<string>
 #include<iostream>
 #include <vector>
+#include <array>
 
 using namespace std;
 
@@ -70,6 +71,11 @@ class Fastq {
       static const int conv=33;
 
    public:
+      /**
+       * Default constructor.
+       * This object can be used for reading from 
+       * a stream.
+       */
       Fastq() : name(), desc(), seq(), qual(0), qual_len(0) {  }
       /**
        * Constructor with integer quality array
@@ -107,10 +113,16 @@ class Fastq {
        * Copy constructor
        */
       Fastq(const Fastq &other);
+      /**
+       * Move constructor
+       */
       Fastq(Fastq &&other);
       ~Fastq();
       Fastq& operator=(const Fastq &other);
       Fastq& operator=(Fastq &&other);
+      /**
+       * Use this for reading from a file.
+       */
       bool read(istream &in);
       /**
        * Write out the object in fastq format.
@@ -142,6 +154,10 @@ class Fastq {
        * @return the underlying sequence as a reference.
        */
       const string& getSequence() const { return seq; }
+      /**
+       * @return a reference to the title (description of the 
+       *   fastq sequence)
+       */
       const string& getDescription() const { return desc; }
       const string& getTitle() const { return desc; }
       void setTitle(const string &title) { desc=title; }
@@ -191,6 +207,11 @@ class Fastq {
       Fastq sub(unsigned int b, unsigned int e) const;
 
       unsigned int length() const { return seq.length(); }
+      /**
+       * Fastq has not underlying sequence
+       * all other fileds should also be empty but
+       * non-empty values are allowed.
+       */
       bool empty() const { return seq.empty(); }
       void clear() { seq.clear(); }
       /**
@@ -206,6 +227,10 @@ class Fastq {
        * @return true if sequence got trimmed.
        */
       bool trimLowq(const unsigned int window=5, const unsigned int cutoff=20);
+      /**
+       * @return the fraction of N bases in the sequence.
+       */
+      std::array<float, 5> baseFraction() const;
       /**
        * reverse complement the under object.
        * After this operation, this object will be in the opposite direction.
