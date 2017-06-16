@@ -37,7 +37,7 @@ int wc(const string &str) {
 bool isnumber(const string &str) {
 	int i = 0;
 	while (isdigit(str[i])) i++;
-	return i == str.size()-1;
+	return i == str.size();
 }
 bool isnumber(const string &str, const string dc) {
 	int i = 0;
