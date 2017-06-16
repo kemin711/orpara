@@ -103,6 +103,7 @@ void strToupper(string &str) {
 	for (int i=0; i<str.length(); i++)
 		str[i] = toupper(str[i]);
 }
+
 string lc(const string& str) {
 	string tmp=str;
 	string::iterator i = tmp.begin();
@@ -112,6 +113,7 @@ string lc(const string& str) {
 	}
 	return tmp;
 }
+
 int cmp_nocase(const string &s1, const string &s2) {
 	string::const_iterator i1 = s1.begin();
 	string::const_iterator i2 = s2.begin();

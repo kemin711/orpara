@@ -52,6 +52,10 @@ void strTolower(const string &str1, string &str2);
  */
 void strToupper(string &str);
 string str2upper(const string &str);
+/**
+ * @return the lower case version of the original string.
+ * @param str input string.
+ */
 string lc(const string &str);
 
 /** compare to string and ignoring case **/
