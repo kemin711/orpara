@@ -1,5 +1,5 @@
-#ifndef DYNALN_H
-#define DYNALN_H
+#ifndef DYNALNT_H
+#define DYNALNT_H
 
 // (c) 2002 Kemin Zhou at orpara.com
 

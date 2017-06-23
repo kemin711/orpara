@@ -330,7 +330,6 @@ class MatrixScoreMethod : public ScoreMethod {
          return mat[row][col]; 
       }
 
-
       /**
        * give two array of int code for sequence, it return
        * the score for this segment of sequence alignment
@@ -375,7 +374,8 @@ class MatrixScoreMethod : public ScoreMethod {
       void setMatrix(const int source[][32], const int size=32);
 
       /**
-       * The path to the matrix directory
+       * The path to the matrix directory, this could be
+       * an environment variable or given by user.
        */
       string path;
       /**
@@ -467,6 +467,9 @@ class ProteinScoreMethod : public MatrixScoreMethod {
       ProteinScoreMethod& operator=(const ProteinScoreMethod &psm) {
          MatrixScoreMethod::operator=(psm); return *this; }
 
+      /**
+       * Overwrite base class method.
+       */
       bool read(const string &p, const string &n);
 
       /**

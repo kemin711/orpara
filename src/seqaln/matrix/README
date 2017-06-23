@@ -3,3 +3,9 @@ identity is for protein
 
 I have memoved all lowercase file names. This causes problems in windows.
 The source code needs to be updated.
+
+NUC.4.4.N is derived from NUC.4.4 by
+any nucleotide to N mutation is fine.
+This can be used for aligning sequences
+where N to other nucleitiedes alignments are 
+expected.
