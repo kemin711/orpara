@@ -35,7 +35,8 @@ SimpleScoreMethod& SimpleScoreMethod::operator=(const SimpleScoreMethod &mt) {
 ///// static method section /////////////
 //
 
-string MatrixScoreMethod::default_path="/home/zhouke/src/proj/seqaln/matrix";
+//string MatrixScoreMethod::default_path="/home/zhouke/src/proj/seqaln/matrix";
+string MatrixScoreMethod::default_path="/usr/local/share/orpara/matrix";
 const char* MatrixScoreMethod::proteinMatrices[]  = {
    // put all new matrices here
    "dayhoff", "gonnet", "identity", "match", 
@@ -56,7 +57,7 @@ const char* MatrixScoreMethod::proteinMatrices[]  = {
 };
 
 const char* MatrixScoreMethod::nucleicMatrices[] = {
-   "DNA", "DNAelem", "NUC.4.4" 
+   "DNA", "DNAelem", "NUC.4.4", "NUC.4.4.N"
 };
 
 bool MatrixScoreMethod::isProteinMatrix(const string &matrixName) {
@@ -86,17 +87,19 @@ void MatrixScoreMethod::setDefaultPath() {
       default_path = matrixDir;
    }
    else {
-      cerr << "SCORING_MATRIX_PATH environment variable is not set, and I will look for the scoring matrix in the the source directory\n";
-      string pathToMatrix(getenv("HOME"));
-      pathToMatrix += "/src/proj/seqaln/matrix";
-      default_path=pathToMatrix;
+      //cerr << "SCORING_MATRIX_PATH environment variable is not set, and I will look for the scoring matrix in the the source directory\n";
+      //string pathToMatrix(getenv("HOME"));
+      //pathToMatrix += "/src/proj/seqaln/matrix";
+      //default_path=pathToMatrix;
+      default_path="/usr/local/share/orpara/matrix";
    }
 }
 
+// no validation, just set it, error will
+// happen later
 void MatrixScoreMethod::setDefaultPath(const string &path) {
    default_path = path;
 }
-
 
 /////////////// Constructors ///////////////
 //
@@ -237,8 +240,6 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
    //setDefaultGapParameter();
 }
 
-
-
 MatrixScoreMethod::~MatrixScoreMethod() {
    //if (mtype == IDENTITY) return;
    if (words != 0) {
@@ -359,6 +360,7 @@ void MatrixScoreMethod::expandWord(char** &in, int &insize, int &ws) const {
    in=ou;
    insize=ousize;
 }
+
 // non-member function
 void expandCombination(char** &buff, int &buffsize, int &ws, const char* alphabet, int alphabetsize) {
    int ousize=buffsize*alphabetsize;

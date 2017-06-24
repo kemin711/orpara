@@ -161,18 +161,13 @@ class MatrixScoreMethod : public ScoreMethod {
        * Set the defalt path to path to the scoring matrix files.
        * It will look for environmental variables SCORING_MATRIX_PATH first.
        * If found will use its value; otherwise will set default_path
-       * to 
-       * $HOME/src/proj/seqaln/matrix
-       * Without checking for errors.
-       * Then use the source directory if not found the above.
-       *
-       * Note: the default_path static variable is also initialized to
-       * "/home/zhouke/src/proj/seqaln/matrix" which may be wrong.
-       * 
+       * to /usr/local/share/orpara/matrix without 
+       * validation.
        */
       static void setDefaultPath();
       /**
        * Set the default_path to path.
+       * Use setPath for instance variable.
        */
       static void setDefaultPath(const string &path);
       static bool isProteinMatrix(const string &matrixName);
@@ -188,6 +183,9 @@ class MatrixScoreMethod : public ScoreMethod {
          : ScoreMethod(), path(default_path), name(), mat(), 
             mins(numeric_limits<int>::max()), maxs(-1),
             words(0), wordSize(0) { }
+      /**
+       * Fixed gap open and gap extension.
+       */
       MatrixScoreMethod(int go, int ge) 
          : ScoreMethod(go, ge), path(default_path), name(), mat(), 
             mins(numeric_limits<int>::max()), maxs(-1),
@@ -199,9 +197,20 @@ class MatrixScoreMethod : public ScoreMethod {
        * Cannot initialize the matrix or read the actual matrix.
        * Require the type of matrix.
        */
-      //MatrixScoreMethod(const string& matrixName, bool nucMatrixScoreMethod=false);
       MatrixScoreMethod(const string& matrixName)
          : ScoreMethod(), path(default_path), name(matrixName), 
+            mins(numeric_limits<int>::max()), maxs(-1),
+            words(0), wordSize(0) 
+      { }
+
+      /**
+       * @param dir path to matrix directory
+       * @param matrixName name of the matrix.
+       * Will not initialize the matrix use
+       * derived class to do it.
+       */
+      MatrixScoreMethod(const string& dir, const string& matrixName)
+         : ScoreMethod(), path(dir), name(matrixName), 
             mins(numeric_limits<int>::max()), maxs(-1),
             words(0), wordSize(0) 
       { }
@@ -409,6 +418,10 @@ class MatrixScoreMethod : public ScoreMethod {
        */
       mutable int mins, maxs;
 
+      /**
+       * Default installed matrix location.
+       * should be /usr/local/share/orpara/matrix
+       */
       static string default_path;
 
       /**
@@ -419,7 +432,6 @@ class MatrixScoreMethod : public ScoreMethod {
        * names of nucleic acid matrices in lower case
        */
       static const char* nucleicMatrices[];
-
 
       mutable char **words;
       mutable int wordsArraySize;
@@ -539,14 +551,32 @@ class NucleicScoreMethod : public MatrixScoreMethod {
          : MatrixScoreMethod(go, ge) {
             copyFrom(default_name, default_symb, default_numsymbol, default_mat); }
 
+      /**
+       * If a full path is given then it will make a new
+       * matrix from it.
+       */
       NucleicScoreMethod(const string& matrixName);
+      /**
+       * path to matrix and matrix name.
+       * @param dir path to matrix directory. It is usualy
+       *   installed in /usr/local/share/orpara/matrix.
+       */
+      NucleicScoreMethod(const string& dir, const string& matrixName);
 
       NucleicScoreMethod(const string& matrixName, int go, int ge);
 
       NucleicScoreMethod(const NucleicScoreMethod &nsm) : MatrixScoreMethod(nsm) { }
+      /**
+       * Assignmenet operator.
+       */
       NucleicScoreMethod& operator=(const NucleicScoreMethod &nsm) {
          MatrixScoreMethod::operator=(nsm); return *this; }
 
+      /**
+       * Read a nucleic acid matrix given path  p and name n
+       * @param p a path to nucleic matrix directory
+       * @param n matrix name.
+       */
       bool read(const string &p, const string &n);
 
       /**
