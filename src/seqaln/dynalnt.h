@@ -2,6 +2,7 @@
 #define DYNALNT_H
 
 // (c) 2002 Kemin Zhou at orpara.com
+//File: dynalnt.h
 
 #include "bioseq.h"
 #include "scorematrix.h"
@@ -19,11 +20,6 @@
 namespace orpara {
 //uncomment if you want to debug the library
 //#define DEBUG
-
-/**
- * I am converting this class to a template version based on the score matrix
- * used.
- */
 
 /**
  * Exception class, not template.

@@ -21,6 +21,10 @@ AC_LANG_PUSH([C++])
 AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
 AC_LANG_POP([C++])
 
+if test "$prefix" = "NONE"; then
+	prefix=$ac_default_prefix
+fi
+## check for pthread library
 save_LDFLAGS=$LDFLAGS
 save_LIBS=$LIBS
 LDFLAGS="-L/usr/lib/x86_64-linux-gnu $LDFLAGS"
@@ -33,16 +37,14 @@ LDFLAGS=$save_LDFLAGS
 LIBS=$save_LIBS
 # could not figure out why PTHREAD_xxx variables are set to empty string!
 
+# user specify gtest include and lib dirs 
+AC_LANG_PUSH([C++])
 AC_ARG_VAR([GTESTINC], [gtest PATH for gtest include dir])
 AC_ARG_VAR([GTESTLIB], [gtest PATH for gtest lib dir])
 if (test -n "$GTESTINC" && test -z "$GTESTLIB") || \
 	(test -z "$GTESTINC" && test -n "$GTESTLIB"); then 
    AC_MSG_ERROR([please specify both lib and include dir for gtest])
 fi
-if test "$prefix" = "NONE"; then
-	prefix=$ac_default_prefix
-fi
-AC_LANG_PUSH([C++])
 save_LIBS=$LIBS
 save_LDFLAGS=$LDFLAGS
 save_CXXFLAGS=$CXXFLAGS

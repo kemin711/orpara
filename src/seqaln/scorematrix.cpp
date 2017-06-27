@@ -56,6 +56,8 @@ const char* MatrixScoreMethod::proteinMatrices[]  = {
    "pam470", "pam480", "pam490", "pam500"
 };
 
+// when you add elements to this array, the number 
+// in isNucleicMatrix also needs to be incremented!
 const char* MatrixScoreMethod::nucleicMatrices[] = {
    "DNA", "DNAelem", "NUC.4.4", "NUC.4.4.N"
 };
@@ -74,8 +76,9 @@ bool MatrixScoreMethod::isProteinMatrix(const string &matrixName) {
    return false;
 }
 
+// may need to add more logic
 bool MatrixScoreMethod::isNucleicMatrix(const string &matrixName) {
-   for (int i = 0; i<3; ++i) {
+   for (int i = 0; i<4; ++i) {
       if (nucleicMatrices[i] == matrixName) return true;
    }
    return false;
@@ -664,26 +667,40 @@ bool NucleicScoreMethod::read(const string &p, const string &n) {
 }
 
 NucleicScoreMethod::NucleicScoreMethod(const string& matrixName)
-   : MatrixScoreMethod() 
+   : MatrixScoreMethod(matrixName) 
 { 
-   if (!isNucleicMatrix(matrixName))
-      cerr << "WARN: " << matrixName << " is not known Nucleic matrix!\n";
-   setName(matrixName); 
+   if (!isNucleicMatrix(matrixName)) {
+      //cerr << "WARN: " << matrixName << " is not known Nucleic matrix!\n";
+      throw runtime_error(string(__FILE__) + ":" + to_string(__LINE__) + ":ERROR: " + matrixName + " unknown nucleic");
+   }
+}
+
+NucleicScoreMethod::NucleicScoreMethod(const string& dir, const string& matrixName)
+   : MatrixScoreMethod(dir, matrixName) 
+{ 
+   if (!isNucleicMatrix(matrixName)) {
+      //cerr << "WARN: " << matrixName << " is not known Nucleic matrix!\n";
+      throw runtime_error(string(__FILE__) + ":" + to_string(__LINE__) + ":ERROR: " + matrixName + " unknown nucleic");
+   }
    MatrixScoreMethod::read(&hashbase); 
 }
 
 NucleicScoreMethod::NucleicScoreMethod(const string& matrixName, int go, int ge)
    : MatrixScoreMethod(go, ge) 
 { 
-   if (!isNucleicMatrix(matrixName))
+   if (!isNucleicMatrix(matrixName)) {
       cerr << "WARN: " << matrixName << " is not known Nucleic matrix!\n";
+      exit(1);
+   }
    setName(matrixName); 
    MatrixScoreMethod::read(&hashbase); 
 }
 
 void NucleicScoreMethod::use(const string &matName) { 
-   if (!isNucleicMatrix(matName))
+   if (!isNucleicMatrix(matName)) {
       cerr << "WARN: " << matName << " is not known Nucleic matrix!\n";
+      exit(1);
+   }
    setName(matName); 
    MatrixScoreMethod::read(&hashbase); 
 }

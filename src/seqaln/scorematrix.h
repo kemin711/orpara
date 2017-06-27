@@ -154,6 +154,9 @@ void expandCombination(char** &buff, int &buffsize, int &ws, const char* alphabe
  * You must use the derive class: protein or nucleic acid.
  *
  * This class provide most of the functinalities for the derived classes.
+ *
+ * Typical usage is to set the default path of the matrix
+ * then you can ignore the path part of the matrix.
  */
 class MatrixScoreMethod : public ScoreMethod {
    public:
@@ -165,12 +168,17 @@ class MatrixScoreMethod : public ScoreMethod {
        * validation.
        */
       static void setDefaultPath();
+      static const string& getDefaultPath() { return default_path; }
       /**
        * Set the default_path to path.
        * Use setPath for instance variable.
        */
       static void setDefaultPath(const string &path);
       static bool isProteinMatrix(const string &matrixName);
+      /**
+       * Helpter method to check whether this matrix
+       * has been registered in this class.
+       */
       static bool isNucleicMatrix(const string &matrixName);
 
    protected:
@@ -192,7 +200,13 @@ class MatrixScoreMethod : public ScoreMethod {
             words(0), wordSize(0) { }
 
       /** 
-       * @param matrixName a known scoring matrix name
+       * The caller should set the default matrix path
+       * before calling this method. The matrix should
+       * be installed in a typical directory. Then
+       * the name correspnds to the files in the matrix
+       * directory.
+       * @param matrixName a known scoring matrix name which
+       *   is also a matrix file name.
        * @param nucMatrixScoreMethod whether it is a matrix for nucleotide default is not.
        * Cannot initialize the matrix or read the actual matrix.
        * Require the type of matrix.
@@ -204,10 +218,15 @@ class MatrixScoreMethod : public ScoreMethod {
       { }
 
       /**
+       * In case class level matrix path is not set,
+       * you can use this method to create your new
+       * matrix.
+       *
        * @param dir path to matrix directory
        * @param matrixName name of the matrix.
-       * Will not initialize the matrix use
-       * derived class to do it.
+       *
+       * Note: This constructor Will not initialize the matrix use
+       *   derived class to do it.
        */
       MatrixScoreMethod(const string& dir, const string& matrixName)
          : ScoreMethod(), path(dir), name(matrixName), 
@@ -580,7 +599,7 @@ class NucleicScoreMethod : public MatrixScoreMethod {
       bool read(const string &p, const string &n);
 
       /**
-       * to use a particular scoring method by name.
+       * to use a particular Nucleic Acid scoring method by name.
        * @param method the string name of the method such as Nuc4.4
        * This function will set the internal matrix to be used for scoring.
        * The scoring matrix must be stored under /path member.
