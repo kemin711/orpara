@@ -17375,6 +17375,10 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+if test "$prefix" = "NONE"; then
+	prefix=$ac_default_prefix
+fi
+## check for pthread library
 save_LDFLAGS=$LDFLAGS
 save_LIBS=$LIBS
 LDFLAGS="-L/usr/lib/x86_64-linux-gnu $LDFLAGS"
@@ -18028,21 +18032,19 @@ LDFLAGS=$save_LDFLAGS
 LIBS=$save_LIBS
 # could not figure out why PTHREAD_xxx variables are set to empty string!
 
-
-
-if (test -n "$GTESTINC" && test -z "$GTESTLIB") || \
-	(test -z "$GTESTINC" && test -n "$GTESTLIB"); then
-   as_fn_error $? "please specify both lib and include dir for gtest" "$LINENO" 5
-fi
-if test "$prefix" = "NONE"; then
-	prefix=$ac_default_prefix
-fi
+# user specify gtest include and lib dirs
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
+
+
+if (test -n "$GTESTINC" && test -z "$GTESTLIB") || \
+	(test -z "$GTESTINC" && test -n "$GTESTLIB"); then
+   as_fn_error $? "please specify both lib and include dir for gtest" "$LINENO" 5
+fi
 save_LIBS=$LIBS
 save_LDFLAGS=$LDFLAGS
 save_CXXFLAGS=$CXXFLAGS
@@ -18358,7 +18360,7 @@ if test -z "$HAVE_DOXYGEN_TRUE"; then :
 
 fi
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/seqaln/Makefile src/test/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/seqaln/Makefile src/test/Makefile src/seqaln/test/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -19487,6 +19489,7 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/seqaln/Makefile") CONFIG_FILES="$CONFIG_FILES src/seqaln/Makefile" ;;
     "src/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/test/Makefile" ;;
+    "src/seqaln/test/Makefile") CONFIG_FILES="$CONFIG_FILES src/seqaln/test/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

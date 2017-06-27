@@ -46,3 +46,5 @@ matrix/PAM180 matrix/PAM260 matrix/PAM360 matrix/PAM450 matrix/PAM90 \
 matrix/PAM100 matrix/PAM190 matrix/PAM270 matrix/PAM370 matrix/PAM460 \
 matrix/PAM120.cdi matrix/PAM40.cdi matrix/PAM160.cdi matrix/PAM80.cdi \
 matrix/PAM250.cdi matrix/PAM200.cdi matrix/README
+
+SUBDIRS = . test
