@@ -385,6 +385,7 @@ void expandCombination(char** &buff, int &buffsize, int &ws, const char* alphabe
    buffsize=ousize;
 }
 
+// failed test
 char** MatrixScoreMethod::allwords(int ws) const {
    int i;
    // had what we wanted
@@ -673,6 +674,7 @@ NucleicScoreMethod::NucleicScoreMethod(const string& matrixName)
       //cerr << "WARN: " << matrixName << " is not known Nucleic matrix!\n";
       throw runtime_error(string(__FILE__) + ":" + to_string(__LINE__) + ":ERROR: " + matrixName + " unknown nucleic");
    }
+   MatrixScoreMethod::read(&hashbase); 
 }
 
 NucleicScoreMethod::NucleicScoreMethod(const string& dir, const string& matrixName)

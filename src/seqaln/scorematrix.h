@@ -311,6 +311,7 @@ class MatrixScoreMethod : public ScoreMethod {
       /**
        * return a pointer to all the words generated in all combination.
        * Symbol B Z X * U should not be used to build words.
+       * TODO: this one failed test need to debug.
        */
       char** allwords(int ws) const;
       int getNumberOfWords() const { return wordsArraySize; }
@@ -452,8 +453,18 @@ class MatrixScoreMethod : public ScoreMethod {
        */
       static const char* nucleicMatrices[];
 
+      /**
+       * This field is populated only if allwords()
+       * method is called.
+       */
       mutable char **words;
+      /**
+       * capacity of words
+       */
       mutable int wordsArraySize;
+      /**
+       * actual size of wordSize
+       */
       mutable int wordSize;  // recoreds the size of words
 
    private:

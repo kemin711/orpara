@@ -230,6 +230,9 @@ class Dynaln {
        * You could have used a subsequence for the alignment,
        * then you want to label the positions in the original sequence.
        * In this case you add the delta to the labeling.
+       *
+       * Note when constructing thread object, the two default
+       * arguments must be provided.
        */
       int runlocal(const int delta1=0, const int delta2=0) {
                int s=local(); buildResult(delta1, delta2); return s; 
@@ -433,6 +436,9 @@ class Dynaln {
        * Get the sequence identity as a fraction range from 0 to 1
        */
       float getIdentity() const { return (float)idencnt/getAlnlen(); }
+      /**
+       * Similar residues are also counted.
+       */
       float getSimilarity() const { return (float)(idencnt+simcnt)/getAlnlen(); }
       /**
        * Exclding the terminal gap when count the identity.

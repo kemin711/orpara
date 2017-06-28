@@ -55,13 +55,36 @@ TEST_F(DynalnTest, nucmatrix) {
    alnnsm.runlocal();
    alnnsm.printAlign(cout);
    ASSERT_GT(alnnsm.getScore(), 0);
+   string base("ACGTN");
+   cout << "NUC.4.4 base similarity\n";
+   for (size_t i=0; i<base.size(); ++i) {
+      for (size_t j=0; j<base.size(); ++j) {
+         cout << base[i] << "x" << base[j] << "="
+            << nsm.lookup(base[i], base[j]) << "  ";
+      }
+      cout << endl;
+   }
 
    cout << "test score matrix NUC.4.4.N\n";
    NucleicScoreMethod nucmatrixN("NUC.4.4.N");
-   alnnsm.setMatrix(nucmatrixN);
-   alnnsm.runlocal();
-   alnnsm.printAlign(cout);
-   ASSERT_GT(alnnsm.getScore(), 0);
+   cout << "default path: " << NucleicScoreMethod::getDefaultPath() << endl;
+   cout << "gap open: " << nucmatrixN.getGapOpen()
+      << " gap extend: " << nucmatrixN.getGapExtend()
+      << endl;
+   cout << "NUC.4.4.N base similarity\n";
+   for (size_t i=0; i<base.size(); ++i) {
+      for (size_t j=0; j<base.size(); ++j) {
+         cout << base[i] << "x" << base[j] << "="
+            << nucmatrixN.lookup(base[i], base[j]) << "  ";
+      }
+      cout << endl;
+   }
+   Dynaln<NucleicScoreMethod> naln(nucmatrixN);
+   //naln.setMatrix(nucmatrixN);
+   naln.setSeq(seq1, seq2);
+   naln.runlocal();
+   naln.printAlign(cout);
+   ASSERT_GT(naln.getScore(), 0);
 }
 
 TEST_F(DynalnTest, prtaln1) {
