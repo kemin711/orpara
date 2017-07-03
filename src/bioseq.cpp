@@ -701,7 +701,7 @@ void bioseq::rvc() {
 	}
    title += " reverse complemented";
    seq=tmp;
-   if (code != 0) { delete[] code; code=0; }
+   if (code != nullptr) { delete[] code; code=nullptr; }
 }
 
 map<char,double> bioseq::getFrequency() const {
@@ -771,10 +771,10 @@ bioseq& bioseq::operator=(const bioseq &s) {
       seq=s.seq;
       name=s.name;
       title=s.title;
-      if (code != 0) {
+      if (code != nullptr) {
          delete[] code;
          // don't copy code until it is called with getcode()
-         code=0; 
+         code=nullptr; 
       }
    }
    return *this;
@@ -785,11 +785,11 @@ bioseq& bioseq::operator=(bioseq &&s) {
       seq=std::move(s.seq);
       name=std::move(s.name);
       title=std::move(s.title);
-      if (code != 0) {
+      if (code != nullptr) {
          delete[] code;
       }
       code=s.code; 
-      s.code=0;
+      s.code=nullptr;
    }
    return *this;
 }
@@ -804,16 +804,16 @@ bioseq& bioseq::operator=(const string &str) {
    if (str.length()>seq.length())
       seq.resize(str.length());
    seq=str;
-   if (code != 0) {
+   if (code != nullptr) {
       delete[] code;
-      code=0;
+      code=nullptr;
    }
    return *this;
 }
 
 const int* bioseq::getcode() const {
    //cerr << "using bioseq::getcode()\n";
-   if (code == 0) {
+   if (code == nullptr) {
       code = new int[length()+1];
       unsigned int i;
       for (i=0; i<length(); i++) {
@@ -925,9 +925,9 @@ Protein DNA::translate(int begin, int end) const {
 void DNA::revcomp() {
    name += "RC";
    reverseComplementInPlace(seq);
-   if (code !=0) {
+   if (code !=nullptr) {
       delete[] code;
-      code=0;
+      code=nullptr;
    }
 }
 // code is zeroed
@@ -942,7 +942,7 @@ DNA DNA::revcompCopy() const {
 // should return a pointer
 const int* DNA::getcode() const {
    //cerr << "Using getcodNuc()\n";
-   if (code == 0)  {
+   if (code == nullptr)  {
       unsigned int i;
       code = new int[bioseq::length()+1];
       for (i=0; i<bioseq::length(); i++) {
@@ -1928,11 +1928,11 @@ void DNAQual::revcomp() {
       //cout << "Inside revcomp(): swaping rc and this\n";
       //cout << "before swap\n" << *this << endl;
       int *rcCode=rc->code;
-      rc->code=0;
+      rc->code=nullptr;
       int *thisCode=code;
-      code=0;
+      code=nullptr;
       DNAQual* rcptr=rc;
-      this->rc=0;
+      this->rc=nullptr;
       DNAQual* thisPtr=new DNAQual(*this); // can this be moved?
       operator=(std::move(*rcptr)); // rc is this object now
       rc = thisPtr;

@@ -81,6 +81,10 @@ class Dynaln {
          topaln(), middle(), bottomaln(), topruler(), bottomruler() 
       { 
          setGapParameterFromMatrix(); 
+#ifdef DEBUG
+         cerr << __FILE__ << ":" << __func__ << ":INFO using matrix\n";
+         scmethod.show(cerr);
+#endif
       }
 
       /**
@@ -506,7 +510,7 @@ class Dynaln {
        */
       const T* getScoringMatrix() const { return &ST; }
       /** 
-       * 0-based start index of the sequence1 in alignment.
+       * 0-based start index in sequence1 for the alignment.
        * For global alignment, the terminal gap are not counted.
        * For example:
        * 1         11        21 
@@ -527,10 +531,11 @@ class Dynaln {
        * 1         11        21        31        41        51        61  
        * The above topBeginIndex() is 6-1, the bottomBeginIndex() is 0;
        * In the printout for humans I used 1-based index.
+       * @return index in sequence1 for the first aligned residue.
        */
       int topBeginIndex() const { return seq1begin; }
       /**
-       * 0-based start index of sequenc2 in alignment.
+       * 0-based start index of sequence2 in alignment.
        */
       int bottomBeginIndex() const { return seq2begin; }
       /**
@@ -791,6 +796,9 @@ class Dynaln {
        *    getcode is a virtual function, so bioseq and DNA
        *    use different algorithms.
        * needs to be updated properly when sequence got updated
+       * Note: may  cause race condition in multithreaded code
+       *   if they share the same sequence. Call get code first
+       *   before sharing the object.
        */
       const int* C1; 
       /**

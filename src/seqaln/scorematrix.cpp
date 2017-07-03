@@ -18,6 +18,16 @@ ScoreMethod& ScoreMethod::operator=(const ScoreMethod &scm) {
    return *this;
 }
 
+ScoreMethod& ScoreMethod::operator=(ScoreMethod &&scm) {
+   if (this != &scm) {
+      gapo = scm.gapo;
+      gape = scm.gape;
+      scm.gapo=0;
+      scm.gape=0;
+   }
+   return *this;
+}
+
 
 /////// class SimpleScoreMethod ////////////////////////
 SimpleScoreMethod& SimpleScoreMethod::operator=(const SimpleScoreMethod &mt) {
@@ -243,14 +253,17 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
    //setDefaultGapParameter();
 }
 
-MatrixScoreMethod::~MatrixScoreMethod() {
-   //if (mtype == IDENTITY) return;
-   if (words != 0) {
-      for (int i=0; i<wordsArraySize; i++) {
+void MatrixScoreMethod::deallocateWords() {
+   if (words != nullptr) {
+      for (size_t i=0; i<wordsArraySize; i++) {
          delete[] words[i];
       }
       delete[] words;
    }
+}
+
+MatrixScoreMethod::~MatrixScoreMethod() {
+   deallocateWords();
 }
 
 void MatrixScoreMethod::setMinMaxScore() const {
@@ -280,33 +293,76 @@ int MatrixScoreMethod::getMaxScore() const {
 MatrixScoreMethod::MatrixScoreMethod(const MatrixScoreMethod& mt) 
   : ScoreMethod(mt),
       path(mt.path), name(mt.name), 
-      maxs(mt.maxs), mins(mt.mins), numsymbol(mt.numsymbol),
-      words(0), wordsArraySize(0), wordSize(0)
+      mat{0}, symb{' '}, numsymbol(mt.numsymbol),
+      maxs(mt.maxs), mins(mt.mins), 
+      words(nullptr), wordsArraySize(0), wordSize(0)
 {
-   strcpy(symb, mt.symb);
-   //setMatrix(mt.mat, numsymbol);
    setMatrix(mt.mat, 32);
+   for (size_t i=0; i<32; ++i) {
+      symb[i] = mt.symb[i];
+   }
+#ifdef DEBUG
+   cerr << "called MatrixScoreMethod copy constructor\n";
+#endif
+}
+
+MatrixScoreMethod::MatrixScoreMethod(MatrixScoreMethod&& mt)
+   : ScoreMethod(std::move(mt)),
+     path(std::move(mt.path)), name(std::move(mt.name)),
+     mat{0}, symb{' '}, numsymbol(mt.numsymbol), 
+     mins(mt.mins), maxs(mt.maxs),
+     words(nullptr), wordsArraySize(0), wordSize(0)
+{
+   setMatrix(mt.mat, 32);
+   for (size_t i=0; i<32; ++i) {
+      symb[i] = mt.symb[i];
+   }
+   mt.deallocateWords();
+   mt.numsymbol=0;
+
 }
 
 MatrixScoreMethod& MatrixScoreMethod::operator=(const MatrixScoreMethod& mt) {
    if (this != &mt) {
+      ScoreMethod::operator=(mt);
       path=mt.path;
       name=mt.name;
-      setGapParameters(mt.getGapOpen(), mt.getGapExtend());
-      maxs=mt.maxs;
+      for (size_t i=0; i<32; ++i) {
+         symb[i] = mt.symb[i];
+      }
       mins=mt.mins;
-      strcpy(symb, mt.symb);
+      maxs=mt.maxs;
       numsymbol=mt.numsymbol;
-      words=0;
+      words=nullptr;
       wordsArraySize=0;
       wordSize=0;
-      //setMatrix(mt.mat, numsymbol);
       setMatrix(mt.mat, 32);
    }
    return *this;
 }
 
+MatrixScoreMethod& MatrixScoreMethod::operator=(MatrixScoreMethod&& mt) {
+   if (this != &mt) {
+      ScoreMethod::operator=(std::move(mt));
+      path=std::move(mt.path);
+      name=std::move(mt.name);
+      for (size_t i=0; i<32; ++i) {
+         symb[i] = mt.symb[i];
+      }
+      mins=mt.mins;
+      maxs=mt.maxs;
+      numsymbol=mt.numsymbol;
+      words=nullptr;
+      wordsArraySize=0;
+      wordSize=0;
+      setMatrix(mt.mat, 32);
+      mt.deallocateWords();
+   }
+   return *this;
+}
+
 void MatrixScoreMethod::show(ostream &ous, int (*hashfunc)(char)) const {
+   ScoreMethod::show(ous);
    ous << "Name: " << name << "\nPath: " << path << endl;
    int i;
    ous << "   ";
@@ -391,7 +447,7 @@ char** MatrixScoreMethod::allwords(int ws) const {
    // had what we wanted
    if (ws == wordSize) return words;
    // discard old memory
-   if (wordSize != 0) {
+   if (words != nullptr) {
       for (i=0; i<wordsArraySize; i++) {
          delete[] words[i];
       }
@@ -428,6 +484,10 @@ char** MatrixScoreMethod::allwords(int ws) const {
 }
 
 void MatrixScoreMethod::showWords() const {
+   if (words == nullptr) {
+      cerr << "words is empty!\n";
+      return;
+   }
    for (int i=0; i<wordsArraySize; i++) {
       cout << words[i] << " ";
       if ((i+1)%numsymbol == 0) cout << endl;
@@ -543,8 +603,8 @@ int MatrixScoreMethod::score(const int* x, const int* y, const int len) const {
 }
 
 void MatrixScoreMethod::setMatrix(const int source[][32], const int size) {
-   for (int i=0; i < size; i++) {
-      for (int j=0; j < size; j++) {
+   for (size_t i=0; i < size; i++) {
+      for (size_t j=0; j < size; j++) {
          mat[i][j]=source[i][j];
       }
    }

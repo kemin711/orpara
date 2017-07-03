@@ -163,6 +163,17 @@ class Fastq {
       void setTitle(const string &title) { desc=title; }
       void setDescription(const string &title) { desc=title; }
       bool hasDescription() const { return !desc.empty(); }
+      void appendDescription(const stgring& extra) {
+         if (extra[0] == ' ') {
+            desc += extra;
+         }
+         else {
+            desc += (string(" ") + extra);
+         }
+      }
+      void appendTitle(const string& extra) {
+         appendDescription(extra);
+      }
 
       /**
        * Given a piece of sequence it will cut at the beginning of the site

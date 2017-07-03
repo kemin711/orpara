@@ -11,6 +11,8 @@
 #include <limits>
 #include "bioseq.h"
 
+//#define DEBUG
+
 using namespace std;
 
 namespace orpara {
@@ -35,8 +37,13 @@ class ScoreMethod {
        */
       ScoreMethod() : gapo(-20), gape(-1) { }
       ScoreMethod(int gopen, int gextend) : gapo(gopen), gape(gextend) { }
+      /**
+       * Copy constructor
+       */
       ScoreMethod(const ScoreMethod &scm) : gapo(scm.gapo), gape(scm.gape) { }
+      ScoreMethod(ScoreMethod &&scm) : gapo(scm.gapo), gape(scm.gape) { }
       ScoreMethod& operator=(const ScoreMethod &scm);
+      ScoreMethod& operator=(ScoreMethod &&scm);
       /**
        * look up the score for two residues
        * @return the match score (10) if they are the same -10 if they are
@@ -188,16 +195,18 @@ class MatrixScoreMethod : public ScoreMethod {
        * initializer. will set the default path to the matrix directory.
        */
       MatrixScoreMethod() 
-         : ScoreMethod(), path(default_path), name(), mat(), 
+         : ScoreMethod(), path(default_path), name(), mat{0}, 
+           symb{' '}, numsymbol(0),
             mins(numeric_limits<int>::max()), maxs(-1),
-            words(0), wordSize(0) { }
+            words(nullptr), wordsArraySize(0), wordSize(0) { }
       /**
        * Fixed gap open and gap extension.
        */
       MatrixScoreMethod(int go, int ge) 
-         : ScoreMethod(go, ge), path(default_path), name(), mat(), 
+         : ScoreMethod(go, ge), path(default_path), name(), mat{0}, 
+           symb{' '}, numsymbol(0),
             mins(numeric_limits<int>::max()), maxs(-1),
-            words(0), wordSize(0) { }
+            words(nullptr), wordsArraySize(0), wordSize(0) { }
 
       /** 
        * The caller should set the default matrix path
@@ -213,8 +222,9 @@ class MatrixScoreMethod : public ScoreMethod {
        */
       MatrixScoreMethod(const string& matrixName)
          : ScoreMethod(), path(default_path), name(matrixName), 
+           mat{0}, symb{' '}, numsymbol(0), 
             mins(numeric_limits<int>::max()), maxs(-1),
-            words(0), wordSize(0) 
+            words(nullptr), wordsArraySize(0), wordSize(0) 
       { }
 
       /**
@@ -230,14 +240,16 @@ class MatrixScoreMethod : public ScoreMethod {
        */
       MatrixScoreMethod(const string& dir, const string& matrixName)
          : ScoreMethod(), path(dir), name(matrixName), 
+           mat{0}, symb{' '}, numsymbol(0),
             mins(numeric_limits<int>::max()), maxs(-1),
-            words(0), wordSize(0) 
+            words(nullptr), wordsArraySize(0), wordSize(0) 
       { }
 
       MatrixScoreMethod(const string& matrixName, int go, int ge)
          : ScoreMethod(go, ge), path(default_path), name(matrixName), 
+           mat{0}, symb{' '}, numsymbol(0),
             mins(numeric_limits<int>::max()), maxs(-1),
-            words(0), wordSize(0) 
+            words(nullptr), wordsArraySize(0), wordSize(0) 
       { }
 
    public:
@@ -245,6 +257,10 @@ class MatrixScoreMethod : public ScoreMethod {
        * copy constructor
        */
       MatrixScoreMethod(const MatrixScoreMethod& mt);
+      /**
+       * Move constructor
+       */
+      MatrixScoreMethod(MatrixScoreMethod&& mt);
 
       ~MatrixScoreMethod();
 
@@ -265,6 +281,7 @@ class MatrixScoreMethod : public ScoreMethod {
        * We usaully pass pointers around.
        */
       MatrixScoreMethod& operator=(const MatrixScoreMethod& mt);
+      MatrixScoreMethod& operator=(MatrixScoreMethod&& mt);
       /** Debug function
        *  to show the matrix in the actual array format
        * output to cout
@@ -401,6 +418,10 @@ class MatrixScoreMethod : public ScoreMethod {
        * array.
        */
       void setMatrix(const int source[][32], const int size=32);
+      /**
+       * Deallocate the words 2-dimensional array.
+       */
+      void deallocateWords();
 
       /**
        * The path to the matrix directory, this could be
@@ -409,13 +430,17 @@ class MatrixScoreMethod : public ScoreMethod {
       string path;
       /**
        * Name of the matrix
+       *  such as Blosum50, Blosum62, etc
        */
       string name; // Blosum50, Blosum62, etc
       /**
        * The core data structure for storing the actual information.
+       * Use 27 of the elements. 32 is a power of 2.
        */
-      int mat[32][32]; // use only 27 of the elements
-      /** residue symbols in temporary working space 
+      int mat[32][32]; 
+      /** 
+       * Alphabet
+       * residue symbols in temporary working space 
        * This will apply to both nucleic acid and amino acid.
        * The actual elements stored is defined by 
        * numsymbol value.
@@ -427,8 +452,7 @@ class MatrixScoreMethod : public ScoreMethod {
        * has no symbol for B, J, O, Sec for U is not part of the
        * Starndard matrix!
        */
-      int numsymbol; // the size of symb array
-
+      int numsymbol;
       /** 
        * minimum and maximum score in the matrix
        * This is a cache value to prevent repeated
@@ -437,6 +461,19 @@ class MatrixScoreMethod : public ScoreMethod {
        * mins start with max_int
        */
       mutable int mins, maxs;
+      /**
+       * This field is populated only if allwords()
+       * method is called.
+       */
+      mutable char **words;
+      /**
+       * capacity of words
+       */
+      mutable int wordsArraySize;
+      /**
+       * actual size of wordSize
+       */
+      mutable int wordSize;  // recoreds the size of words
 
       /**
        * Default installed matrix location.
@@ -452,20 +489,6 @@ class MatrixScoreMethod : public ScoreMethod {
        * names of nucleic acid matrices in lower case
        */
       static const char* nucleicMatrices[];
-
-      /**
-       * This field is populated only if allwords()
-       * method is called.
-       */
-      mutable char **words;
-      /**
-       * capacity of words
-       */
-      mutable int wordsArraySize;
-      /**
-       * actual size of wordSize
-       */
-      mutable int wordSize;  // recoreds the size of words
 
    private:
       /**
@@ -569,17 +592,23 @@ class ProteinScoreMethod : public MatrixScoreMethod {
  * hashbase function is used here.
  * The default matrix is NUC.4.4 without specifying any name.
  * You can also specify a particular matrix.
+ * Under multi-threading environment, this class cause segmentation 
+ * fault, but the ScoreMethod is fine.
  */
 class NucleicScoreMethod : public MatrixScoreMethod {
    public:
       // the default_numsymbol needs to be checked!
       NucleicScoreMethod() 
-         : MatrixScoreMethod() { 
-            copyFrom(default_name, default_symb, default_numsymbol, default_mat); }
+         : MatrixScoreMethod() 
+      { 
+         copyFrom(default_name, default_symb, default_numsymbol, default_mat); 
+      }
 
       NucleicScoreMethod(int go, int ge) 
-         : MatrixScoreMethod(go, ge) {
-            copyFrom(default_name, default_symb, default_numsymbol, default_mat); }
+         : MatrixScoreMethod(go, ge) 
+      {
+         copyFrom(default_name, default_symb, default_numsymbol, default_mat); 
+      }
 
       /**
        * If a full path is given then it will make a new
@@ -595,12 +624,26 @@ class NucleicScoreMethod : public MatrixScoreMethod {
 
       NucleicScoreMethod(const string& matrixName, int go, int ge);
 
-      NucleicScoreMethod(const NucleicScoreMethod &nsm) : MatrixScoreMethod(nsm) { }
+      /**
+       * Copy constructor uses the base class version.
+       * This class does nothing.
+       */
+      NucleicScoreMethod(const NucleicScoreMethod &nsm) 
+         : MatrixScoreMethod(nsm) 
+      { 
+//#ifdef DEBUG
+         cerr << "Called NucleicScoreMethod copy constructor\n";
+         show(cerr);
+//#endif
+      }
+      NucleicScoreMethod(NucleicScoreMethod &&nsm) : MatrixScoreMethod(std::move(nsm)) { }
       /**
        * Assignmenet operator.
        */
       NucleicScoreMethod& operator=(const NucleicScoreMethod &nsm) {
          MatrixScoreMethod::operator=(nsm); return *this; }
+      NucleicScoreMethod& operator=(NucleicScoreMethod &&nsm) {
+         MatrixScoreMethod::operator=(std::move(nsm)); return *this; }
 
       /**
        * Read a nucleic acid matrix given path  p and name n

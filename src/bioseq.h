@@ -215,13 +215,13 @@ char aanum2char(int c);
  */
 class bioseq {
    public:
-      bioseq() : seq(), name(), title(), code(0) {}
+      bioseq() : seq(), name(), title(), code(nullptr) {}
       /**
        * copy constructor.
        * Will not copy code.
        */
       bioseq(const bioseq &s) : seq(s.seq), name(s.name),
-                                title(s.title), code(0) { }
+                                title(s.title), code(nullptr) { }
       /**
        * Move constructor.
        */
@@ -229,24 +229,24 @@ class bioseq {
          : seq(std::move(s.seq)), 
            name(std::move(s.name)), title(),
            code(s.code)
-      { if (s.code != 0) s.code=0; if (!s.title.empty()) title=std::move(s.title); }
+      { if (s.code != nullptr) s.code=nullptr; if (!s.title.empty()) title=std::move(s.title); }
 
-      bioseq(const string &s) : seq(s), name(), title(), code(0) {}
+      bioseq(const string &s) : seq(s), name(), title(), code(nullptr) {}
       /** @param n name of the sequence
        *  @param s sequence 
        */
       bioseq(const string &n, const string &s) 
-         : seq(s), name(n), title(), code(0) {}
+         : seq(s), name(n), title(), code(nullptr) {}
       /** @param n name
        *  @param s sequence
        *  @param t title
        */
       bioseq(const string &n, const string &s, const string &t) 
-         : seq(s), name(n), title(t), code(0) {}
+         : seq(s), name(n), title(t), code(nullptr) {}
       //virtual ~bioseq() { 
-      virtual ~bioseq() { if (code != 0) delete[] code; code=0; }
+      virtual ~bioseq() { if (code != nullptr) delete[] code; code=nullptr; }
 
-      void clear() { if (code != 0) delete[] code; code=0; seq.clear(); name.clear(); title.clear(); }
+      void clear() { if (code != nullptr) delete[] code; code=nullptr; seq.clear(); name.clear(); title.clear(); }
 
       /** change the underlying sequence
        */
