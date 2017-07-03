@@ -163,7 +163,7 @@ class Fastq {
       void setTitle(const string &title) { desc=title; }
       void setDescription(const string &title) { desc=title; }
       bool hasDescription() const { return !desc.empty(); }
-      void appendDescription(const stgring& extra) {
+      void appendDescription(const string& extra) {
          if (extra[0] == ' ') {
             desc += extra;
          }
