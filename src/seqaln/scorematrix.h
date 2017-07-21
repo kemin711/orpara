@@ -632,8 +632,8 @@ class NucleicScoreMethod : public MatrixScoreMethod {
          : MatrixScoreMethod(nsm) 
       { 
 //#ifdef DEBUG
-         cerr << "Called NucleicScoreMethod copy constructor\n";
-         show(cerr);
+         //cerr << "Called NucleicScoreMethod copy constructor\n";
+         //show(cerr);
 //#endif
       }
       NucleicScoreMethod(NucleicScoreMethod &&nsm) : MatrixScoreMethod(std::move(nsm)) { }

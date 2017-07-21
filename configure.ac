@@ -15,6 +15,10 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
+AC_PROG_SED
+#AC_PATH_PROG([PERLBIN], [perl])
+
+
 AC_LANG([C], [C++])
 # Checks for libraries.
 AC_LANG_PUSH([C++])

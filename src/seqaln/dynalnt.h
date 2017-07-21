@@ -576,7 +576,7 @@ class Dynaln {
        * @return bottom alignment string based on the top sequence
        *   position 1-based.
        */
-      string getBottomAlnByTopPosition(int tpos1, int tpos2);
+      string getBottomAlnByTopPosition(int tpos1, int tpos2) const;
 
       ///////// Input and Parameter Settings /////////////////////////
       /**
@@ -1988,7 +1988,7 @@ pair<char, char> Dynaln<T>::getResiduesByTopPosition(int tpos, int &bpos) {
 }
 
 template<class T>
-string Dynaln<T>::getBottomAlnByTopPosition(int tpos1, int tpos2) {
+string Dynaln<T>::getBottomAlnByTopPosition(int tpos1, int tpos2) const {
    if (tpos1 < 0 || tpos2 > int(seq1->length())-1) {
       throw out_of_range("top positon cannot be out of seq1");
    }
