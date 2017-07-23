@@ -409,4 +409,15 @@ std::array<float, 5> Fastq::baseFraction() const {
    return frac;
 }
 
+void Fastq::appendDescription(const string& extra) {
+   if (extra[0] == ' ') {
+      if (desc.empty()) desc = extra.substr(1);
+      else desc += extra;
+   }
+   else {
+      if (desc.empty()) desc = extra;
+      else desc += (string(" ") + extra);
+   }
+}
+
 }

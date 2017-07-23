@@ -891,4 +891,24 @@ string getScientificSpeciesName(const string &taxon) {
    }
    return taxon;
 }
+
+string fileBasename(const string& pathstr) {
+   string::size_type x = pathstr.rfind('/');
+   string result = pathstr;
+   if (x != string::npos) {
+      rsult = patstr.substr(x);
+   }
+   return result;
+}
+
+string fileBasename(const string& pathstr, const string& suffix) {
+   string base = fileBasename(pathstr);
+   string::size_type x = base.rfind(suffix);
+   if (x != string::npos) {
+      base = base.substr(0,x);
+   }
+   return base;
+}
+
+// end of orpara namespace
 }

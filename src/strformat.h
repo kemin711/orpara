@@ -34,6 +34,14 @@ bool isupper(const string &str);
  * All chars are alpha
  */
 bool isAlpha(const string& str);
+/**
+ * @return true if str end with tail
+ * @param str is the input string
+ * @param tail is the tail part to be tested.
+ *
+ * example: endwith("horse.tail", "tail") will
+ * return true.
+ */
 bool endwith(const string& str, const string &tail);
 bool startwith(const string& str, const string &head);
 
@@ -296,6 +304,23 @@ bool isScientificSpeciesName(const string &str);
  * Extract the species name without any strain labeling.
  */
 string getScientificSpeciesName(const string &taxon);
+
+///////////// for file manipulations //////////////////
+
+/**
+ * Discard the path prefix retain the last element
+ * \/myhome/dir/filename as input will produce filename
+ */
+string fileBasename(const string& pathstr);
+/**
+ * Same as above but will also remove the suffix part if 
+ * exists
+ * say you have .txt as suffix, then this part will be removed too.
+ * So far I only implemented the unix path separater \/
+ */
+string fileBasename(const string& pathstr, const string& suffix);
+
+// end of namespace
 }
 
 #endif

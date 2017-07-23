@@ -163,14 +163,12 @@ class Fastq {
       void setTitle(const string &title) { desc=title; }
       void setDescription(const string &title) { desc=title; }
       bool hasDescription() const { return !desc.empty(); }
-      void appendDescription(const string& extra) {
-         if (extra[0] == ' ') {
-            desc += extra;
-         }
-         else {
-            desc += (string(" ") + extra);
-         }
-      }
+      /**
+       * Append extra information to the title.
+       * In case the title was empty, this method
+       * is equvelant to set title.
+       */
+      void appendDescription(const string& extra);
       void appendTitle(const string& extra) {
          appendDescription(extra);
       }
