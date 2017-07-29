@@ -37,16 +37,31 @@ Interval::Interval(const string &str) {
 
 int Interval::overlap(const Interval &i) const
 {
+   if (isNull() && i.isNull()) return 0;
+   if (isNull()) {
+      return i.length();
+   }
+   if (i.isNull()) {
+      return length();
+   }
    if (e<i.b) return e-i.b+1; 
    else if (i.e<b) return i.e-b+1;
    else return min(e,i.e)-max(b, i.b) + 1;
 }
 
 int Interval::overlap(const int bb, const int ee) const {
+   if (isNull()) return (ee-bb+1);
    if (e < bb) return e-bb+1;
    else if (ee < b)  return ee-b+1; 
    else return min(e,ee)-max(b,bb)+1;
 }
+
+int Interval::distance(const Interval& i) const {
+   if (isNull() || i.isNull()) return 0;
+   // [this interval] before [i interval]
+   return max(b, i.b) - min(e,i.e);
+}
+
 
 /** base class merge does not invalidate input 
  * pointer.

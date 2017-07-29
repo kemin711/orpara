@@ -43,7 +43,13 @@ class Interval {
        * You can use a,b, a-b, a:b formats
        */
       Interval(const string &str);
+      /**
+       * Constructor from a pair of values.
+       */
       Interval(const pair<int,int> &p) : b(p.first), e(p.second) { }
+      /**
+       * Destructor
+       */
       virtual ~Interval() { }
       /**
        * assignment operator
@@ -57,14 +63,36 @@ class Interval {
          ous << iv.b << "-" << iv.e; return ous; }
 
       /**
+       * If this object is null, then this function
+       * return the length of i. So null objects
+       * always overlap with other objects. This is
+       * useful for looping start conditions.
+       *
+       * The reverse situation, i is null then  return
+       * the length of this object.  If both objects
+       * are null then return 0;
+       *
        * @return a number representing the length of the 
        *   overlap between the two intervals.
        *   If there is no overlap, then a negative number will be 
-       *   returned.
+       *   returned to represent the distance between the intervals.
        */
       int overlap(const Interval &i) const;
+      int overlap(const pair<int,int> &i) const {
+         return overlap(i.first, i.second);
+      }
       int overlap(const int bb, const int ee) const;
-      /** Merging two Intervals.
+      /**
+       * the distance between the two ranges
+       *    |Range1|      | Range 2 |
+       *           |<-d-->|
+       * if overlap then return a negative number as the
+       * amount of overlap.
+       * if one of the object is null, then return 0.
+       */
+      int distance(const Interval& i) const;
+      /** 
+       * Merging two Intervals.
        * The merge only happens when the overlap > cut
        * If this object is null, then the overlap will
        * be the length of i and this object will become i.
@@ -86,6 +114,12 @@ class Interval {
        */
       int extend(const Interval &i);
       virtual string toDelimitedString(const string &dl="\t") const;
+      void clear() {
+         b=-1; e=-1;
+      }
+      void setNull() {
+         b=-1; e=-1;
+      }
       /**
        * This interval should be arranged before iv
        * in sorted order.

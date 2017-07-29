@@ -460,9 +460,11 @@ class bioseq {
          }
          return entropy(seq.substr(b,e-b+1)); }
 
-      /** return the single letter and double letter
-       * entrpy of the sequence string
-       * This is not a member function!
+      /** 
+       * @return the single letter and double letter
+       *    entrpy of the sequence string.
+       *
+       * This is not a member function for convenient application on string.
        */
       static pair<double,double> entropy(const string &seq);
       size_t length() const { return seq.length(); }
