@@ -102,6 +102,6 @@ AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([docs/Makefile])])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/seqaln/Makefile
-                 src/test/Makefile]
-                 src/seqaln/test/Makefile)
+                 src/test/Makefile
+                 src/seqaln/test/Makefile])
 AC_OUTPUT

@@ -23,9 +23,16 @@ namespace orpara {
  */
 int wc(const string &str);  // word cound
 bool isnumber(const string &str); // all digits
-// whether is it a number with other chars
-// such as 1.2, 1,000, -1
+/** 
+ * @param dc is other allowed characters such as
+ *    period, comma.  Examples are 1.2, 1,000, -1
+*/
 bool isnumber(const string &str, const string dc);
+/**
+ * @param str input string is null terminated
+ *    C-string. This is normally used in argv[i]
+ */
+bool isInt(const char str[]);
 /** 
  * @return true if all of the chars are in upper case
  */
@@ -137,6 +144,7 @@ int getInt(const string &str);
  * @param str string contain multiple integers
  *    that can be separate by any number of any non-digit
  *    characters.
+ * @see extractInt
  * */
 vector<int> getAllInt(const string &str);
 
@@ -176,6 +184,9 @@ template<class T> string anyToString(const T &val) {
    ous << val;
    return ous.str();
 }
+/**
+ * Extract all integers from a string
+ */
 vector<int> extractInt(const string &str);
 
 ////////////////////////////////////////////////////////////

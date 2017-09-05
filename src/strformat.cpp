@@ -39,6 +39,7 @@ bool isnumber(const string &str) {
 	while (isdigit(str[i])) i++;
 	return i == str.size();
 }
+
 bool isnumber(const string &str, const string dc) {
 	int i = 0;
 	while (i<str.size()) {
@@ -48,6 +49,16 @@ bool isnumber(const string &str, const string dc) {
 	}
 	return true;
 }
+
+bool isInt(const char str[]) {
+   size_t i=0;
+   while (str[i] != '\0') {
+      if (!isdigit(str[i])) return false;
+      ++i;
+   }
+   return true;
+}
+
 bool isupper(const string &str) {
 	int i = 0;
 	while (i<str.length()) {
