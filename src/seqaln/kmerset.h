@@ -5,7 +5,10 @@
 
 using namespace std;
 
-template<int K> class KmerSet : KmerSet<K> {
+namespace orpara {
+
+template<int K> 
+class KmerSet : KmerSet<K> {
    public:
       KmerSet() : member() { }
       /**
@@ -14,6 +17,19 @@ template<int K> class KmerSet : KmerSet<K> {
        * This object can east any number of sequences.
        */
       void eat(const string& seq);
+      /**
+       * Add reverse complement kmer int value
+       * to member.
+       */
+      void addRC();
+      /**
+       * @return the number of kmers common in both
+       *   objects.
+       */
+      int common(const KmerSet<K>& other) const;
+      int size() const {
+         return member.size();
+      }
 
    private:
       /**
@@ -41,5 +57,33 @@ void KmerSet<K>::eat(const string& seq) {
    }
    member.insert(v);
 }
+
+template<int K>
+void KmerSet<K>::addRC() {
+   vector<int> tmp;
+   for (int h : member) {
+      tmp.push_back(revcompKmerInt(h));
+   }
+   member.insert(tmp.begin(), tmp.end());
+}
+
+template<int K>
+int KmerSet<K>::common(const KmerSet<K>& other) const {
+   int res=0;
+   if (size() < other.size()) {
+      for (int h : member) {
+         if (other.member.find(h) != other.member.end()) 
+            ++res;
+      }
+   }
+   else {
+      for (int h : other.member) {
+         if (member.find(h) != member.end())
+            ++res;
+      }
+   }
+   return res;
+}
+} // orpara namespace
 
 #endif

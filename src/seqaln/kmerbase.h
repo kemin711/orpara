@@ -30,6 +30,21 @@ template <int K> class KmerBase {
                return -1;
          }
       }
+      /**
+       * @return the int value of the reverse complement of the kmer
+       * whose int value is hv.
+       */
+      static unsigned int revcompKmerInt(unsigned int hv) {
+         unsigned int hvc = (~hv);
+         size_t i;
+         unsigned int res=(3&hvc);
+         for (size_t i=0; i<K-1; ++i) {
+            res <<= 2;
+            hvc >>= 2;
+            res |= (3&hvc);
+         }
+         return res&mask;
+      }
 
    private:
       /** mask is pow(4,K)-1 
