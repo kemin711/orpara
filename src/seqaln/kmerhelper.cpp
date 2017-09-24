@@ -37,9 +37,6 @@ unsigned int computeMask(int mersz) {
    return (2<<(2*mersz-1)) - 1;
 }
 
-/**
- * For external use
- */
 vector<int> hashArray(const string &s, const int w) {
    unsigned int v=0;
    vector<int> tmp(s.length()-w+1);

@@ -13,7 +13,7 @@ using namespace std;
 namespace orpara {
 /**
  *  convert sequence to an array indexed by the
- *  integer representation of the word
+ *  integer representation of the word (kmer)
  *  @param s input string
  *  @param w word size
  */
@@ -22,14 +22,14 @@ vector<int> hashArray(const string &s, const int w);
  * convert base to integer
  */
 int b2i(char ch);
-/**
- * helper function conversting k into mask for 
- * making the hash value of kmer.
- */
 
 void check_pair(set<int> &loc);
 
 
+/**
+ * helper function conversting k into mask for 
+ * making the hash value of kmer.
+ */
 unsigned int computeMask(int mersz);
 
 /**
@@ -50,5 +50,6 @@ vector<pair<int,int> > combineStemRanges(set<int> &loc);
 
 pair<int,int> longestRegion(const vector<pair<int,int> > &reg);
 pair<int,int> nearestRegion(const vector<pair<int,int> > &reg, int point);
-}
+
+}  // namespace end
 #endif

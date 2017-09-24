@@ -21,13 +21,16 @@ using namespace std;
 
 namespace orpara {
 /**
- * Templae version 
+ * Templae version of kmer.  Kmer length
+ * is a parameter in this class.
+ *
  * This class is for individual sequences.
  * This will be dedicated to DNA 4 bases
  * K is a Nontype templae parameter.
  * This class emphasize the location information.
  * Kmercount class emphasizes the count without
  * storing the location information.
+ * @see KmerCount
  */
 template<int K> class Kmert {
    private:
@@ -43,14 +46,15 @@ template<int K> class Kmert {
       string seq;
       /**
        * hashed kmer interger value for position from 0 to L-k+1
+       * This is tied to the input sequence length.
        */
       vector<int> hashval;
       /** 
-       * the locations of kmers
+       * The locations of each kmer in the input sequence.
        * First index is the kmer's hash value.
        * Vector store the 0 or more location of the kmer's 
-       * first base's 0-based index. Empty vector
-       * signifies the lack of kmer value.
+       * first base's 0-based index in seq. Empty vector
+       * signifies the lack of kmer in the entire sequence.
        */
       vector<vector<unsigned int> > loc;
       /**
@@ -85,6 +89,9 @@ template<int K> class Kmert {
       /**
        * hashval is intialized with -1.
        * Pow(4,k) is the same as 2<<(2*k-1)
+       * There are pow(4,k) possible k-mers with ACGT at symbol.
+       * Each K-mer is represented with a integer number
+       * from 0 to pow(4,k)-1
        */
       Kmert(const string &s)
          : seq(s), hashval(s.length()-K+1, -1), 
@@ -113,12 +120,14 @@ template<int K> class Kmert {
          copy(hashval.begin(), hashval.end(), ostream_iterator<int>(cout, ", "));
          cout << endl;
       }
+
       /**
        * obtain the result
        */
       const vector<int>& getHashValue() const {
          return hashval;
       }
+
       bool isPalindrome(pair<int,int> &lpreg, vector<double> &freq, vector<double> &rcfreq) const;
 
       unsigned int revcompBits(unsigned int hv) {
@@ -153,6 +162,10 @@ template<int K> class Kmert {
        */
       /**
        * Set the mer size (K) and build the mask
+       * It create a bit string with 2*K 1 from the right.
+       *   |-> 2*K  <-|
+       * |0|1|1|....|1|
+       * set mask to 2*K 1's
        */
       static void buildMask();
 };
@@ -311,9 +324,6 @@ double Kmert<K>::calculateDistance(vector<double>& freq1, vector<double>& freq2)
     return sum;
 }
 */
-
-
-
 
 template<int K>
 bool Kmert<K>::isPalindrome(pair<int,int> &lpreg, vector<double> &freq,vector<double> &rcfreq) const {
