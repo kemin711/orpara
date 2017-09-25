@@ -10,7 +10,7 @@ namespace orpara {
 template<int K> 
 class KmerSet : KmerSet<K> {
    public:
-      KmerSet() : member() { }
+      KmerSet() : member(), rcmember() { }
       /**
        * Eat one sequence and convert it to  the 
        * kmer set, add the kmers to member.
@@ -27,6 +27,10 @@ class KmerSet : KmerSet<K> {
        *   objects.
        */
       int common(const KmerSet<K>& other) const;
+      /**
+       * rcmember may not have the same size as the
+       * member if use even K?
+       */
       int size() const {
          return member.size();
       }
@@ -37,6 +41,7 @@ class KmerSet : KmerSet<K> {
        * to integers.
        */
       unordered_set<int> member;
+      unordered_set<int> rcmember;
 };
 
 template<int K>
@@ -60,17 +65,43 @@ void KmerSet<K>::eat(const string& seq) {
 
 template<int K>
 void KmerSet<K>::addRC() {
-   vector<int> tmp;
    for (int h : member) {
-      tmp.push_back(revcompKmerInt(h));
+      rcmember.push_back(revcompKmerInt(h));
    }
-   member.insert(tmp.begin(), tmp.end());
+   //member.insert(tmp.begin(), tmp.end());
+}
+template<int K>
+int KmerSet<K>::commonForward(const KmerSet<K>& other, const bool rc=false) const {
+   const unordered_set* tmp = &other.member;
+   if (rc) {
+      tmp = &other.rcmember;
+   }
+
+   int res=0;
+   if (member.size() < tmp->size()) {
+      for (int h : member) {
+         if (tmp->find(h) != tmp->end()) 
+            ++res;
+      }
+   }
+   else {
+      for (int h : *tmp) {
+         if (member.find(h) != member.end())
+            ++res;
+      }
+   }
+   return res;
 }
 
 template<int K>
-int KmerSet<K>::common(const KmerSet<K>& other) const {
+int KmerSet<K>::commonReverse(const KmerSet<K>& other, const bool rc=false) const {
+   const unordered_set* tmp = &other.member;
+   if (rc) {
+      tmp = &other.rcmember;
+   }
+
    int res=0;
-   if (size() < other.size()) {
+   if (rcmember.size() < tmp->size()) {
       for (int h : member) {
          if (other.member.find(h) != other.member.end()) 
             ++res;
