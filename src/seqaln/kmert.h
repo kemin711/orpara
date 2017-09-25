@@ -15,7 +15,9 @@
 #include <set>
 #include <map>
 #include <algorithm>
+// why kerm.h?
 #include "kmer.h"
+#include "kmerbase.h"
 
 using namespace std;
 
@@ -32,13 +34,14 @@ namespace orpara {
  * storing the location information.
  * @see KmerCount
  */
-template<int K> class Kmert {
+template<int K> 
+class Kmert : public KmerBase<K> {
    private:
       /**
        * Each instance has one mask based on K parameter. 
        * Each K class share one mask
        */
-      static unsigned int mask;
+      //static unsigned int mask;
 
       /**
        * Not sure we should store the original sequence
@@ -130,6 +133,7 @@ template<int K> class Kmert {
 
       bool isPalindrome(pair<int,int> &lpreg, vector<double> &freq, vector<double> &rcfreq) const;
 
+      /*
       unsigned int revcompBits(unsigned int hv) {
          //cout << bitset<32>(hv) << " " << hv << " input\n";
          unsigned int hvc = (~hv);
@@ -145,6 +149,7 @@ template<int K> class Kmert {
          //cout << bitset<32>(res&mask) << " " << (res&mask) << " after clean up\n";
          return res&mask;
       }
+      */
 
       int getSequenceLength() const { return seq.length(); }
       const string& getSequence() const { return seq; }
@@ -167,21 +172,23 @@ template<int K> class Kmert {
        * |0|1|1|....|1|
        * set mask to 2*K 1's
        */
-      static void buildMask();
+      //static void buildMask();
 };
 
 
-template<int K>
-unsigned int Kmert<K>::mask = computeMask(K);
+//template<int K>
+//unsigned int Kmert<K>::mask = computeMask(K);
 
 ///////// template kmer class implementation ////////////
 
+/*
 template<int K>
 void Kmert<K>::buildMask() {
    mask=(2<<(2*K-1)) - 1;
    // for debug
    cout << "mask value: " << bitset<32>(mask) << endl;
 }
+*/
 
 template<int K>
 void Kmert<K>::kmer2int() {
@@ -191,12 +198,14 @@ void Kmert<K>::kmer2int() {
    // build the intial hash value for the first kmer.
    for (i=0; i<K; ++i) {
       v <<= 2;
-      v |= b2i(seq[i]);
+      //v |= b2i(seq[i]);
+      v |= base2int(seq[i]);
    }
    for (i=0; i<seq.length()-K; ++i) {
       hashval[i]=v;
       v<<=2;
-      v |= b2i(seq[i+K]);
+      //v |= b2i(seq[i+K]);
+      v |= base2int(seq[i+K]);
       v &= mask;
    }
    hashval[i]=v;
@@ -223,7 +232,8 @@ void Kmert<K>::tabulateLoc() {
    for (unsigned int i=mask; int(i) > -1; --i) {
       if (!loc[i].empty()) {
          for (unsigned int j=loc[i].size()-1; int(j)> -1; --j) {
-            locrc[revcompBits(i)].push_back(seq.length()-K+1-loc[i][j]);
+            //locrc[revcompBits(i)].push_back(seq.length()-K+1-loc[i][j]);
+            locrc[revcompKmerInt(i)].push_back(seq.length()-K+1-loc[i][j]);
          }
       }
    }

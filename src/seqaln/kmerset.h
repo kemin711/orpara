@@ -2,13 +2,14 @@
 #define KMERSET_H
 
 #include <unordered_set>
+#include "kmerbase.h"
 
 using namespace std;
 
 namespace orpara {
 
 template<int K> 
-class KmerSet : KmerSet<K> {
+class KmerSet : public KmerBase<K> {
    public:
       KmerSet() : member(), rcmember() { }
       /**
