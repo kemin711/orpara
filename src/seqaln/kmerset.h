@@ -24,10 +24,33 @@ class KmerSet : public KmerBase<K> {
        */
       void addRC();
       /**
-       * @return the number of kmers common in both
-       *   objects.
+       * @param rc to use forward or reverse member of other to
+       *   compute the common number reverse member of other.
+       *   Default is to compute common with forward.
+       * @return the number of kmers common in forward direction 
+       *   which is using the member to compute.
        */
-      int common(const KmerSet<K>& other) const;
+      int commonForward(const KmerSet<K>& other, const bool rc=false) const;
+      /**
+       * @return number of common kmers shared by reverse direction
+       *   which is the rcmember
+       */
+      int commonReverse(const KmerSet<K>& other, const bool rc=false) const;
+      /**
+       * Compute for both forward and revers
+       * return the larger of the two results.
+       */
+      int common(const Kmerset<K>& other) {
+         int f = commonForward(other);
+         int r = commonReverse(other);
+         return  max(f,r);
+      }
+      /**
+       * Compare the kmerset of this object with
+       * an input sequence's forward kmerset.
+       */
+      int common(const string& seq) const;
+
       /**
        * rcmember may not have the same size as the
        * member if use even K?
@@ -72,7 +95,7 @@ void KmerSet<K>::addRC() {
    //member.insert(tmp.begin(), tmp.end());
 }
 template<int K>
-int KmerSet<K>::commonForward(const KmerSet<K>& other, const bool rc=false) const {
+int KmerSet<K>::commonForward(const KmerSet<K>& other, const bool rc) const {
    const unordered_set* tmp = &other.member;
    if (rc) {
       tmp = &other.rcmember;
@@ -95,7 +118,7 @@ int KmerSet<K>::commonForward(const KmerSet<K>& other, const bool rc=false) cons
 }
 
 template<int K>
-int KmerSet<K>::commonReverse(const KmerSet<K>& other, const bool rc=false) const {
+int KmerSet<K>::commonReverse(const KmerSet<K>& other, const bool rc) const {
    const unordered_set* tmp = &other.member;
    if (rc) {
       tmp = &other.rcmember;
@@ -103,19 +126,27 @@ int KmerSet<K>::commonReverse(const KmerSet<K>& other, const bool rc=false) cons
 
    int res=0;
    if (rcmember.size() < tmp->size()) {
-      for (int h : member) {
-         if (other.member.find(h) != other.member.end()) 
+      for (int h : rcmember) {
+         if (rmp->find(h) != tmp->end()) 
             ++res;
       }
    }
-   else {
-      for (int h : other.member) {
-         if (member.find(h) != member.end())
+   else { // tmp smaller look up in rcmember
+      for (int h : tmp->rcmember) {
+         if (rcmember.find(h) != rcmember.end())
             ++res;
       }
    }
    return res;
 }
+
+template<int K>
+int KmerSet<K>::common(const string& seq) const {
+   KmerSet<K> tmp;
+   tmp.eat(seq);
+   return common(tmp);
+}
+
 } // orpara namespace
 
 #endif
