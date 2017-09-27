@@ -40,7 +40,7 @@ class KmerSet : public KmerBase<K> {
        * Compute for both forward and revers
        * return the larger of the two results.
        */
-      int common(const KmerSet<K>& other) {
+      int common(const KmerSet<K>& other) const {
          int f = commonForward(other);
          int r = commonReverse(other);
          return  max(f,r);
@@ -76,13 +76,13 @@ void KmerSet<K>::eat(const string& seq) {
    // build the intial hash value for the first kmer.
    for (i=0; i<K; ++i) {
       v <<= 2;
-      v |= base2iint(seq[i]);
+      v |= KmerBase<K>::base2int(seq[i]);
    }
    for (i=0; i<seq.length()-K; ++i) {
       member.insert(v);
       v<<=2;
-      v |= base2int(seq[i+K]);
-      v &= mask;
+      v |= KmerBase<K>::base2int(seq[i+K]);
+      v &= KmerBase<K>::mask;
    }
    member.insert(v);
 }
@@ -90,13 +90,13 @@ void KmerSet<K>::eat(const string& seq) {
 template<int K>
 void KmerSet<K>::addRC() {
    for (int h : member) {
-      rcmember.push_back(revcompKmerInt(h));
+      rcmember.insert(KmerBase<K>::revcompKmerInt(h));
    }
    //member.insert(tmp.begin(), tmp.end());
 }
 template<int K>
 int KmerSet<K>::commonForward(const KmerSet<K>& other, const bool rc) const {
-   const unordered_set* tmp = &other.member;
+   const unordered_set<int>* tmp = &other.member;
    if (rc) {
       tmp = &other.rcmember;
    }
@@ -119,7 +119,7 @@ int KmerSet<K>::commonForward(const KmerSet<K>& other, const bool rc) const {
 
 template<int K>
 int KmerSet<K>::commonReverse(const KmerSet<K>& other, const bool rc) const {
-   const unordered_set* tmp = &other.member;
+   const unordered_set<int>* tmp = &other.member;
    if (rc) {
       tmp = &other.rcmember;
    }
@@ -127,12 +127,12 @@ int KmerSet<K>::commonReverse(const KmerSet<K>& other, const bool rc) const {
    int res=0;
    if (rcmember.size() < tmp->size()) {
       for (int h : rcmember) {
-         if (rmp->find(h) != tmp->end()) 
+         if (tmp->find(h) != tmp->end()) 
             ++res;
       }
    }
    else { // tmp smaller look up in rcmember
-      for (int h : tmp->rcmember) {
+      for (int h : *tmp) {
          if (rcmember.find(h) != rcmember.end())
             ++res;
       }

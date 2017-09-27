@@ -46,7 +46,7 @@ template <int K> class KmerBase {
          return res&mask;
       }
 
-   private:
+   protected:
       /** mask is pow(4,K)-1 
        * This should be shared by all objects in this class.
        */
