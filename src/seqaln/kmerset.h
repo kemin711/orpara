@@ -40,7 +40,7 @@ class KmerSet : public KmerBase<K> {
        * Compute for both forward and revers
        * return the larger of the two results.
        */
-      int common(const Kmerset<K>& other) {
+      int common(const KmerSet<K>& other) {
          int f = commonForward(other);
          int r = commonReverse(other);
          return  max(f,r);
