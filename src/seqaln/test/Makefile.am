@@ -1,4 +1,4 @@
-TESTS = testall testmatrix
+TESTS = testall testmatrix testkmerset
 check_PROGRAMS = testall testmatrix testkmerset
 testall_SOURCES = main_testall.cpp dynalnt_test.cpp 
 testall_CXXFLAGS = -I.. -I../.. $(gtest_CXXFLAGS)
