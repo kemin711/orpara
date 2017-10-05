@@ -89,7 +89,12 @@ class Fastq {
              qual[i] = *(quality + i);
       }
       /**
-       * Constructor with string quality
+       * Constructor using string quality
+       * @param id unique identifier for the sequence.
+       * @param description title for the sequence
+       * @param sequence the string representation of the
+       *   nucleic acids sequence.
+       * @param quality string representation of the quality.
        */
       Fastq(const string &id, const string &description, const string &sequence, const string &quality)
          : name(id), desc(description), seq(sequence), 
