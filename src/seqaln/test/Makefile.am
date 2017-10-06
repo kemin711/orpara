@@ -1,5 +1,5 @@
-TESTS = testall testmatrix
-check_PROGRAMS = testall testmatrix
+TESTS = testall testmatrix testkmerset
+check_PROGRAMS = testall testmatrix testkmerset
 testall_SOURCES = main_testall.cpp dynalnt_test.cpp 
 testall_CXXFLAGS = -I.. -I../.. $(gtest_CXXFLAGS)
 testall_LDFLAGS = $(gtest_LDFLAGS)
@@ -9,3 +9,8 @@ testmatrix_SOURCES = scorematrix_test.cpp
 testmatrix_CXXFLAGS = -I.. -I../.. $(gtest_CXXFLAGS)
 testmatrix_LDFLAGS = $(gtest_LDFLAGS)
 testmatrix_LDADD = $(gtest_LIBS) ../../libkemin.la
+
+testkmerset_SOURCES = kmerset_test.cpp
+testkmerset_CXXFLAGS = -I.. -I../.. $(gtest_CXXFLAGS)
+testkmerset_LDFLAGS = $(gtest_LDFLAGS)
+testkmerset_LDADD = $(gtest_LIBS) ../../libkemin.la
