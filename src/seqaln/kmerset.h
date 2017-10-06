@@ -11,7 +11,9 @@ namespace orpara {
 template<int K> 
 class KmerSet : public KmerBase<K> {
    public:
-      KmerSet() : member(), rcmember() { }
+      KmerSet() : member(), rcmember() {
+        cout << "KmerSet default constructor\n";
+      }
       /**
        * Eat one sequence and convert it to  the 
        * kmer set, add the kmers to member.
