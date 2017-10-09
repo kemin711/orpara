@@ -12,7 +12,7 @@ template<int K>
 class KmerSet : public KmerBase<K> {
    public:
       KmerSet() : member(), rcmember() {
-        cout << "KmerSet default constructor\n";
+        //cout << "KmerSet default constructor\n";
       }
       /**
        * Eat one sequence and convert it to  the 
@@ -61,6 +61,11 @@ class KmerSet : public KmerBase<K> {
          return member.size();
       }
 
+      void show(ostream& ous) const {
+         ous << "member size: " << member.size() 
+            << " rcmember size: " << rcmember.size() << endl;
+      }
+
    private:
       /**
        * Kmers represented as integers after converting them
@@ -72,6 +77,7 @@ class KmerSet : public KmerBase<K> {
 
 template<int K>
 void KmerSet<K>::eat(const string& seq) {
+   //cout << __func__ << "(" << seq << ")\n";
    // calculate kmer integer hash value for all kmers in the sequence
    size_t i;
    unsigned int v=0;
@@ -81,7 +87,10 @@ void KmerSet<K>::eat(const string& seq) {
       v |= KmerBase<K>::base2int(seq[i]);
    }
    for (i=0; i<seq.length()-K; ++i) {
-      member.insert(v);
+      // skip N
+      if (toupper(seq[i]) != 'N') {
+         member.insert(v);
+      }
       v<<=2;
       v |= KmerBase<K>::base2int(seq[i+K]);
       v &= KmerBase<K>::mask;

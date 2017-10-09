@@ -394,7 +394,7 @@ class Dynaln {
 
       ////////////  Informational Functions ///////////////////////////////
       /**
-       * return the score of the alignment
+       * @return the score of the alignment
        */
       int getScore() const { return Smax; }
       /**
