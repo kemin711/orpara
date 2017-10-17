@@ -128,6 +128,12 @@ void rmsp(const char a[], char b[]);
 //overloaded version.   input string a, output string b
 void rmdquote(char a[]); //removes double quote
 void rpldquote(char a[], const char r); //replace double quote with r
+/**
+ * @param q quote chacter can be single or double
+ */
+void removeQuote(string& str, const char q);
+void removeDoubleQuote(string& str);
+string getQuoteLess(const string& str, const char q);
 
 /** This function is not so good and should be removed in the future
  */
@@ -246,6 +252,7 @@ vector<string> split(const string &str, const char sep='\t');
 
 /**
  * Some fields may be double or single quoted
+ * @return fields as vector with quotes preserved.
  */
 vector<string> splitQuoted(const string &str, const char quote, const char sep='\t');
 
