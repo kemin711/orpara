@@ -259,6 +259,29 @@ void rpldquote(char a[], const char r)
 		x = strchr(++x, '\"');
 	}
 }
+
+void removeQuote(string& str, const char q) {
+   if (str[0] == q && str.back() == q) {
+      str = str.substr(1, str.size()-2);
+   }
+}
+
+string getQuoteLess(const string& str, const char q) {
+   if (str[0] == q && str.back() == q) {
+      return str.substr(1, str.size()-2);
+   }
+   if (str[0] == q || str.back() == q) {
+      throw runtime_error(string(__func__) + ":ERROR: unbalanced quote: " + str);
+   }
+   return str;
+}
+
+void removeDoubleQuote(string& str) {
+   if (str[0] == '"' && str.back() == '"') {
+      str = str.substr(1, str.size()-2);
+   }
+}
+
 string tr(const string& str, char i, char o) {
 	string::const_iterator it = str.begin();
 	string tmp;
@@ -639,12 +662,16 @@ vector<string> split(const string &str, const char sep) {
 // optional quote
 // will preserve the quote in the value
 vector<string> splitQuoted(const string &str, const char quote, const char sep) {
-	vector<string> tmp;
 	string::size_type i=0,ii, iq;
    bool quoted = false;
-   if (str[0] == quote) {
+   if (isspace(str[0])) {
+      cerr << "WARN: string starts with white space!\n";
+      ++i;
+   }
+   if (str[i] == quote) {
       quoted=true;
    }
+	vector<string> tmp;
    do {
       if (quoted) { // use quote
          iq = str.find(quote, i+1);
@@ -654,14 +681,18 @@ vector<string> splitQuoted(const string &str, const char quote, const char sep) 
          }
          tmp.push_back(str.substr(i, iq-i+1));
          quoted = false;
-         i = iq + 1;
-         if (i < str.size()) ++i;
+         i = iq + 1; // either quote or end of line
+         if (i < str.size()) {
+            assert(str[i] == sep);
+            ++i;
+         }
       }
       else { // not quoted string field<SEP>abcdef<SEP>
          ii = str.find(sep, i);
          if (ii == string::npos) {
             tmp.push_back(str.substr(i));
-            i=ii;
+            break;
+            //i=ii;
          }
          else {
             tmp.push_back(str.substr(i,ii-i));
@@ -673,6 +704,9 @@ vector<string> splitQuoted(const string &str, const char quote, const char sep) 
       }
 	}
    while (i != str.size() && i != string::npos);
+   if (str[i] == sep) { // last field is empty, must append empty string!
+      tmp.push_back(string());
+   }
 	return tmp;
 }
 
@@ -920,6 +954,15 @@ string fileBasename(const string& pathstr, const string& suffix) {
    }
    return base;
 }
+string getFileStem(const string& filename) {
+   string tmp = fileBasename(filename);
+   string::size_type i = tmp.rfind('.');
+   if (i != string::npos) {
+      return tmp.substr(0,i);
+   }
+   return tmp;
+}
+
 
 // end of orpara namespace
 }
