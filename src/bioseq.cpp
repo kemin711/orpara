@@ -578,8 +578,8 @@ string bioseq::substring(const int b) const throw (bioseqexception) {
 // using human coordinates
 bioseq bioseq::subseq(int b, int e) const throw (bioseqexception) { 
    if (b<1) {
-      cerr << "Coordinates b=" << b << " e=" << e 
-         << "error, must use 1-based index\n";
+      cerr << __FILE__ << ":" << __LINE__ << ":ERROR: Coordinates b=" << b << " e=" << e 
+         << " must use 1-based index\n";
       throw bioseqexception("Bioseq coordinates in subseq is 1-based, coordinates < 1");
    }
    if (e > (int)length() || e == -1) {

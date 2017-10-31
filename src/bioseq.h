@@ -443,7 +443,8 @@ class bioseq {
        */
       map<char, double> getFrequency() const;
 
-      /** compute the entropy of this sequence
+      /** 
+       * compute the entropy of this sequence
        * for both single- and double-letter 
        */
       pair<double,double> computeEntropy() const {
@@ -724,6 +725,7 @@ class DNA : public bioseq {
       Protein translate(int begin, int end=-1) const;
       /**
        * Nothing more than the parent method.
+       * 1-based index.
        */
       DNA subseq(int b, int e) const {
          return bioseq::subseq(b,e); }

@@ -58,8 +58,13 @@ bool startwith(const string& str, const string &head);
 void upper(const char lo[], char *up);
 /**
  * get an all lower case version of the original string.
+ * @param str input string will not be changed.
+ * @return a lower case copy of the original strin.
  */
 string getLower(const string &str);
+/**
+ * Convert the str to lower case
+ */
 void strTolower(string &str);
 void strTolower(const string &str1, string &str2);
 /**
