@@ -337,6 +337,14 @@ string fileBasename(const string& pathstr);
  * So far I only implemented the unix path separater \/
  */
 string fileBasename(const string& pathstr, const string& suffix);
+/**
+ * @return the file part of the path excluding the last suffix.
+ *   for example, /path/to/filestem.suff1.suff2 as input
+ *   will produce filestem.suff1
+ *   If filename is a single string then itself will be
+ *   retunred.
+ */
+string getFileStem(const string& filename);
 
 // end of namespace
 }

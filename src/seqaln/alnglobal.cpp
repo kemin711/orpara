@@ -39,7 +39,6 @@ void usage() {
  * Only works for unix path separator '/'.
  */
 string getFilePart(const string &path);
-string getFileStem(const string &fname);
 /**
  * Remove the path part and suffix
  * @return the file stem only.
@@ -290,14 +289,6 @@ string getFilePart(const string &path) {
       return path.substr(i);
    }
    else return path;
-}
-
-string getFileStem(const string &fname) {
-   string::size_type i = fname.rfind('.');
-   if (i != string::npos) {
-      return fname.substr(0,i);
-   }
-   else return fname;
 }
 
 string getOnlyFileStem(const string &fname) {

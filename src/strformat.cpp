@@ -704,6 +704,9 @@ vector<string> splitQuoted(const string &str, const char quote, const char sep) 
       }
 	}
    while (i != str.size() && i != string::npos);
+   if (str[i] == sep) { // last field is empty, must append empty string!
+      tmp.push_back(string());
+   }
 	return tmp;
 }
 
@@ -951,6 +954,15 @@ string fileBasename(const string& pathstr, const string& suffix) {
    }
    return base;
 }
+string getFileStem(const string& filename) {
+   string tmp = fileBasename(filename);
+   string::size_type i = tmp.rfind('.');
+   if (i != string::npos) {
+      return tmp.substr(0,i);
+   }
+   return tmp;
+}
+
 
 // end of orpara namespace
 }

@@ -260,7 +260,7 @@ class Fastq {
        */
       int* getQuality() const { return qual; }
       /**
-       * @return average quality score for this sequence
+       * @return average quality score Q for this sequence
        */
       double getAverageQuality() const;
       /**
