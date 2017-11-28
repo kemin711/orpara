@@ -136,11 +136,19 @@ class Interval {
       bool operator==(const Interval &iv) const { return b==iv.b && e==iv.e; }
       bool before(const Interval &iv) const { return e < iv.b; }
       bool after(const Interval &iv) const { return b > iv.e; }
+      /**
+       * @return true if the range is [-1, -1]. 
+       *   This is the original default state.
+       */
       bool isNull() const { return b==-1 && e==-1; }
 
       void setBegin(const int bb) { b=bb; }
       void setEnd(const int ee) { e=ee; }
       void set(const Interval &iv) { b=iv.b; e=iv.e; }
+      /**
+       * change the interval to be [bb, ee]
+       */
+      void set(const int bb, const int ee) { b=bb; e=ee; }
       /** return the beginning of the interval.
        * begin() will do the same */
       int getBegin() const { return b; }
@@ -159,8 +167,10 @@ class Interval {
        * For composite derived class, it is the Interval
        * covered by all the members.
        * it is min(b) - max(e) of all members.
+       * @return length of the interval. For NULL ranges
+       *   the length is defined as zero not 1.
        */
-      int length() const { return e-b+1; }
+      int length() const { if (isNull()) return 0; else return e-b+1; }
 
    private:
       int b, e;

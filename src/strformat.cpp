@@ -688,15 +688,21 @@ vector<string> splitQuoted(const string &str, const char quote, const char sep) 
          }
       }
       else { // not quoted string field<SEP>abcdef<SEP>
-         ii = str.find(sep, i);
-         if (ii == string::npos) {
-            tmp.push_back(str.substr(i));
-            break;
-            //i=ii;
+         if (i+1 < str.size() && str[i+1] == sep) { // special empty field case
+            tmp.push_back(string());
+            ++i;
          }
          else {
-            tmp.push_back(str.substr(i,ii-i));
-            i = ii + 1;
+            ii = str.find(sep, i);
+            if (ii == string::npos) {
+               tmp.push_back(str.substr(i));
+               break;
+               //i=ii;
+            }
+            else {
+               tmp.push_back(str.substr(i,ii-i));
+               i = ii + 1;
+            }
          }
       }
       if (i != str.size() && i != string::npos && str[i] == quote) {
@@ -704,7 +710,7 @@ vector<string> splitQuoted(const string &str, const char quote, const char sep) 
       }
 	}
    while (i != str.size() && i != string::npos);
-   if (str[i] == sep) { // last field is empty, must append empty string!
+   if (str.back() == sep) { // last field is empty, must append empty string!
       tmp.push_back(string());
    }
 	return tmp;
@@ -954,6 +960,7 @@ string fileBasename(const string& pathstr, const string& suffix) {
    }
    return base;
 }
+
 string getFileStem(const string& filename) {
    string tmp = fileBasename(filename);
    string::size_type i = tmp.rfind('.');
