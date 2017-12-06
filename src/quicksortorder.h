@@ -191,9 +191,18 @@ int randomSelectIterative(vector<T> &arr, int p, int r, int i) {
 template<class T>
 class FindMedian {
    public:
+      /**
+       * Default constructor with empty data
+       */
       FindMedian() : data() { }
+      /**
+       * Constructor from a vector as input.
+       */
       FindMedian(const vector<T>& arr) 
             : data(arr) {}
+      /**
+       * Accumulate indidual data.
+       */
       void operator()(T val) {
          data.push_back(val);
       }
@@ -227,7 +236,9 @@ class FindMedian {
       void clear() { data.clear(); }
       bool empty() const { return data.empty(); }
       int getN() const { return data.size(); }
+
       int getUniqueCount() const {
+         //cerr << __FILE__ << ":" << __LINE__ << " data size: " << data.size() << endl;
          set<T> tmp;
          for (const T& d : data) {
             tmp.insert(d);
