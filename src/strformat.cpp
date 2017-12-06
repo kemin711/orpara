@@ -688,10 +688,17 @@ vector<string> splitQuoted(const string &str, const char quote, const char sep) 
          }
       }
       else { // not quoted string field<SEP>abcdef<SEP>
+         //5,7,,,8,ABC => 5|7|||8|ABC
+         if (i < str.size() && str[i] == sep) {
+            tmp.push_back(string());
+            ++i;
+         }
+         /*
          if (i+1 < str.size() && str[i+1] == sep) { // special empty field case
             tmp.push_back(string());
             ++i;
          }
+         */
          else {
             ii = str.find(sep, i);
             if (ii == string::npos) {
@@ -710,9 +717,9 @@ vector<string> splitQuoted(const string &str, const char quote, const char sep) 
       }
 	}
    while (i != str.size() && i != string::npos);
-   if (str.back() == sep) { // last field is empty, must append empty string!
-      tmp.push_back(string());
-   }
+   //if (str.back() == sep) { // last field is empty, must append empty string!
+   //   tmp.push_back(string());
+   //}
 	return tmp;
 }
 

@@ -111,9 +111,10 @@ testAll-main_testall.o: main_testall.cpp /usr/include/stdc-predef.h \
  /usr/local/include/gtest/internal/gtest-internal.h \
  /usr/local/include/gtest/internal/gtest-port.h /usr/include/string.h \
  /usr/include/x86_64-linux-gnu/bits/string3.h \
- /usr/local/include/sys/stat.h /usr/include/x86_64-linux-gnu/bits/stat.h \
- /usr/include/c++/5/algorithm /usr/include/c++/5/utility \
- /usr/include/c++/5/bits/stl_relops.h /usr/include/c++/5/bits/stl_algo.h \
+ /usr/include/x86_64-linux-gnu/sys/stat.h \
+ /usr/include/x86_64-linux-gnu/bits/stat.h /usr/include/c++/5/algorithm \
+ /usr/include/c++/5/utility /usr/include/c++/5/bits/stl_relops.h \
+ /usr/include/c++/5/bits/stl_algo.h \
  /usr/include/c++/5/bits/algorithmfwd.h \
  /usr/include/c++/5/bits/stl_heap.h /usr/include/c++/5/bits/stl_tempbuf.h \
  /usr/include/c++/5/random /usr/include/c++/5/cmath /usr/include/math.h \
@@ -238,7 +239,8 @@ testAll-main_testall.o: main_testall.cpp /usr/include/stdc-predef.h \
  /usr/local/include/gtest/gtest-typed-test.h \
  /usr/local/include/gtest/gtest_pred_impl.h ../bioseq.h \
  /usr/include/c++/5/list /usr/include/c++/5/bits/stl_list.h \
- /usr/include/c++/5/bits/list.tcc ../range.h ../interval.h ../codon.h
+ /usr/include/c++/5/bits/list.tcc ../range.h ../interval.h ../codon.h \
+ ../strformat.h /usr/include/c++/5/cstring
 
 /usr/include/stdc-predef.h:
 
@@ -542,7 +544,7 @@ testAll-main_testall.o: main_testall.cpp /usr/include/stdc-predef.h \
 
 /usr/include/x86_64-linux-gnu/bits/string3.h:
 
-/usr/local/include/sys/stat.h:
+/usr/include/x86_64-linux-gnu/sys/stat.h:
 
 /usr/include/x86_64-linux-gnu/bits/stat.h:
 
@@ -855,3 +857,7 @@ testAll-main_testall.o: main_testall.cpp /usr/include/stdc-predef.h \
 ../interval.h:
 
 ../codon.h:
+
+../strformat.h:
+
+/usr/include/c++/5/cstring:
