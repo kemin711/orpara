@@ -15,18 +15,27 @@ TEST(GlobalFunctionTest, translate) {
 }
 
 TEST(StrformatTest, splitQuotedNarrow) {
-   string rowstr="PR_RNA_NT1,PR_RNA_NT1,NA,NA,Pool24,NA,Pool24,NA,cfRNA_RT_20171201,PrediActV2,RNA,Predi_Run0067_NextSeq_171201_2,NA,5,1.38525";
+   string rowstr="XRNA_NT1,PR_NT1,NA,NA,Pool24,NA,Pool24,NA,RNA_RT_20171201,tacctV2,RNA,Run0067_Seq_171201_2,NA,5,1.38525";
    vector<string> row=splitQuoted(rowstr, '"', ',');
    cout << rowstr << endl;
    copy(row.begin(), row.end(), ostream_iterator<string>(cout, " | "));
 }
 
 TEST(StrformatTest, splitQuotedEmpty) {
-   string rowstr=",Field2,PR_RNA_NT1,\"some thong to do with quote\",,,NA,Pool24,NA,Pool24,NA,cfRNA_RT_20171201,PrediActV2,RNA,Predi_Run0067_NextSeq_171201_2,NA,5,1.38525,LASTempty,";
+   string rowstr=",Field2,PR_RNA_NT1,\"some thong to do with quote\",,,NA,Pool24,NA,Pool24,NA,RNA_RT_20171201,XYX,RNA,Run0067_xeq_171201_2,NA,5,1.38525,LASTempty,";
    vector<string> row=splitQuoted(rowstr, '"', ',');
    cout << rowstr << endl;
    copy(row.begin(), row.end(), ostream_iterator<string>(cout, " | "));
 }
+
+TEST(StrformatTest, splitQuotedTail) {
+   string input="Run0066_exteq_171104_1,,";
+   vector<string> row=splitQuoted(input, '"', ',');
+   cout << input << endl;
+   copy(row.begin(), row.end(), ostream_iterator<string>(cout, " | "));
+   ASSERT_EQ(row.size(), 3);
+}
+   
 
 int main(int argc, char* argv[]) {
    testing::InitGoogleTest(&argc, argv);
