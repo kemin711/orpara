@@ -717,9 +717,9 @@ vector<string> splitQuoted(const string &str, const char quote, const char sep) 
       }
 	}
    while (i != str.size() && i != string::npos);
-   //if (str.back() == sep) { // last field is empty, must append empty string!
-   //   tmp.push_back(string());
-   //}
+   if (str.back() == sep) { // last field is empty, must append empty string!
+      tmp.push_back(string());
+   }
 	return tmp;
 }
 
