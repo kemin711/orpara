@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <random>
 #include <set>
+#include <limits>
 
 //#define DEBUGLOG
 
@@ -194,7 +195,7 @@ class FindMedian {
       /**
        * Default constructor with empty data
        */
-      FindMedian() : data() { }
+      FindMedian() : data(), medianVal(numeric_limits<T>::max()), numuniq(-1) { }
       /**
        * Constructor from a vector as input.
        */
@@ -208,10 +209,12 @@ class FindMedian {
       }
 
       T getMedian() {
+         if (medianVal != numeric_limits<T>::max()) 
+            return medianVal;
          if (data.size() == 1) return data[0];
          if (data.size() == 2) return (data[0]+data[1])/2;
          int Im = data.size()/2;
-         T medianVal = randomselIterative(data, 0, data.size()-1, Im+1);
+         medianVal = randomselIterative(data, 0, data.size()-1, Im+1);
 #ifdef DEBUGLOG
          cout << Im+1 << "th value: " << medianVal << endl;
 #endif
@@ -220,7 +223,7 @@ class FindMedian {
 #ifdef DEBUGLOG
             cout << Im << "th value: " << medianAfter << endl;
 #endif
-            return (medianAfter + medianVal)/2;
+            medianVal = (medianAfter+medianVal)/2;
          }
          return medianVal;
       }
@@ -231,19 +234,26 @@ class FindMedian {
          return tmp;
       }
 
-      void setData(const vector<T>& newdata) { data = newdata; }
+      void setData(const vector<T>& newdata) { 
+         data = newdata; 
+         numuniq=-1;
+         medianVal=numeric_limits<T>::max();
+      }
 
       void clear() { data.clear(); }
       bool empty() const { return data.empty(); }
       int getN() const { return data.size(); }
 
       int getUniqueCount() const {
-         //cerr << __FILE__ << ":" << __LINE__ << " data size: " << data.size() << endl;
-         set<T> tmp;
-         for (const T& d : data) {
-            tmp.insert(d);
+         if (numuniq == -1) {
+            //cerr << __FILE__ << ":" << __LINE__ << " data size: " << data.size() << endl;
+            set<T> tmp(data.begin(), data.end());
+            //for (const T& d : data) {
+            //   tmp.insert(d);
+            //}
+            numuniq=tmp.size();
          }
-         return tmp.size();
+         return numuniq;
       }
 
       pair<T, int> getMedianUnique() {
@@ -274,6 +284,15 @@ class FindMedian {
 
    private:
       vector<T> data;
+      /**
+       * Median value from data. After obtaining this value
+       * the data can be cleared.
+       */
+      mutable T medianVal;
+      /**
+       * Number of unique values
+       */
+      mutable int numuniq;
 
       int randompart(vector<T> &arr, int p, int r) {
          uniform_int_distribution<int> unif_dist(p, r);
