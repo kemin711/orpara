@@ -248,9 +248,6 @@ class FindMedian {
          if (numuniq == -1) {
             //cerr << __FILE__ << ":" << __LINE__ << " data size: " << data.size() << endl;
             set<T> tmp(data.begin(), data.end());
-            //for (const T& d : data) {
-            //   tmp.insert(d);
-            //}
             numuniq=tmp.size();
          }
          return numuniq;
@@ -261,9 +258,11 @@ class FindMedian {
       }
 
       pair<T, int> getMedianUniqueAndClear() {
-         pair<T, int> tmp = make_pair(getMedian(), getUniqueCount());
+         if (numuniq == -1) getUnique();
+         if (medianVal == numeric_limits<T>::max()) getMedian();
+         //pair<T, int> tmp = make_pair(getMedian(), getUniqueCount());
          clear();
-         return tmp;
+         return make_pair<T,int>(medianVal, numuniq);
       }
 
       void showData(ostream &ous) const {

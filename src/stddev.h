@@ -261,6 +261,10 @@ class Stddev {
 			}
 		}
 
+      /**
+       * Get mean value for the member with index i
+       * use 0-based index
+       */
       double getMean(size_t i) const { return avg[i]; }
       /**
        * @return the mean value.
