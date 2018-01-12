@@ -215,7 +215,7 @@ class FindMedian {
          data.push_back(val);
       }
 
-      T getMedian() {
+      T getMedian() const {
          if (medianVal != numeric_limits<T>::max()) 
             return medianVal;
          if (data.size() == 1) return data[0];
@@ -260,7 +260,7 @@ class FindMedian {
          return numuniq;
       }
 
-      pair<T, int> getMedianUnique() {
+      pair<T, int> getMedianUnique() const {
          return make_pair(getMedian(), getUniqueCount());
       }
 
