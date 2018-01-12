@@ -201,6 +201,13 @@ class FindMedian {
        */
       FindMedian(const vector<T>& arr) 
             : data(arr) {}
+      FindMedian(const FindMedian& other)
+         : data(other.data), medianVal(other.medianVal), numuniq(other.numuniq)
+      { }
+      FindMedian(FindMedian&& other)
+         : data(std::move(other.data)), 
+           medianVal(other.medianVal), numuniq(other.numuniq)
+      { }
       /**
        * Accumulate indidual data.
        */
