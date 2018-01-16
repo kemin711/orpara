@@ -55,7 +55,8 @@ class stddev {
          }
          return *this;
       }
-
+      stddev(stddev&& other) = default;
+      stddev& operator=(stddev&& other) = default;
       /**
        * To be used to accumulate input values.
        */
