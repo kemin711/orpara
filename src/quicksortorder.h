@@ -214,6 +214,23 @@ class FindMedian {
       void operator()(T val) {
          data.push_back(val);
       }
+      FindMedian& operator=(const FindMedian& other) {
+         if (this != &other) {
+            data=other.data;
+            medianVal=other.medianVal;
+            numuniq=other.numuniq;
+         }
+         return *this;
+      }
+
+      FindMedian& operator=(FindMedian&& other) {
+         if (this != &other) {
+            data=std::move(other.data);
+            medianVal=other.medianVal;
+            numuniq=other.numuniq;
+         }
+         return *this;
+      }
 
       T getMedian() const {
          if (medianVal != numeric_limits<T>::max()) 
