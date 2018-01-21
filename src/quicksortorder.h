@@ -282,11 +282,11 @@ class FindMedian {
       }
 
       pair<T, int> getMedianUniqueAndClear() {
-         if (numuniq == -1) getUnique();
+         if (numuniq == -1) getUniqueCount();
          if (medianVal == numeric_limits<T>::max()) getMedian();
          //pair<T, int> tmp = make_pair(getMedian(), getUniqueCount());
          clear();
-         return make_pair<T,int>(medianVal, numuniq);
+         return make_pair(medianVal, numuniq);
       }
 
       void showData(ostream &ous) const {
@@ -306,7 +306,7 @@ class FindMedian {
       }
 
    private:
-      vector<T> data;
+      mutable vector<T> data;
       /**
        * Median value from data. After obtaining this value
        * the data can be cleared.
@@ -317,7 +317,7 @@ class FindMedian {
        */
       mutable int numuniq;
 
-      int randompart(vector<T> &arr, int p, int r) {
+      static int randompart(vector<T> &arr, int p, int r) {
          uniform_int_distribution<int> unif_dist(p, r);
          int i = unif_dist(rand_engine);
 #ifdef DEBUGLOG
@@ -332,8 +332,10 @@ class FindMedian {
        * @param arr input array
        * @param p start of the array
        * @param r end of the array [p, r] close range.
+       *
+       * This is a helper function
        */
-      int randomselIterative(vector<T> &arr, int p, int r, int i) {
+      static int randomselIterative(vector<T> &arr, int p, int r, int i) {
 #ifdef DEBUGLOG
          cout << __func__ << ": input selecting " << i << "th\n";
          showData(cout);

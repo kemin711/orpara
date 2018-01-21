@@ -93,7 +93,7 @@ class stddev {
 		double getStd() const { return sqrt(var); }
 		double getSampleStd() const { return sqrt(SS); }
       /**
-       * print avg stddev n to the output stream.
+       * print avg,stddev,n to the output stream.
        * will not output endl for flexibility.
        * @param delim delimter default is TAB.
        * @return output stream for chaining.
@@ -136,7 +136,6 @@ class stddev {
 
 /**
  * Useful for working with multiple numbers.
- * Cannot have move constructor or operator
  */
 template<size_t N>
 class Stddev {
@@ -317,10 +316,11 @@ class Stddev {
          return ous; 
       }
       /**
-       * print avg stddev n to the output stream.
+       * print count, [avg,stddev] ... for each feature
+       * to the output stream.
        * will not output endl for flexibility.
        * @param delim delimter default is TAB.
-       * @return output stream for chaining.
+       * @return ous output stream for chaining.
        */
       ostream& print(ostream &ous, const string &delim="\t") const {
          array<double, N> sd=getStd();
