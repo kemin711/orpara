@@ -13,7 +13,7 @@
 
 using namespace std;
 
-namespace orpara{
+namespace orpara {
 
 /**
  * This function work on a range [p, r] p<r.
@@ -189,18 +189,30 @@ int randomSelectIterative(vector<T> &arr, int p, int r, int i) {
    return arr[p];
 }
 
+/**
+ * Algorithm object to calculate the median for
+ * a given data.
+ */
 template<class T>
 class FindMedian {
    public:
       /**
        * Default constructor with empty data
        */
-      FindMedian() : data(), medianVal(numeric_limits<T>::max()), numuniq(-1) { }
+      FindMedian() : data(), medianVal(numeric_limits<T>::max()), numuniq(-1) 
+      { }
+      /**
+       * Initialize from a single datum.
+       */
+      FindMedian(const T& d)
+         : data(1,d), medianVal(numeric_limits<T>::max()), numuniq(-1) 
+      { }
       /**
        * Constructor from a vector as input.
        */
       FindMedian(const vector<T>& arr) 
-            : data(arr) {}
+         : data(arr), medianVal(numeric_limits<T>::max()), numuniq(-1) 
+      {}
       FindMedian(const FindMedian& other)
          : data(other.data), medianVal(other.medianVal), numuniq(other.numuniq)
       { }
@@ -214,6 +226,7 @@ class FindMedian {
       void operator()(T val) {
          data.push_back(val);
       }
+
       FindMedian& operator=(const FindMedian& other) {
          if (this != &other) {
             data=other.data;
@@ -232,29 +245,74 @@ class FindMedian {
          return *this;
       }
 
-      T getMedian() const {
-         if (medianVal != numeric_limits<T>::max()) 
+      /**
+       * Computation will alter the stats of 
+       * the data member.
+       */
+      T getMedian() {
+         /*
+         if (medianVal != numeric_limits<T>::max()) {
+#ifdef DEBUGLOG
+            cout << "median value already computed: " << medianVal << endl;
+#endif
             return medianVal;
-         if (data.size() == 1) return data[0];
-         if (data.size() == 2) return (data[0]+data[1])/2;
-         int Im = data.size()/2;
-         medianVal = randomselIterative(data, 0, data.size()-1, Im+1);
+         }
+         */
+         if (data.empty()) {
+            cerr << __FILE__ << ":" << __LINE__ << ":" << __func__ 
+               << ":WARN data is empty, please check your logic\n";
+            return medianVal;
+         }
+         else if (data.size() == 1) {
+            medianVal=data.front();
+         }
+         else if (data.size() == 2) {
+            medianVal = (data[0]+data[1])/2;
+         }
+         else {
+            int Im = data.size()/2;
+            medianVal = randomselIterative(data, 0, data.size()-1, Im+1);
+            if (data.size() % 2 == 0) {
+               T medianAfter = randomselIterative(data, 0, data.size()-1, Im);
+               medianVal = (medianAfter+medianVal)/2;
+            }
+         }
 #ifdef DEBUGLOG
-         cout << Im+1 << "th value: " << medianVal << endl;
+         cout << __FILE__ << ":" << __LINE__ << ":" << __func__ << endl;
+         show(cout);
 #endif
-         if (data.size() % 2 == 0) {
-            T medianAfter = randomselIterative(data, 0, data.size()-1, Im);
-#ifdef DEBUGLOG
-            cout << Im << "th value: " << medianAfter << endl;
-#endif
-            medianVal = (medianAfter+medianVal)/2;
+         return medianVal;
+      }
+
+      /**
+       * Pure function to compute the median value.
+       */
+      T computeMedian() {
+         if (data.empty()) {
+            cerr << __FILE__ << ":" << __LINE__ << ":" << __func__ 
+               << ":WARN data is empty, please check your logic\n";
+            medianVal=numeric_limits<T>::max();
+         }
+         else if (data.size() == 1) { // single value
+            medianVal=data.front();
+         }
+         else if (data.size() == 2) {
+            medianVal = (data[0]+data[1])/2;
+         }
+         else {
+            int Im = data.size()/2;
+            medianVal = randomselIterative(data, 0, data.size()-1, Im+1);
+            if (data.size() % 2 == 0) {
+               T medianAfter = randomselIterative(data, 0, data.size()-1, Im);
+               medianVal = (medianAfter+medianVal)/2;
+            }
          }
          return medianVal;
       }
 
       T getMedianAndClear() {
          T tmp = getMedian();
-         clear();
+         data.clear();
          return tmp;
       }
 
@@ -264,13 +322,47 @@ class FindMedian {
          medianVal=numeric_limits<T>::max();
       }
 
-      void clear() { data.clear(); }
+      /**
+       * Clear the intermediate data 
+       * and set the final result to 
+       * default impossible numbers.
+       */
+      void clear() { 
+         data.clear(); 
+         medianVal=numeric_limits<T>::max();
+         numuniq=-1;
+      }
+
       bool empty() const { return data.empty(); }
       int getN() const { return data.size(); }
 
       int getUniqueCount() const {
-         if (numuniq == -1) {
-            //cerr << __FILE__ << ":" << __LINE__ << " data size: " << data.size() << endl;
+         if (data.empty()) {
+            cerr << __FILE__ << ":" << __LINE__ << ":" << __func__
+               << ":WARN empty data, check logic\n";
+            return -1;
+         }
+         //if (numuniq == -1) {
+            set<T> tmp(data.begin(), data.end());
+            numuniq=tmp.size();
+#ifdef DEBUGLOG
+            cerr << __FILE__ << ":" << __LINE__ << " data size: " 
+               << data.size() << " unique: " << numuniq << endl;
+#endif
+         //}
+         return numuniq;
+      }
+
+      /**
+       * Compute the unique count and return the value.
+       */
+      int computeUniqueCount() const {
+         if (data.empty()) {
+            cerr << __FILE__ << ":" << __LINE__ << ":" << __func__
+               << ":WARN empty data, check logic\n";
+            numuniq=-1;
+         }
+         else {
             set<T> tmp(data.begin(), data.end());
             numuniq=tmp.size();
          }
@@ -281,11 +373,24 @@ class FindMedian {
          return make_pair(getMedian(), getUniqueCount());
       }
 
+      /**
+       * This method can only be called once!
+       *
+       * Compute and store median and numberOfUnique in this
+       *  object. Clear the storage, then return the computed values.
+       * @return the [median, uniqueCount] pair
+       *    then clear the data member to save storage.
+       */
       pair<T, int> getMedianUniqueAndClear() {
-         if (numuniq == -1) getUniqueCount();
-         if (medianVal == numeric_limits<T>::max()) getMedian();
-         //pair<T, int> tmp = make_pair(getMedian(), getUniqueCount());
-         clear();
+         computeMedian();
+         computeUniqueCount();
+         data.clear();
+         return make_pair(medianVal, numuniq);
+      }
+
+      pair<T, int> computeMedianUnique() {
+         computeMedian();
+         computeUniqueCount();
          return make_pair(medianVal, numuniq);
       }
 
@@ -300,13 +405,25 @@ class FindMedian {
             ous << endl;
          }
       }
+
       void show(ostream& ous) const {
-         ous << "FindMedian: ";
-         showData(ous);
+         ous << "FindMedian Object\n"
+            << "data: ";
+         copy(data.begin(), data.end(), ostream_iterator<T>(ous, ", "));
+         //showData(ous);
+         ous << "\nmedian=" << medianVal << " numUnique=" << numuniq
+            << endl;
+      }
+
+      static void showArray(const vector<T>& arr, ostream& ous) {
+         copy(arr.begin(), arr.end(), ostream_iterator<T>(ous, "|"));
       }
 
    private:
-      mutable vector<T> data;
+      /**
+       * Data member.
+       */
+      vector<T> data;
       /**
        * Median value from data. After obtaining this value
        * the data can be cleared.
@@ -338,11 +455,11 @@ class FindMedian {
       static int randomselIterative(vector<T> &arr, int p, int r, int i) {
 #ifdef DEBUGLOG
          cout << __func__ << ": input selecting " << i << "th\n";
-         showData(cout);
+         showArray(arr, cout);
 #endif
          while (p != r) {
 #ifdef DEBUGLOG
-            cout << endl << __func__ << "---: p=" << p << ", r=" << r << " i=" << i << endl;
+            //cout << endl << __func__ << ": p=" << p << ", r=" << r << " i=" << i << endl;
 #endif
             if (r-p == 1) {
                if (arr[r] < arr[p]) {
@@ -361,43 +478,20 @@ class FindMedian {
                continue;
             }
             else if (q == r) {
-#ifdef DEBUGLOG
-               cout << __func__ << ":" << __LINE__ << ": " << q << " is the same as r\n";
-#endif
                if (i == r-p+1)  {
-#ifdef DEBUGLOG
-                  cout << "last element: " << arr[r] << " is " << i << "th\n";
-#endif
                   return arr[r];
                }
-#ifdef DEBUGLOG
-               cout << "reduced range try again\n";
-#endif
                --r;
                continue;
             }
             int k = q-p+1;
-#ifdef DEBUGLOG
-            cout << __func__ << ": q returned by randompart() " << q 
-               << endl << "k=" << k << endl;
-#endif
             if ( k == i) {
-#ifdef DEBUGLOG
-               cout << "pivot element (" << arr[q] 
-                  << ") is right at the the " << i << "th\n";
-#endif
                return arr[q];
             }
             if (i < k) {
-#ifdef DEBUGLOG
-               cout << "i<k" << endl;
-#endif
                r = q-1;
             }
             else {
-#ifdef DEBUGLOG
-               cout << "i>k" << endl;
-#endif
                p = q+1;
                i -= k;
             }
@@ -408,6 +502,7 @@ class FindMedian {
 #endif
          return arr[p];
       }
+
       static mt19937 rand_engine;
 };
 
