@@ -116,13 +116,21 @@ void strToupper(string &str) {
 }
 
 string lc(const string& str) {
-	string tmp=str;
+	string tmp(str);
 	string::iterator i = tmp.begin();
 	while (i != tmp.end()) {
 		*i = tolower(*i);
 		++i;
 	}
 	return tmp;
+} 
+
+string uc(const sring& str) {
+   string tmp(str);
+   for (auto i=0; i<tmp.size(); ++i) {
+      tmp[i]=toupper(str[i]);
+   }
+   return tmp;
 }
 
 int cmp_nocase(const string &s1, const string &s2) {
