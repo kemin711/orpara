@@ -125,7 +125,7 @@ string lc(const string& str) {
 	return tmp;
 } 
 
-string uc(const sring& str) {
+string uc(const string& str) {
    string tmp(str);
    for (auto i=0; i<tmp.size(); ++i) {
       tmp[i]=toupper(str[i]);
