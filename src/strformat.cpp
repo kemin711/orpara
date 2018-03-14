@@ -962,7 +962,7 @@ string fileBasename(const string& pathstr) {
    string::size_type x = pathstr.rfind('/');
    string result = pathstr;
    if (x != string::npos) {
-      result = pathstr.substr(x);
+      result = pathstr.substr(x+1);
    }
    return result;
 }
