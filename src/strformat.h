@@ -71,12 +71,17 @@ void strTolower(const string &str1, string &str2);
  * @param str this string will become upper case after the function call.
  */
 void strToupper(string &str);
+/**
+ * Convert string to its upper case version.
+ * @return a copy of the str in its upper case.
+ */
 string str2upper(const string &str);
 /**
  * @return the lower case version of the original string.
  * @param str input string.
  */
 string lc(const string &str);
+string uc(const string &str);
 
 /** compare to string and ignoring case **/
 int cmp_nocase(const string &s1, const string &s2);
