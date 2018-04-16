@@ -218,7 +218,7 @@ void rmsp(char a[])
 }
 
 void rmsp(string& str) {
-   str.erase(remove_if(str.begin(), str.end(), isspace));
+   str.erase(remove_if(str.begin(), str.end(), [](char c){ return isspace(c); }), str.end());
 }
 
 // not tested yet
