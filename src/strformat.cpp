@@ -217,8 +217,25 @@ void rmsp(char a[])
 	*bb = '\0';
 }
 
-/** if str is very long, this operation will be slow
- */
+void rmsp(string& str) {
+   str.erase(remove_if(str.begin(), str.end(), isspace));
+}
+
+// not tested yet
+void removeWhiteChar(string& str) {
+   string::size_type i=0,j=0;
+   while (j<str.size()) {
+      if (i<j) { str[i]=str[j]; }
+      if (isspace(str[j])) {
+         ++j;
+      }
+      else {
+         ++i; ++j;
+      }
+   }
+   if (i < str.size()-1) str.resize(i);
+}
+
 string delall(const string& str, const char c) {
 	string tmp = str;
 	int i=0;

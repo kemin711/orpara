@@ -92,7 +92,8 @@ bool intersect(vector<string> &s1, vector<string> &s2);
  */
 /** delete all character from a string
  * @see also deleteChr
- * */
+ * if str is very long, this operation will be slow
+ */
 string delall(const string& str, const char c);
 /** delete all string c from str */
 string delall(const string& str, const string& c);
@@ -130,11 +131,16 @@ string chopFirstWord(const string &str);
 void dlc(char a[]); //deltes the last character
 void rmtsp(char a[]); //remove trailing white characters such as space and \n
 void rmsp(char a[]);
+/** remove all spaces */
+void rmsp(const char a[], char b[]);
+void rmsp(string& str);
+/**
+ * Same as rmsp, different implementation, not tested.
+ */
+void removeWhiteChar(string& str);
 //removes extra white-char (space, \t, and \n) from the string, so 
 //that only one space is left to separate words
 void singleSpace(string &str);
-/** remove all spaces */
-void rmsp(const char a[], char b[]);
 //overloaded version.   input string a, output string b
 void rmdquote(char a[]); //removes double quote
 void rpldquote(char a[], const char r); //replace double quote with r
