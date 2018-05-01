@@ -5,6 +5,8 @@
 #include <cassert>
 #include <string>
 #include <stdexcept>
+#include <cmath>
+
 //#include <algorithm>
 //file: strformat.cpp
 //

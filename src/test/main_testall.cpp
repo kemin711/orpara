@@ -2,7 +2,11 @@
 #include <gtest/gtest.h>
 #include <bioseq.h>
 #include <string>
+#include <fstream>
+
 #include "../strformat.h"
+#include "../derivative.h"
+
 
 using namespace std;
 using namespace orpara;
@@ -34,6 +38,31 @@ TEST(StrformatTest, splitQuotedTail) {
    cout << input << endl;
    copy(row.begin(), row.end(), ostream_iterator<string>(cout, " | "));
    ASSERT_EQ(row.size(), 3);
+}
+
+TEST(DerivativeTest, compute) {
+   string inputFile="derivative_test.tab";
+   vector<pair<int,double>> input;
+   // first line is header x,y
+   ifstream inf(inputFile);
+   if (inf.fail()) {
+      cerr << "Failed to open input file: " << inputFile << endl;
+      exit(1);
+   }
+   string line;
+   getline(inf, line); // remove header
+   getline(inf, line);
+   while (!inf.eof()) {
+      string::size_type i = line.find('\t');
+      input.push_back(make_pair(std::stoi(line.substr(0, i)), std::stof(line.substr(i+1))));
+      getline(inf, line);
+   }
+
+   vector<tuple<int,double, double>> result=computeDerivative(input);
+   for (size_t i=0; i<input.size(); ++i) {
+      cout << input[i].first << " " << input[i].second << " "
+         << get<1>(result[i]) << " " << get<2>(result[i]) << endl;
+   }
 }
    
 
