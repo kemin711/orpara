@@ -6,6 +6,7 @@
 #include <utility>
 #include <math.h>
 #include "stddev.h"
+#include <numeric>
 
 namespace orpara {
 int Fastq::minScore=999;
