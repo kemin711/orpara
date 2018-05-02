@@ -14,7 +14,8 @@ namespace orpara {
   // if (i < 0 ) return 26;
 //   return i;
 //}
-string Matrix::default_path="/home/zhouke/src/proj/seqaln/matrix";
+//string Matrix::default_path="/home/zhouke/src/proj/seqaln/matrix";
+string Matrix::default_path=MATRIXDIR;
 const char* Matrix::proteinMatrices[]  = {
    // put all new matrices here
    "dayhoff", "gonnet", "identity", "match", 
