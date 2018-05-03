@@ -47,7 +47,7 @@ SimpleScoreMethod& SimpleScoreMethod::operator=(const SimpleScoreMethod &mt) {
 
 //string MatrixScoreMethod::default_path="/home/zhouke/src/proj/seqaln/matrix";
 //string MatrixScoreMethod::default_path="/usr/local/share/orpara/matrix";
-string MatrixScoreMethod::default_path="MATRIXDIR";
+string MatrixScoreMethod::default_path=MATRIXDIR;
 const char* MatrixScoreMethod::proteinMatrices[]  = {
    // put all new matrices here
    "dayhoff", "gonnet", "identity", "match", 
