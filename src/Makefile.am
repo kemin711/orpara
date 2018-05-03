@@ -19,6 +19,6 @@ pkginclude_HEADERS = $(only_headers) $(header_forlibs)
 lib_LTLIBRARIES = libkemin.la
 libkemin_la_SOURCES = $(header_forlibs) $(cppfiles)
 libkemin_la_LDFLAGS = -version-info 0:0:0
-libkkemin_la_CPPFLAGS = -D MATRIXDIR=$(pkgdatadir)
+libkkemin_la_CPPFLAGS = -D MATRIXDIR=$(pkgdatadir)/matrix
 
 SUBDIRS = . seqaln test
