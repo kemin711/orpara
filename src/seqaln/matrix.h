@@ -62,6 +62,12 @@ class Matrix {
        * @param nucMatrix whether it is a matrix for nucleotide default is not.
        */
       Matrix(const string& matrixName, bool nucMatrix=false);
+      /**
+       * Constructor of a particular matrix given a path to the matrix.
+       * @param matrixName name of the matrix.
+       * @param dir directory path to the matrix.
+       */
+      Matrix(const string& matrixName, const string& dir);
       /*
          : path(default_path), name(matrixName), 
            matchS(5), mismatchS(-5),
@@ -177,6 +183,9 @@ class Matrix {
       void setDefaultGapParameter();
       void setMinMaxScore() const;
 
+      /**
+       * update the path of the matrix directory.
+       */
       void setPath(const string &p) { path=p; }
       int getMatchScore(const char c1, const char c2) {
          if (c1==c2) return matchS; return mismatchS; }
@@ -249,6 +258,9 @@ class Matrix {
        * Without checking for errors.
        */
       static void setDefaultPath();
+      /**
+       * set the default matrix path
+       */
       static void setDefaultPath(const string &path);
       static bool isProteinMatrix(const string &matrixName);
       static bool isNucleicMatrix(const string &matrixName);

@@ -60,16 +60,15 @@ bool Matrix::isNucleicMatrix(const string &matrixName) {
 }
 
 void Matrix::setDefaultPath() {
-   string pathToMatrix(getenv("HOME"));
-   pathToMatrix += "/src/proj/seqaln/matrix";
-   default_path=pathToMatrix;
+   //string pathToMatrix(getenv("HOME"));
+   //pathToMatrix += "/src/proj/seqaln/matrix";
+   //default_path=pathToMatrix;
+   default_path="/usr/local/share/orpara/matrix";
 }
 void Matrix::setDefaultPath(const string &path) {
    default_path = path;
 }
 
-
-   
 // This is a default protein matrix.
 int Matrix::default_mat[32][32] = {
    /* this is the default blosum50 matrix in computer format*/
@@ -135,6 +134,13 @@ Matrix::Matrix(const string& matrixName, bool nucMatrix)
            words(0), wordSize(0) 
 { 
    read(); 
+}
+Matrix::Matrix(const string& matrixName, const string& dir)
+   : path(dir), name(matrixName), matchS(5), mismatchS(-5),
+     mtype(NUCLEIC), mins(numeric_limits<int>::max()),
+     maxs(-1), words(0), wordSize(0)
+{
+   read();
 }
 
 void Matrix::setDefaultGapParameter() {
@@ -210,8 +216,9 @@ bool Matrix::read() {
    */
    ifstream IN(infile.c_str());
    if (IN.fail()) {
-      cerr << "Failed to open " << infile << endl;
-      exit(1);
+      cerr << __FILE__ << ":" << __LINE__ << ":ERROR Failed to open " << infile << endl;
+      throw runtime_error("failed to find matrix file, path set up needed");
+      //exit(1);
    }
    string line;
    // read the comment and discard them
