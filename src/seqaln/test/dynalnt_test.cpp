@@ -103,6 +103,19 @@ TEST_F(DynalnTest, repeataln) {
 TEST_F(DynalnTest, simplescoremethodshortseq) {
    SimpleScoreMethod sm(5, -4, -8, -8);
    Dynaln<SimpleScoreMethod> aln;
+   
+   DNA seqA2("seqA2", "ACG");
+   DNA seqB2("seqB2", "TTT");
+   aln.setseq(seqA2, seqB2);
+   aln.runlocal();
+   double tmp1=aln.getScore();
+   DNA seqA1("seqA1", "AGTC");
+   DNA seqB1("seqB1", "TTTC");
+   aln.setseq(seqA1, seqB1);
+   aln.runlocal();
+   double tmp2=aln.getScore();
+   cout << tmp1 << " " << tmp2 << endl;
+
    DNA dna1("sq1", "ACGGGTG");
    DNA dna2("sq2", "TTTTTTG");
    aln.setseq(dna1, dna2);
@@ -110,6 +123,11 @@ TEST_F(DynalnTest, simplescoremethodshortseq) {
    cout << "Aligning two sequences:\n" << dna1 << dna2 << endl;
    aln.printAlign(cout);
    ASSERT_GT(aln.getScore(), 7);
+   DNA dna3("seq3", "CGATCAGTC");
+   DNA dna4("seq4", "TTTGGTTTC");
+   aln.setseq(dna3, dna4);
+   aln.runlocal();
+   aln.printAlign(cout);
 }
 
 TEST_F(DynalnTest, nucmatrix) {
