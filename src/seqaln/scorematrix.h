@@ -80,7 +80,12 @@ class ScoreMethod {
       void show() const { show(cout); }
 
    protected:
-      int gapo, gape;
+      /**
+       * gapo gap open value default -20
+       */
+      int gapo;
+      /**
+      int gape;
 };
 
 
@@ -100,6 +105,13 @@ class SimpleScoreMethod : public ScoreMethod {
        * gap extend -1.
        */
       SimpleScoreMethod() : ScoreMethod(), matchs(10), mismatchs(-10) { }
+      /**
+       * @param match a positive number to reward a pair of identical 
+       *    residues
+       * @param mismatch to penalize of pair of unmatched residues
+       *    This value is usually a negative number to subtract from the 
+       *    accumulated score.
+       */
       SimpleScoreMethod(int match, int mismatch) 
          : ScoreMethod(2*mismatch, mismatch/8 <0? mismatch/8 : -1),
             matchs(match), mismatchs(mismatch) { }
@@ -107,7 +119,8 @@ class SimpleScoreMethod : public ScoreMethod {
        * complete constructor.
        * @param match match score
        * @param mismatch mismatch score
-       * @param gapOpen score for opening a gap.
+       * @param gapOpen score for opening a gap. Usually a large
+       *     negative number.
        * @param gapExtend score for extend a gap by one extra.
        */
       SimpleScoreMethod(int match, int mismatch, int gapOpen, int gapExtend) 

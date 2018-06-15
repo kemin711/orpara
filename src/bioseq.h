@@ -446,6 +446,7 @@ class bioseq {
       /** 
        * compute the entropy of this sequence
        * for both single- and double-letter 
+       * @return <1,2> residue entropy.
        */
       pair<double,double> computeEntropy() const {
          return entropy(seq); }

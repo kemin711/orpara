@@ -35,6 +35,17 @@ class DynalnTest : public testing::Test {
       Dynaln<NucleicScoreMethod> alnnsm;
 };
 
+TEST_F(DynalnTest, simplescoremethodshortseq) {
+   SimpleScoreMethod sm(5, -4, -8, -8);
+   Dynaln<SimpleScoreMethod> aln;
+   DNA dna1("sq1", "ACGGGTG");
+   DNA dna1("sq2", "TTTTTTG");
+   aln.setseq(dan1, dna2);
+   aln.runlocal();
+   aln.printAlignment(cout);
+   ASSERT_GT(aln.getScore(), 7);
+}
+
 TEST_F(DynalnTest, nucmatrix) {
    DNA seq1("CCGTAACTTGAAAGTATTTCGATTTCTTGGCTTTATATATCGATGTAAAAGGACGAAACACCGG");
    DNA seq2("CCGTAACTTGAAAGTATTTCGATTTCTTGGCTTTATATATCGATGTAAAAGGACAACACCGG");
