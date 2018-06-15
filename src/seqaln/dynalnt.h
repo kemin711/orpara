@@ -444,11 +444,17 @@ class Dynaln {
       /**
        * Get the sequence identity as a fraction range from 0 to 1
        */
-      float getIdentity() const { return (float)idencnt/getAlnlen(); }
+      float getIdentity() const { 
+         if (getAlnlen() == 0) return 0;
+         return (float)idencnt/getAlnlen(); 
+      }
       /**
        * Similar residues are also counted.
        */
-      float getSimilarity() const { return (float)(idencnt+simcnt)/getAlnlen(); }
+      float getSimilarity() const { 
+         if (getAlnlen() == 0) return 0;
+         return (float)(idencnt+simcnt)/getAlnlen(); 
+      }
       /**
        * Exclding the terminal gap when count the identity.
        * Identical/(alignlen - terminal gaps)
@@ -1280,6 +1286,7 @@ template<class T>
 void Dynaln<T>::debug_showmatrix(ostream &ous) const {
    int Nc=seq2->length();
    int i,j;
+   ous << "Ssize: " << Ssize << endl;
    ous << "\t*";
    for (j=0; j<seq2->length(); j++) ous << (*seq2)[j] << "\t";
    ous << endl;
