@@ -327,9 +327,14 @@ class Dynaln {
        */
       const string& getBottomAln() const { return bottomaln; }
       /**
-       * @return a reference to a const bioseq object. 
+       * @return a reference to a const bioseq object
+       *   represented by the first sequence. 
        */
       const bioseq& getTopSequence() const { return *seq1; }
+      /**
+       * @return a reference to a const bioseq object
+       *   represented by the second sequence. 
+       */
       const bioseq& getBottomSequence() const { return *seq2; }
       /**
        * return the consensus sequence, and the number of residues
@@ -500,6 +505,8 @@ class Dynaln {
       /**
        * @return the pair of aligned positions.
        *         -1 means a gap in the sequence.
+       *         each pair is <idx1, idx2> 0-based index position
+       *         of a matched pair of residues.
        */
       const list<pair<int, int> >& getAlnindex() const { return alnidx; }
       vector<pair<int, int> > getAlnindexVector() const {
@@ -512,6 +519,8 @@ class Dynaln {
       /** 
        * 0-based start index in sequence1 for the alignment.
        * For global alignment, the terminal gap are not counted.
+       *
+       * \verbatim
        * For example:
        * 1         11        21 
        * +         +         +         +
@@ -529,6 +538,8 @@ class Dynaln {
        * ATGCACGGTGTTGACTGACTTCAAGACCTGGCTCCAGTCCAAACTCTTGCCACGGTTGCCGGGAGTTCCTTTCTTCTCGT
        * +         +         +         +         +         +         + 
        * 1         11        21        31        41        51        61  
+       * \endverbatim
+       *
        * The above topBeginIndex() is 6-1, the bottomBeginIndex() is 0;
        * In the printout for humans I used 1-based index.
        * @return index in sequence1 for the first aligned residue.
@@ -539,13 +550,13 @@ class Dynaln {
        */
       int bottomBeginIndex() const { return seq2begin; }
       /**
-       * 0-based end index of sequence1 in alignment.
+       * 0-based end index of sequence1 included in the alignment.
        * End index in the alignment. Not counting unaligned region in the end
        * region.
        */
       int topEndIndex() const { return seq1end; }
       /**
-       * 0-based end index of sequence2 in alignment.
+       * 0-based end index of sequence2 included in the alignment.
        */
       int bottomEndIndex() const { return seq2end; }
       int getSeq1AlignedLength() const { return topEndIndex() - topBeginIndex() + 1; }
