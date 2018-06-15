@@ -551,7 +551,12 @@ string bioseq::substr(int b, int e) const {
       return seq.substr(e-1,b-e+1);
    }
 }
-
+string bioseq::substr(int b) const {
+   if (b<1) {
+      throw runtime_error("This function index start from 1, index " + to_string(b) + " out of bound!"); 
+   }
+   return seq.substr(b-1);
+}
 string bioseq::substring(const int b, const int len) const throw (bioseqexception) {
    if ((size_t)b >= length()) {
       cerr << "seq: " << seq << "\nb,len: " << b << ',' << len 

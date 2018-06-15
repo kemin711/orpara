@@ -345,6 +345,11 @@ class bioseq {
        */
       string substr(int b, int e) const; 
       /**
+       * @return the substring of the underlying string object
+       *    starting from 1-based index b to the end.
+       */
+      string substr(int b) const; 
+      /**
        * C-style index, same as C::substr() function
        * @param b 0-based index of start
        * @param len length of the string.
@@ -353,6 +358,8 @@ class bioseq {
       string substring(const int b, const int len) const throw (bioseqexception); 
       /**
        * Same function as C++ string.substr
+       * @return the substring from b to end of the underlying string object.
+       * @param b start of the substring 0-based index
        */
       string substring(const int b) const throw (bioseqexception); 
 
