@@ -39,10 +39,11 @@ TEST_F(DynalnTest, simplescoremethodshortseq) {
    SimpleScoreMethod sm(5, -4, -8, -8);
    Dynaln<SimpleScoreMethod> aln;
    DNA dna1("sq1", "ACGGGTG");
-   DNA dna1("sq2", "TTTTTTG");
-   aln.setseq(dan1, dna2);
+   DNA dna2("sq2", "TTTTTTG");
+   aln.setseq(dna1, dna2);
    aln.runlocal();
-   aln.printAlignment(cout);
+   cout << "Aligning two sequences:\n" << dna1 << dna2 << endl;
+   aln.printAlign(cout);
    ASSERT_GT(aln.getScore(), 7);
 }
 

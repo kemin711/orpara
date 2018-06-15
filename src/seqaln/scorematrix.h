@@ -85,6 +85,8 @@ class ScoreMethod {
        */
       int gapo;
       /**
+       * Gap extension score, a smaller number than gapo. I negative number
+       */
       int gape;
 };
 
