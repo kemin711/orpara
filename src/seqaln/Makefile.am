@@ -2,7 +2,7 @@
 ## The uppler directory Makefile will pick the header and lib files
 ## and added into the library
 
-bin_PROGRAMS = alnlocal alnglobal alnlocalmany alnglobalparam testrepeatrun
+bin_PROGRAMS = alnlocal alnglobal alnlocalmany alnglobalparam 
 
 # useless program: bbaln braboualnparam 
 
@@ -21,7 +21,7 @@ alnglobal_SOURCES = alnglobal.cpp scorematrix.h scorematrix.cpp dynalnt.h
 
 alnglobalparam_SOURCES = alnglobalparam.cpp scorematrix.h scorematrix.cpp dynalnt.h
 
-testrepeatrun_SOURCES = testrepeatrun.cpp
+#testrepeatrun_SOURCES = testrepeatrun.cpp
 
 #bbaln_SOURCES = bbaln.cpp braboualn.h braboualn.cpp
 #braboualnparam_SOURCES = braboualnparam.cpp braboualn.cpp braboualn.h
