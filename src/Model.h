@@ -30,7 +30,8 @@ class Model {
       Model(const Model& other) : id(other.id), exons(other.exons) { }
       Model(Model &&other) : id(std::move(other.id)), exons(std::move(other.exons)) { }
       //void addExon(int bb, int ee) { exons.push_back(make_pair(bb,ee)); }
-      void addExon(int bb, int ee) throw(ExondirectionError);
+      //void addExon(int bb, int ee) throw(ExondirectionError);
+      void addExon(int bb, int ee);
       bool operator==(const Model &mm) const;
       // return +, -, or ' ' if now known
       char direction() const;

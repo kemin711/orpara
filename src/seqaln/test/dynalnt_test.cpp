@@ -53,7 +53,8 @@ TEST_F(DynalnTest, repeataln) {
    double normalScore[maxLen + 1], score12, score11, score22;
 
    //for (int l = 1; l <= maxLen; l++) {
-   for (int l = 3; l <= maxLen; l++) {
+   //for (int l = 3; l <= maxLen; l++) {
+   for (int l = 3; l <= 5; l++) {
       int x, y;
       x=max<int>(0, int(sA1.size())-l);
       y=max<int>(0, int(sB1.size()) - l);
@@ -73,7 +74,7 @@ TEST_F(DynalnTest, repeataln) {
       score11 = aln.getScore();
       cout << parSeqA1 << parSeqB1 << endl;
       aln.printAlign(cout);
-      aln.debug_showmatrix(cout);
+      //aln.debug_showmatrix(cout);
       cout << string(30, '&') << endl;
 
       //cout << "parSeqA1: " << parSeqA1.toString() << endl;
@@ -83,7 +84,7 @@ TEST_F(DynalnTest, repeataln) {
       score12 = aln.getScore();
       cout << parSeqA1 << parSeqB2 << endl;
       aln.printAlign(cout);
-      aln.debug_showmatrix(cout);
+      //aln.debug_showmatrix(cout);
       cout << string(30, '&') << endl;
 
       //cout << "parSeqA2: " << parSeqA2.toString() << endl;
@@ -93,28 +94,34 @@ TEST_F(DynalnTest, repeataln) {
       score22 = aln.getScore();
       cout << parSeqA2 << parSeqB2 << endl;
       aln.printAlign(cout);
-      aln.debug_showmatrix(cout);
+      //aln.debug_showmatrix(cout);
       cout << string(30, '&') << endl;
-
       cout << "score 1x1=" << score11 << " 1x2=" << score12 << " 2x2=" << score22 << endl;
    }
 }
 
 TEST_F(DynalnTest, simplescoremethodshortseq) {
    SimpleScoreMethod sm(5, -4, -8, -8);
-   Dynaln<SimpleScoreMethod> aln;
-   
+   Dynaln<SimpleScoreMethod> aln(sm);
+   double tmp1=0, tmp2;
+
    DNA seqA2("seqA2", "ACG");
    DNA seqB2("seqB2", "TTT");
    aln.setseq(seqA2, seqB2);
    aln.runlocal();
    double tmp1=aln.getScore();
+   //aln.debug_showmatrix(cout);
+   aln.printAlign(cout);
+
    DNA seqA1("seqA1", "AGTC");
    DNA seqB1("seqB1", "TTTC");
    aln.setseq(seqA1, seqB1);
    aln.runlocal();
-   double tmp2=aln.getScore();
+   tmp2=aln.getScore();
+   //aln.debug_showmatrix(cout);
+   aln.printAlign(cout);
    cout << tmp1 << " " << tmp2 << endl;
+   ASSERT_GT(aln.getScore(), 7);
 
    DNA dna1("sq1", "ACGGGTG");
    DNA dna2("sq2", "TTTTTTG");

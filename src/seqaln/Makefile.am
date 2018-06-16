@@ -11,6 +11,7 @@ bin_PROGRAMS = alnlocal alnglobal alnlocalmany alnglobalparam testrepeatrun
 LDADD = ../libkemin.la
 AM_CXXFLAGS = -I..
 AM_LDFLAGS = -L..
+AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\""
 
 alnlocal_SOURCES = alnlocal.cpp scorematrix.h scorematrix.cpp dynalnt.h
 

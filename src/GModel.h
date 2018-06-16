@@ -56,7 +56,8 @@ template<class T> class GModel {
       
       /* require the exons are sorted from small to large
        */
-      void addExon(int bb, int ee) throw(ExondirectionError);
+      //void addExon(int bb, int ee) throw(ExondirectionError);
+      void addExon(int bb, int ee);
       bool operator==(const GModel &mm) const;
       // return +, -, or ' ' if now known
       char direction() const;
@@ -134,7 +135,7 @@ template<class T> class GModel {
 
 
 template<class T>
-void GModel<T>::addExon(int bb, int ee) throw(ExondirectionError) { 
+void GModel<T>::addExon(int bb, int ee) { 
    if (bb < ee) {
       if (numExons() > 0 && direction() == '-') {
          cerr << "must add exon to gene of the same direction\n"

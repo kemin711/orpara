@@ -60,8 +60,8 @@ class Dynaln {
        * If no parameter is given to the constructor, it will use the default
        * matrix of the given type.
        */
-      Dynaln() : ST(), seq1(0), seq2(0),
-         S(0), M(0), IX(0), IY(0), alnidx(), 
+      Dynaln() : ST(), seq1(nullptr), seq2(nullptr),
+         S(nullptr), Ssize(0), M(nullptr), IX(nullptr), IY(nullptr), numcol(0), alnidx(), 
          Smax(0), seq1begin(-1), seq1end(-1), seq2begin(-1), seq2end(-1),
          idencnt(0), simcnt(0), 
          numgaps1(0), numgaps2(0), gaplen1(0), gaplen2(0),
@@ -73,8 +73,8 @@ class Dynaln {
        *        hierarchy.
        */
       Dynaln(const T &scmethod) 
-         : ST(scmethod), seq1(0), seq2(0),
-         S(0), M(0), IX(0), IY(0), alnidx(), 
+         : ST(scmethod), seq1(nullptr), seq2(nullptr),
+         S(nullptr), Ssize(0), M(nullptr), IX(nullptr), IY(nullptr), alnidx(), 
          Smax(0), seq1begin(-1), seq1end(-1), seq2begin(-1), seq2end(-1),
          idencnt(0), simcnt(0), 
          numgaps1(0), numgaps2(0), gaplen1(0), gaplen2(0),
@@ -108,9 +108,9 @@ class Dynaln {
        * matrix file is a disk operation which is slow. Please
        * consider using setSeq() method.
        */
-      Dynaln(const bioseq &s1, const bioseq &s2) throw(AlnInputException) 
+      Dynaln(const bioseq &s1, const bioseq &s2) 
          : ST(), seq1(&s1), seq2(&s2), 
-            S(0), M(0), IX(0), IY(0), alnidx(), 
+            S(nullptr), Ssize(0), M(nullptr), IX(nullptr), IY(nullptr), alnidx(), 
             Smax(0), seq1begin(-1), seq1end(-1), seq2begin(-1), seq2end(-1),
             idencnt(0), simcnt(0), 
             numgaps1(0), numgaps2(0), gaplen1(0), gaplen2(0),
@@ -126,9 +126,9 @@ class Dynaln {
        * @param s2 second sequence
        * @param ma score matrix name such as blosum62
        */
-      Dynaln(const bioseq &s1, const bioseq &s2, const string &ma) throw(AlnInputException)
+      Dynaln(const bioseq &s1, const bioseq &s2, const string &ma) 
          : ST(ma), seq1(&s1), seq2(&s2), 
-            S(0), M(0), IX(0), IY(0), alnidx(), 
+            S(nullptr), Ssize(0), M(nullptr), IX(nullptr), IY(nullptr), alnidx(), 
             Smax(0), seq1begin(-1), seq1end(-1), seq2begin(-1), seq2end(-1),
             idencnt(0), simcnt(0), 
             numgaps1(0), numgaps2(0), gaplen1(0), gaplen2(0),
@@ -137,9 +137,9 @@ class Dynaln {
          setGapParameterFromMatrix();
          if (!validInput()) throw AlnInputException("Matrix and Input sequence type mismatch");
       }
-      Dynaln(const bioseq &s1, const bioseq &s2, const T &sm) throw(AlnInputException)
+      Dynaln(const bioseq &s1, const bioseq &s2, const T &sm) 
          : ST(sm), seq1(&s1), seq2(&s2), 
-            S(0), M(0), IX(0), IY(0), alnidx(), 
+            S(nullptr), Ssize(0), M(nullptr), IX(nullptr), IY(nullptr), alnidx(), 
             Smax(0), seq1begin(-1), seq1end(-1), seq2begin(-1), seq2end(-1),
             idencnt(0), simcnt(0), 
             numgaps1(0), numgaps2(0), gaplen1(0), gaplen2(0),
@@ -170,8 +170,8 @@ class Dynaln {
          bottomaln(std::move(o.bottomaln)), topruler(std::move(o.topruler)),
          bottomruler(std::move(o.bottomruler)), alntype(o.alntype)
       {
-         o.C1=0; o.C2=0; o.S=0;
-         o.M=0; o.IX=0; o.IY=0;
+         o.C1=nullptr; o.C2=nullptr; o.S=nullptr;
+         o.M=nullptr; o.IX=nullptr; o.IY=nullptr;
       }
       /**
        * Use with care.
@@ -180,14 +180,14 @@ class Dynaln {
          if (this != &o) {
             gapi=o.gapi; gape=o.gape; ST=std::move(o.ST);
             seq1=o.seq1; seq2=o.seq2;
-            if (C1 != 0) delete[] C1; 
-            if (C2 != 0) delete C2; 
-            if (S != 0) delete S;
+            if (C1 != nullptr) delete[] C1; 
+            if (C2 != nullptr) delete C2; 
+            if (S != nullptr) delete S;
             C1=o.C1; C2=o.C2; S=o.S; 
-            o.C1=o.C2=o.S=0;
+            o.C1=o.C2=o.S=nullptr;
             Ssize=o.Ssize;
-            if (M != 0) delete M; if (IX != 0) delete IX;
-            if (IY != 0) delete IY;
+            if (M != nullptr) delete M; if (IX != nullptr) delete IX;
+            if (IY != nullptr) delete IY;
             M=o.M; IX=o.IX; IY=o.IY; 
             o.M=o.IX=o.IY=0;
             numcol=o.numcol;
@@ -212,7 +212,7 @@ class Dynaln {
        *
        * @return the max score of the global alignment.
        */
-      int global() throw(AlnInputException);
+      int global();
       /**
        * This method is used if you want the alignment
        * The alignment result will be stored internally.
@@ -417,12 +417,12 @@ class Dynaln {
       /**
        * @return the length of sequence1. If not set then throw exception.
        */
-      int getSeq1Length() const throw (std::runtime_error);
+      int getSeq1Length() const;
       /**
        * @return the length of sequence 2.
        * @throws exception of sequence2 is not set or out of scope
        */
-      int getSeq2Length() const throw (std::runtime_error);
+      int getSeq2Length() const;
       /**
        * @return the name of the first sequence.
        */
@@ -774,11 +774,18 @@ class Dynaln {
        */
       void allocmem();
 
-      /** this version works with the pointers
+      /** 
+       * This version works with the pointers
        * and only affect the alnidx list.
+       * The alnidx list will be updated.
        */
       void tracepointer(int &i, int &j);
       /**
+       * Update the begin and end index of the 
+       * aligned portion of the two input sequences.
+       * If there is no alignment, then all four members will be set to 
+       * negative 1 
+       * seq1begin=-1; seq2begin=-1; seq1end=-1; seq2end=-1;
        */
       void findAlnBoundary();
 
@@ -841,7 +848,12 @@ class Dynaln {
        *  These are all mutable.
        */
       int *M, *IX, *IY; 
-      int numcol;  // for the next round
+      /**
+       * remember the number of columns should be
+       * the same as last input sequence. 
+       * For repeated runs.
+       */
+      int numcol; 
       
       /** 
        * alnidx contains the final alignment result.
@@ -853,7 +865,11 @@ class Dynaln {
        * Many secondary results are computed from this data structure.
        */
       list<pair<int, int> > alnidx;
-      int Smax;  // assigned before the trace back step.
+      /**
+       * variable used by the algorimth to remember the maximum score
+       * after the algorithm is finished.
+       */
+      int Smax;  
       // in local it is use during the build up phase
       // in global it is the last cell m,n
       /** the two numbers are use to record the
@@ -868,6 +884,9 @@ class Dynaln {
        * it is the aligned part, if global, it 
        * excludes the begining and ending gaps
        * 0-based index, inclusive [b,e]
+       *
+       * If no match is found then these values will all be
+       * set to -1.
       */
       int seq1begin, seq1end, seq2begin, seq2end;
 
@@ -884,6 +903,9 @@ class Dynaln {
        * Similar residues (including identicals)
        */
       int simcnt;
+      /**
+       * Number of gaps in the alignment for the first sequence.
+       */
       int numgaps1;
       int numgaps2;
       int gaplen1;
@@ -929,7 +951,7 @@ class LSDynaln : public Dynaln<T> {
        * e1: one-passed the end index of sequence1 (0-based index)
        * @return the best score
        */
-      int global() throw(AlnInputException);
+      int global();
       int local();
       /** 
        * Overwrite parent class method. Specific to linear space
@@ -1101,6 +1123,8 @@ void Dynaln<T>::tracepointer(int &i, int &j) {
    if (!alnidx.empty()) {
       alnidx.clear();
    }
+   // nothing need to be done if no result for local.
+   if (Smax == 0 && alntype == LOCAL) return;
    int Nc=seq2->length();
    //int pi, pj;
    int *ptr = S+(i*seq2->length() + j);
@@ -1221,10 +1245,18 @@ void Dynaln<T>::tracepointer(int &i, int &j) {
 template<class T>
 void Dynaln<T>::findAlnBoundary() {
    if (alntype == LOCAL) {
-      seq1begin=alnidx.begin()->first;
-      seq2begin=alnidx.begin()->second;
-      seq1end=alnidx.rbegin()->first;
-      seq2end=alnidx.rbegin()->second;
+      if (S == 0) {
+         seq1begin=-1;
+         seq2begin=-1;
+         seq1end=-1;
+         seq2end=-1;
+      }
+      else {
+         seq1begin=alnidx.begin()->first;
+         seq2begin=alnidx.begin()->second;
+         seq1end=alnidx.rbegin()->first;
+         seq2end=alnidx.rbegin()->second;
+      }
    }
    else if (alntype == GLOBAL) {
       // For global alignement, the end will be corrected for the terminal gaps.
@@ -1311,7 +1343,7 @@ void Dynaln<T>::showParameters() const {
 // pointer for traceback (j-i) diag=0, top=1 (Ix), left=-1 (Iy)
 // only store the pointers not the scores, too many
 template<class T>
-int Dynaln<T>::global() throw(AlnInputException) {
+int Dynaln<T>::global() {
    if (seq1->length() < 1) {
       throw AlnInputException("seq1 is empty");
    }
@@ -1474,10 +1506,6 @@ int Dynaln<T>::local() {
     * saved as an OR operation, the it is left to the trace-back
     * algorithm to decide which direction to pick.
     */
-#ifdef DEBUG
-   cerr << " Looking up a matrix entry S x T\n";
-   cerr << ST.lookup('S', 'T') << " " << ST.lookup(12, 12) << endl;
-#endif
    int maxDiag, maxTop, maxLeft;
    for (i=0; i < s1len; i++) {
 #ifdef DEBUG
@@ -1497,9 +1525,9 @@ int Dynaln<T>::local() {
          CIy=max(leftM+gapi, leftIy+gape);
          if (CM <= 0 && CIx <= 0 && CIy <= 0) {
             currScore = 0;
-            backptr = PTRNULL;
+            //backptr = PTRNULL;
          }
-         else if (CM > CIx && CM > CIy) {
+         else if (CM > CIx && CM > CIy) { 
             currScore = CM;
             backptr = PTRDIAG;
          }
@@ -1507,7 +1535,7 @@ int Dynaln<T>::local() {
             currScore = CIx;
             backptr = PTRTOP; // insert gap in seq2
          }
-         else if (CIy > CM && CIy > CIx) {
+         else if (CIy > CIx && CIy > CM) {
             currScore = CIy;
             backptr = PTRLEFT; // insert gap in seq1
          }
@@ -1545,16 +1573,18 @@ int Dynaln<T>::local() {
                backptr = (PTRLEFT | PTRTOP);
             }
          }
-         else { // this state should be impossible!
+         else { // this state is rare but possible
             currScore = CM;
             maxTop = max(M[j+1], max(IX[j+1], IY[j+1]));
             maxLeft = max(leftM, max(leftIy, leftIx));
-            //cerr << i << ", " << j
-            //   << " All three trace pointer have the same probability! very rare\n"
-            //   << " Scores for CM, CIx, CIy: "
-            //   << CM << ", " << CIx << ", " << CIy << endl
-            //   << " Diag, Top, Left: " << maxDiag << ", " << maxTop << ", "
-            //   << maxLeft << endl;
+            /*
+            cerr << i << ", " << j
+               << " All three trace pointer have the same probability! very rare\n"
+               << " Scores for CM, CIx, CIy: "
+               << CM << ", " << CIx << ", " << CIy << endl
+               << " Diag, Top, Left: " << maxDiag << ", " << maxTop << ", "
+               << maxLeft << endl;
+               */
             if (maxDiag > maxTop && maxDiag > maxLeft) backptr= PTRDIAG;
             else if (maxTop > maxDiag && maxTop > maxLeft) backptr= PTRTOP;
             else if (maxLeft > maxDiag && maxLeft > maxTop) backptr= PTRLEFT;
@@ -1576,8 +1606,9 @@ int Dynaln<T>::local() {
                backptr= PTRDIAG | PTRTOP | PTRLEFT;
             }
          }
+         if (currScore <= 0) backptr = PTRNULL;
 #ifdef DEBUG
-         cerr << " (" << CM << ", " << CIx << ", " << CIy << ") ";
+         cerr << " (" << CM << ", " << CIx << ", " << CIy << ") currScore=" << currScore;
 #endif
          // save the trace-back pointer in the matrix
          S[i*s2len+j] = backptr;
@@ -1586,14 +1617,20 @@ int Dynaln<T>::local() {
             Smaxi=i; Smaxj=j;
          }
 #ifdef DEBUG
-         cerr << " max score: " << Smax << ", " << Smaxi << ", " << Smaxj << endl;
+         cerr << " max score: " << Smax << ", [" << Smaxi << ", " << Smaxj << "]" << endl;
 #endif
          // ready for the next round
-         M[j]=leftM; IX[j]=leftIx; IY[j]=leftIy; // for the lower row
-         leftM=CM; leftIx=CIx; leftIy=CIy;
+         M[j]=leftM > 0? leftM : 0; 
+         IX[j]=leftIx > 0? leftIx: 0; 
+         IY[j]=leftIy > 0? leftIy : 0; // for the lower row
+         leftM=CM > 0? CM : 0; 
+         leftIx=CIx > 0? CIx : 0; 
+         leftIy=CIy > 0? CIy : 0;
       }
       //cout << " max: " << Smax << " [" << Smaxi << ", " << Smaxj << "]\n";
-      M[j]=CM; IX[j]=CIx; IY[j]=CIy;
+      M[j]=CM > 0? CM : 0; 
+      IX[j]=CIx > 0? CIx : 0; 
+      IY[j]=CIy > 0? CIx : 0;
       leftM=leftIx=leftIy=0;
    }
    clearResult();
@@ -1611,6 +1648,7 @@ void Dynaln<T>::countnumgaps() {
    list<pair<int,int> >::const_iterator li=alnidx.begin();
    numgaps1=0;
    numgaps2=0;
+   if (alnidx.empty()) return;
    while (li != alnidx.end()) {
       if (li->first == -1) {
          ++numgaps1;
@@ -1659,6 +1697,12 @@ void Dynaln<T>::buildResult(const int delta1, const int delta2) {
  */
 template<class T>
 void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
+   if (alnidx.empty()) {
+      topaln.clear();
+      bottomaln.clear();
+      middle.clear();
+      return;
+   }
    list<pair<int, int> >::const_iterator lit= alnidx.begin();
    int i,j,counter;
    counter=0;
@@ -1977,14 +2021,14 @@ string Dynaln<T>::headers(const string &dl) {
 }
 
 template<class T>
-int Dynaln<T>::getSeq1Length() const throw (runtime_error) {
-   if (seq1 == 0) throw runtime_error("NULL pointer for aligner's seq1");
+int Dynaln<T>::getSeq1Length() const {
+   if (seq1 == nullptr) throw runtime_error("NULL pointer for aligner's seq1");
    return seq1->length();
 }
 
 template<class T>
-int Dynaln<T>::getSeq2Length() const throw (runtime_error) {
-   if (seq2 == 0) throw runtime_error("NULL pointer for aligner's seq2");
+int Dynaln<T>::getSeq2Length() const {
+   if (seq2 == nullptr) throw runtime_error("NULL pointer for aligner's seq2");
    return seq2->length();
 }
 
@@ -2206,7 +2250,7 @@ pair<int,int> LSDynaln<T>::computeScoreBW(int b1, int e1, int b2, int e2)
 }
 
 template<class T>
-int LSDynaln<T>::global() throw(AlnInputException) {
+int LSDynaln<T>::global() {
    if (this->seq1->length() < 1) {
       throw AlnInputException("seq1 empty");
    }
