@@ -3,7 +3,8 @@
 #include <cstdlib>
 
 namespace orpara {
-void Model::addExon(int bb, int ee) throw(ExondirectionError) { 
+//void Model::addExon(int bb, int ee) throw(ExondirectionError) { 
+void Model::addExon(int bb, int ee) { 
    if (bb < ee) {
       if (numExons() > 0 && direction() == '-') {
          cerr << "must add exon to gene of the same direction\n"

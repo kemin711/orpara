@@ -47,6 +47,8 @@ SimpleScoreMethod& SimpleScoreMethod::operator=(const SimpleScoreMethod &mt) {
 
 //string MatrixScoreMethod::default_path="/home/zhouke/src/proj/seqaln/matrix";
 //string MatrixScoreMethod::default_path="/usr/local/share/orpara/matrix";
+// MATRIXDIR will be replaced by the autotool automake
+// AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\""
 string MatrixScoreMethod::default_path=MATRIXDIR;
 const char* MatrixScoreMethod::proteinMatrices[]  = {
    // put all new matrices here

@@ -262,7 +262,7 @@ int aachar2num(char a) {
 /////////////////////////////////////////////////////////////
 ////////////// bioseq class /////////////////////////////////
 
-bool bioseq::read(istream &ins, string &header) throw(bioseqexception) {
+bool bioseq::read(istream &ins, string &header) {
    if (ins.eof()) return false;
    string line;
    string::size_type i;
@@ -323,7 +323,7 @@ bool bioseq::read(istream &ins, string &header) throw(bioseqexception) {
    return true;
 }
 
-bool bioseq::read(istream &ins) throw (bioseqexception) {
+bool bioseq::read(istream &ins) {
    if (ins.eof()) return false;
    string::size_type i;
    clear(); // make sure the sequence starts with empty
@@ -557,7 +557,7 @@ string bioseq::substr(int b) const {
    }
    return seq.substr(b-1);
 }
-string bioseq::substring(const int b, const int len) const throw (bioseqexception) {
+string bioseq::substring(const int b, const int len) const {
    if ((size_t)b >= length()) {
       cerr << "seq: " << seq << "\nb,len: " << b << ',' << len 
          << " b is greater than sequence length: " << length() << endl;
@@ -569,7 +569,7 @@ string bioseq::substring(const int b, const int len) const throw (bioseqexceptio
    }
    return seq.substr(b, len);
 }
-string bioseq::substring(const int b) const throw (bioseqexception) {
+string bioseq::substring(const int b) const {
    if (b>=(int)length() || b < 0) {
       cerr << "seq: " << seq << endl
          << "b: " << b << endl;
@@ -581,7 +581,7 @@ string bioseq::substring(const int b) const throw (bioseqexception) {
 
 
 // using human coordinates
-bioseq bioseq::subseq(int b, int e) const throw (bioseqexception) { 
+bioseq bioseq::subseq(int b, int e) const { 
    if (b<1) {
       cerr << __FILE__ << ":" << __LINE__ << ":ERROR: Coordinates b=" << b << " e=" << e 
          << " must use 1-based index\n";
@@ -612,7 +612,7 @@ bioseq bioseq::subseq(int b, int e) const throw (bioseqexception) {
    }
 }
 
-bioseq bioseq::subsequence(int b, int len) const throw (bioseqexception) { 
+bioseq bioseq::subsequence(int b, int len) const { 
    if (b<0 || (unsigned)b > seq.length()-1) {
       cerr << "seq: " << seq << " b,len: " << b << ',' << len << endl;
       throw bioseqexception("index out of bound in bioseq::subsequence");
@@ -624,7 +624,7 @@ bioseq bioseq::subsequence(int b, int len) const throw (bioseqexception) {
 }
 
 // b is 0-based index
-bioseq bioseq::subsequenceWithName(int b, int len) const throw (bioseqexception) { 
+bioseq bioseq::subsequenceWithName(int b, int len) const { 
    if (b<0 || (unsigned)b > seq.length()-1) {
       cerr << "seq: " << seq << " b,len: " << b << ',' << len << endl;
       throw bioseqexception("index out of bound in bioseq::subsequence");
@@ -1328,7 +1328,7 @@ bool DNA::ambiguous() const {
    return false;
 } 
 
-bool DNA::read(istream &ins) throw (bioseqexception) {
+bool DNA::read(istream &ins) {
    if (ins.eof()) return false;
    string::size_type i;
    clear(); // make sure the sequence starts with empty
@@ -1891,7 +1891,7 @@ DNAQual DNAQual::subseq(int b, int e) const {
    return tmp;
 }
 
-DNAQual DNAQual::subsequenceWithName(int b, int len) const throw (bioseqexception) {
+DNAQual DNAQual::subsequenceWithName(int b, int len) const {
    int endPos = len<0? length() : b+len;
    DNAQual tmp = this->subseq(b+1, endPos);
    tmp.setName(tmp.name + "_" + itos(b) + "_" + itos(b+len));
@@ -2064,7 +2064,7 @@ DNAQualCount DNAQualCount::subseq(int b, int e) const {
    return tmp;
 }
 
-DNAQualCount DNAQualCount::subsequenceWithName(int b, int len) const throw (bioseqexception) {
+DNAQualCount DNAQualCount::subsequenceWithName(int b, int len) const {
    DNAQualCount tmp(DNAQual::subsequenceWithName(b, len));
    tmp.cnt = cnt;
    return tmp;

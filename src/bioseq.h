@@ -283,12 +283,13 @@ class bioseq {
        * Note: for better design, there should be a BioseqReader class.
        *       I may add one later.
        */
-      bool read(istream &ins, string &header) throw (bioseqexception);
+      bool read(istream &ins, string &header);
       /**
        * @return true if not reaching the end of file.
        *    fasle if reached the end of file
        */
-      bool read(istream &ins) throw (bioseqexception);
+      //bool read(istream &ins) throw (bioseqexception);
+      bool read(istream &ins);
       /** 
        * Essentially the same as read. Just a different foramt.
        */
@@ -355,13 +356,14 @@ class bioseq {
        * @param len length of the string.
        * @return a copy of the underlying substring.
        */
-      string substring(const int b, const int len) const throw (bioseqexception); 
+      //string substring(const int b, const int len) const throw (bioseqexception); 
+      string substring(const int b, const int len) const; 
       /**
        * Same function as C++ string.substr
        * @return the substring from b to end of the underlying string object.
        * @param b start of the substring 0-based index
        */
-      string substring(const int b) const throw (bioseqexception); 
+      string substring(const int b) const; 
 
       /** performance is very bad if sequence is long.
        * 1-based index, inclusive [b, e]
@@ -369,7 +371,7 @@ class bioseq {
        * The name of the returned sequence will be derived from the original
        * sequence with range in it.
        */
-      bioseq subseq(int b, int e=-1) const throw (bioseqexception);
+      bioseq subseq(int b, int e=-1) const;
 
       /** use the C-style indexing
        * This is an expensive operation. It is making a copy
@@ -380,7 +382,7 @@ class bioseq {
        * @param b 0-based begin index
        * @param len if not given assuming to the end of sequence.
        */
-      bioseq subsequence(int b, int len=-1) const throw (bioseqexception);
+      bioseq subsequence(int b, int len=-1) const;
       /** use the C-style indexing
        * This is an expensive operation. It is making a copy
        * of the subsequence.
@@ -391,7 +393,7 @@ class bioseq {
        * title of new sequence will be parent.title + "b-e"
        * @param b 0-based index in the sequence.
        */
-      bioseq subsequenceWithName(int b, int len=-1) const throw (bioseqexception);
+      bioseq subsequenceWithName(int b, int len=-1) const;
       void setName(const string &n) { name=n; }
       /**
        * extend name. No space will be added.
@@ -461,7 +463,7 @@ class bioseq {
        * @param b is the 0-based index
        * @param e is the end of the index (inclusive)
        */
-      pair<double,double> computeEntropy(int b, unsigned e) const throw(bioseqexception) {
+      pair<double,double> computeEntropy(int b, unsigned e) const {
          if (b<0 || e>seq.length()-1) { 
             cerr << "index error in computeEntropy()"; 
             throw bioseqexception("index out of range inside bioseq::computeEntropy");
@@ -737,7 +739,7 @@ class DNA : public bioseq {
        */
       DNA subseq(int b, int e) const {
          return bioseq::subseq(b,e); }
-      DNA subsequenceWithName(int b, int len=-1) const throw (bioseqexception) {
+      DNA subsequenceWithName(int b, int len=-1) const {
          return bioseq::subsequenceWithName(b, len); }
 
       /**
@@ -804,8 +806,8 @@ class DNA : public bioseq {
        * @return true if the read obtained one record
        *      false if no more sequence left in the input stream.
        */
-      bool read(istream &ins) throw (bioseqexception);
-      bool read(istream &ins, string &hd) throw (bioseqexception) {
+      bool read(istream &ins);
+      bool read(istream &ins, string &hd) {
          return bioseq::read(ins,hd); }
       void read(const string &file) { bioseq::read(file); }
 
@@ -961,7 +963,7 @@ class DNAQual : public DNA {
        * @param len length of the subsequence if not given assuming
        *     to the end of the sequence.
        */
-      DNAQual subsequenceWithName(int b, int len=-1) const throw (bioseqexception);
+      DNAQual subsequenceWithName(int b, int len=-1) const;
       //{ return bioseq::subsequenceWithName(b, len); }
       /**
        * I am using virtual functions, so this should not be needed anymore.
@@ -1089,7 +1091,7 @@ class DNAQualCount : public DNAQual {
       /**
        * @param b 0-based starting index
        */
-      DNAQualCount subsequenceWithName(int b, int len=-1) const throw (bioseqexception);
+      DNAQualCount subsequenceWithName(int b, int len=-1) const;
 
       /** 
        * you normally don't use this one.  This is poor design.
