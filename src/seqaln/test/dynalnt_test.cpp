@@ -38,17 +38,20 @@ class DynalnTest : public testing::Test {
 TEST_F(DynalnTest, simplescoremethodshortseq) {
    SimpleScoreMethod sm(5, -4, -8, -8);
    Dynaln<SimpleScoreMethod> aln;
-   
+   cout << "starting from length 3\n";
    DNA seqA2("seqA2", "ACG");
    DNA seqB2("seqB2", "TTT");
    aln.setseq(seqA2, seqB2);
    aln.runlocal();
    double tmp1=aln.getScore();
+   aln.printAlign(cout);
+   cout << "transition to length 4\n";
    DNA seqA1("seqA1", "AGTC");
    DNA seqB1("seqB1", "TTTC");
    aln.setseq(seqA1, seqB1);
    aln.runlocal();
    double tmp2=aln.getScore();
+   aln.printAlign(cout);
    cout << tmp1 << " " << tmp2 << endl;
 
    DNA dna1("sq1", "ACGGGTG");
