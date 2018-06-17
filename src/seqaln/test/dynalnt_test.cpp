@@ -102,23 +102,22 @@ TEST_F(DynalnTest, repeataln) {
 
 TEST_F(DynalnTest, simplescoremethodshortseq) {
    SimpleScoreMethod sm(5, -4, -8, -8);
-   Dynaln<SimpleScoreMethod> aln(sm);
+   Dynaln<SimpleScoreMethod> aln;
    double tmp1=0, tmp2;
 
    DNA seqA2("seqA2", "ACG");
    DNA seqB2("seqB2", "TTT");
    aln.setseq(seqA2, seqB2);
    aln.runlocal();
-   double tmp1=aln.getScore();
-   //aln.debug_showmatrix(cout);
+   tmp1=aln.getScore();
    aln.printAlign(cout);
+   cout << "transition to length 4\n";
 
    DNA seqA1("seqA1", "AGTC");
    DNA seqB1("seqB1", "TTTC");
    aln.setseq(seqA1, seqB1);
    aln.runlocal();
    tmp2=aln.getScore();
-   //aln.debug_showmatrix(cout);
    aln.printAlign(cout);
    cout << tmp1 << " " << tmp2 << endl;
    ASSERT_GT(aln.getScore(), 7);
