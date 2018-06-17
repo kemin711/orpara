@@ -836,6 +836,7 @@ class Dynaln {
        *  Will store the trace-back pointer.
        *  This will save the time for reallocating memory unless new requests
        *  are larger than previous ones.
+       *  The extra row, column is for boundary condition.
        */
       int* S; 
       /** the size of the S 
@@ -844,8 +845,9 @@ class Dynaln {
        * */
       int Ssize;
       /**
-       *  Arrays for computing the scores
+       *  Arrays for computing the scores.
        *  These are all mutable.
+       *  Their size should be numcol+1.
        */
       int *M, *IX, *IY; 
       /**
@@ -957,7 +959,7 @@ class LSDynaln : public Dynaln<T> {
        * Overwrite parent class method. Specific to linear space
        */
       int runlocal(const int delta1=0, const int delta2=0) {
-         int s=local(); buildResult(delta1, delta2); return s; 
+         local(); buildResult(delta1, delta2); return Smax; 
       }
       //void global();
       /* globalLS in reverse direction
@@ -1081,7 +1083,7 @@ template<class T>
 void Dynaln<T>::allocmem() {
    int Nr=seq1->length();
    int Nc=seq2->length();
-   if (S == 0) { // allocate from new memory
+   if (S == nullptr) { // allocate from new memory
       Ssize=Nr*Nc;
       numcol=Nc;
       S = new int[Ssize];
@@ -1610,7 +1612,7 @@ int Dynaln<T>::local() {
 #ifdef DEBUG
          cerr << " (" << CM << ", " << CIx << ", " << CIy << ") currScore=" << currScore;
 #endif
-         // save the trace-back pointer in the matrix
+         // save the trace-back pointer in the matrix S
          S[i*s2len+j] = backptr;
          if (currScore > Smax) {
             Smax=currScore;
@@ -1619,7 +1621,7 @@ int Dynaln<T>::local() {
 #ifdef DEBUG
          cerr << " max score: " << Smax << ", [" << Smaxi << ", " << Smaxj << "]" << endl;
 #endif
-         // ready for the next round
+         // ready for the next column 
          M[j]=leftM > 0? leftM : 0; 
          IX[j]=leftIx > 0? leftIx: 0; 
          IY[j]=leftIy > 0? leftIy : 0; // for the lower row
