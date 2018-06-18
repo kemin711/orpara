@@ -218,7 +218,7 @@ class Dynaln {
        * The alignment result will be stored internally.
        */
       int runglobal(const int delta1=0, const int delta2=0) {
-         int s=global(); buildResult(delta1, delta2); return s; }
+         global(); buildResult(delta1, delta2); return this->Smax; }
       /** 
        * Run the local algorithm
        */
@@ -239,7 +239,7 @@ class Dynaln {
        * arguments must be provided.
        */
       int runlocal(const int delta1=0, const int delta2=0) {
-               int s=local(); buildResult(delta1, delta2); return s; 
+               local(); buildResult(delta1, delta2); return this->Smax; 
       }
       //void globalTraceBack();
       ~Dynaln();
@@ -959,7 +959,7 @@ class LSDynaln : public Dynaln<T> {
        * Overwrite parent class method. Specific to linear space
        */
       int runlocal(const int delta1=0, const int delta2=0) {
-         local(); buildResult(delta1, delta2); return Smax; 
+         local(); buildResult(delta1, delta2); return this->Smax; 
       }
       //void global();
       /* globalLS in reverse direction
