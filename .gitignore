@@ -8,6 +8,7 @@ Makefile.in
 *.Plo
 *.Po
 autom4te.cache
+configure
 
 doc/
 fastqreduceid
