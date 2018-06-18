@@ -1,5 +1,6 @@
 #! /bin/bash
 # Generated automatically by config.status (orpara) 0.1.2
+# Libtool was configured on host pus2:
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 
 # Provide generalized library-building support services.
@@ -542,7 +543,7 @@ func_cc_basename ()
 
 PROGRAM=libtool
 PACKAGE=libtool
-VERSION="2.4.6 Debian-2.4.6-2"
+VERSION="2.4.6 Debian-2.4.6-0.1"
 package_revision=2.4.6
 
 
@@ -2579,7 +2580,7 @@ include the following information:
        compiler:       $LTCC
        compiler flags: $LTCFLAGS
        linker:         $LD (gnu? $with_gnu_ld)
-       version:        $progname $scriptversion Debian-2.4.6-2
+       version:        $progname (GNU libtool) 2.4.6
        automake:       `($AUTOMAKE --version) 2>/dev/null |$SED 1q`
        autoconf:       `($AUTOCONF --version) 2>/dev/null |$SED 1q`
 

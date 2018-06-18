@@ -90,8 +90,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = alnlocal$(EXEEXT) alnglobal$(EXEEXT) \
-	alnlocalmany$(EXEEXT) alnglobalparam$(EXEEXT) \
-	testrepeatrun$(EXEEXT)
+	alnlocalmany$(EXEEXT) alnglobalparam$(EXEEXT)
 subdir = src/seqaln
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
@@ -130,10 +129,6 @@ am_alnlocalmany_OBJECTS = alnlocalmany.$(OBJEXT) scorematrix.$(OBJEXT)
 alnlocalmany_OBJECTS = $(am_alnlocalmany_OBJECTS)
 alnlocalmany_LDADD = $(LDADD)
 alnlocalmany_DEPENDENCIES = ../libkemin.la
-am_testrepeatrun_OBJECTS = testrepeatrun.$(OBJEXT)
-testrepeatrun_OBJECTS = $(am_testrepeatrun_OBJECTS)
-testrepeatrun_LDADD = $(LDADD)
-testrepeatrun_DEPENDENCIES = ../libkemin.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -187,11 +182,9 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(alnglobal_SOURCES) $(alnglobalparam_SOURCES) \
-	$(alnlocal_SOURCES) $(alnlocalmany_SOURCES) \
-	$(testrepeatrun_SOURCES)
+	$(alnlocal_SOURCES) $(alnlocalmany_SOURCES)
 DIST_SOURCES = $(alnglobal_SOURCES) $(alnglobalparam_SOURCES) \
-	$(alnlocal_SOURCES) $(alnlocalmany_SOURCES) \
-	$(testrepeatrun_SOURCES)
+	$(alnlocal_SOURCES) $(alnlocalmany_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -432,7 +425,8 @@ alnlocal_SOURCES = alnlocal.cpp scorematrix.h scorematrix.cpp dynalnt.h
 alnlocalmany_SOURCES = alnlocalmany.cpp scorematrix.h scorematrix.cpp dynalnt.h
 alnglobal_SOURCES = alnglobal.cpp scorematrix.h scorematrix.cpp dynalnt.h
 alnglobalparam_SOURCES = alnglobalparam.cpp scorematrix.h scorematrix.cpp dynalnt.h
-testrepeatrun_SOURCES = testrepeatrun.cpp
+
+#testrepeatrun_SOURCES = testrepeatrun.cpp
 
 #bbaln_SOURCES = bbaln.cpp braboualn.h braboualn.cpp
 #braboualnparam_SOURCES = braboualnparam.cpp braboualn.cpp braboualn.h
@@ -560,10 +554,6 @@ alnlocalmany$(EXEEXT): $(alnlocalmany_OBJECTS) $(alnlocalmany_DEPENDENCIES) $(EX
 	@rm -f alnlocalmany$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(alnlocalmany_OBJECTS) $(alnlocalmany_LDADD) $(LIBS)
 
-testrepeatrun$(EXEEXT): $(testrepeatrun_OBJECTS) $(testrepeatrun_DEPENDENCIES) $(EXTRA_testrepeatrun_DEPENDENCIES) 
-	@rm -f testrepeatrun$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(testrepeatrun_OBJECTS) $(testrepeatrun_LDADD) $(LIBS)
-
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -575,7 +565,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alnlocal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/alnlocalmany.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scorematrix.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testrepeatrun.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
