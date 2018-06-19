@@ -288,7 +288,6 @@ class bioseq {
        * @return true if not reaching the end of file.
        *    fasle if reached the end of file
        */
-      //bool read(istream &ins) throw (bioseqexception);
       bool read(istream &ins);
       /** 
        * Essentially the same as read. Just a different foramt.
@@ -356,7 +355,6 @@ class bioseq {
        * @param len length of the string.
        * @return a copy of the underlying substring.
        */
-      //string substring(const int b, const int len) const throw (bioseqexception); 
       string substring(const int b, const int len) const; 
       /**
        * Same function as C++ string.substr
