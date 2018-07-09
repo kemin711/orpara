@@ -146,6 +146,10 @@ void Fastq::writeFasta(ostream &ous, const int width) const {
 bool Fastq::read(istream &ins) {
    string line;
    getline(ins, line);
+   while (! ins.eof() && line.empty()) {
+      cerr << __FILE__ << ":" << __LINE__ << ":WARN empty line inside fastq file\n";
+      getline(ins, line);
+   }
    if (ins.eof()) {
       return false;
    }
@@ -155,6 +159,9 @@ bool Fastq::read(istream &ins) {
       desc = line.substr(i+1);
    }
    else {
+      if (line.length() == 1) {
+         throw runtime_error("name empty at line " + line);
+      }
       name=line.substr(1);
       if (hasDescription()) desc.clear();
    }
