@@ -159,6 +159,8 @@ class Fastq {
        * @return the underlying sequence as a reference.
        */
       const string& getSequence() const { return seq; }
+      string getSubSequence(int b, int len) const { return seq.substr(b,len); }
+      string getSubSequence(int b) const { return seq.substr(b); }
       /**
        * @return a reference to the title (description of the 
        *   fastq sequence)
