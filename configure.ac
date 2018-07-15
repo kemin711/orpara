@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([orpara], [0.1.2], [kmzhou4@yaho.com])
+AC_INIT([orpara], [0.1.3], [kmzhou4@yaho.com])
 AM_INIT_AUTOMAKE([-Wall -Werror])
 AM_PROG_AR
 AC_CONFIG_SRCDIR([src/interval.cpp])

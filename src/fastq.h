@@ -156,11 +156,34 @@ class Fastq {
        * */
       void setName(const string &newname) { name=newname; }
       /**
+       * replace long names with a short name. This is useful
+       * in reducing the memory usage for very long fastq names.
+       */
+      void setNumberName(const string& prefix, int id) {
+         setName(prefix + to_string(id));
+      }
+      /**
        * @return the underlying sequence as a reference.
        */
       const string& getSequence() const { return seq; }
+      void setSequence(const string& sq) { 
+         seq=sq;
+      }
+      void setSequence(string&& sq) {
+         seq=std::move(sq);
+      }
+
+      void setSequenceQuality(const string& s, const string& q) {
+         seq=s; encode(q);
+      }
+      void setSequenceQuality(string&& s, const string& q) {
+         seq=std::move(s); encode(q);
+      }
+
       string getSubSequence(int b, int len) const { return seq.substr(b,len); }
+      string getSubsequence(int b, int len) const { return seq.substr(b,len); }
       string getSubSequence(int b) const { return seq.substr(b); }
+      string getSubsequence(int b) const { return seq.substr(b); }
       /**
        * @return a reference to the title (description of the 
        *   fastq sequence)
@@ -184,7 +207,7 @@ class Fastq {
        * Given a piece of sequence it will cut at the beginning of the site
        * if the site is found in the sequence.
        * The current object will be shortened by the right piece.
-       * The mothod uses string's find method.
+       * The method uses string's find method.
        * @param site DNA sequence in all CAPS, upper case.
        *      | cut here
        *  ----==Site==-----
@@ -243,6 +266,19 @@ class Fastq {
        * @return true if sequence got trimmed.
        */
       bool trimLowq(const unsigned int window=5, const unsigned int cutoff=20);
+      bool trimG();
+      bool trimGLowq() {
+         bool a=trimG(); bool  b=trimLowq(5,16);
+         return a || b;
+      }
+      /**
+       * Sequence has > 0.3 N or > 0.7 single Base
+       */
+      bool plaguedBySingleBase(float nfrac=0.3, float bfrac=0.75) const;
+      /**
+       * @return true if trimming happened.
+       */
+      bool qualityTrim();
       /**
        * @return the fraction of N bases in the sequence.
        */
@@ -261,6 +297,9 @@ class Fastq {
        * the value.
        */
       int* getQuality() const { return qual; }
+      void setQuality(const string& strQ) {
+         encode(strQ);
+      }
       /**
        * @return average quality score Q for this sequence
        */

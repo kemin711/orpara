@@ -7,6 +7,7 @@
 #include <math.h>
 #include "stddev.h"
 #include <numeric>
+#include <queue>
 
 namespace orpara {
 int Fastq::minScore=999;
@@ -354,6 +355,80 @@ bool Fastq::trimLowq(const unsigned int window, const unsigned int cutoff) {
    return trimmed;
 }
 
+// if fraction(N) > nfrac and any other base fraction > 0.3
+// then it has a problem.
+// by composition is not very fine scale.
+bool Fastq::plaguedBySingleBase(float nfrac, float bfrac) const {
+   array<float, 5> baseFrac = baseFraction();
+   if (baseFrac[4] > nfrac) {
+      //cout << "too much N: " << fq << endl;
+      for (size_t i=0; i<4; ++i) {
+         if (baseFrac[i] > 0.3) {
+            //cout << "too much repeats: " << fq << endl;
+            return true;
+         }
+      }
+   }
+   else {
+      for (size_t i=0; i<4; ++i) {
+         if (baseFrac[i] > bfrac) {
+            //cout << "too much repeats: " << fq << endl;
+            return true;
+         }
+      }
+   }
+   return false;
+}
+
+bool Fastq::qualityTrim() {
+   if (plaguedBySingleBase()) {
+      clear();
+      return true;
+   }
+   if (trimLowq(5, 16)) {
+      if (length() < 19) clear();
+      else if (plaguedBySingleBase())
+         clear();
+      return true;
+   }
+   if (!empty() && length() < 19) {
+      clear();
+      return true;
+   }
+   return false;
+}
+
+// trim sequence like this from the right
+// TCTCTTCAGGGTCCCATGCTGGGCAGGAGGGGCCTGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+bool Fastq::trimG() {
+   static const int window=19;
+   static const int cut=17;
+   queue<char> movingW;
+   int GCount=0;
+   string::size_type i=length()-1;
+   for (auto x=0; x<window && i > 0; ++x) {
+      movingW.push(seq[i]);
+      if (seq[i] == 'G') {
+         ++GCount;
+      }
+      --i;
+   }
+   if (movingW.size() < window || GCount < cut) {
+      return false;
+   }
+   while (i > 0 && GCount >= cut) {
+      if (movingW.front() == 'G') --GCount;
+      movingW.pop();
+      if (seq[i] == 'G') ++GCount;
+      movingW.push(seq[i]);
+      --i;
+   }
+   if (i+cut < length()-1) {
+      discardTail(i+cut);
+      return true;
+   }
+   return false;
+}
 
 void Fastq::revcomp() {
    reverseComplementInPlace(seq);

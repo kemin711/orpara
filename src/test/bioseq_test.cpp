@@ -24,7 +24,6 @@ class BioseqTest : public testing::Test {
       bioseq bsq_filled;
 };
 
-
 TEST_F(BioseqTest, getname) {
    const string seqname = bsq_filled.getName();
    ASSERT_EQ("seqname", seqname);
