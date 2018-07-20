@@ -267,18 +267,25 @@ class Fastq {
        */
       bool trimLowq(const unsigned int window=5, const unsigned int cutoff=20);
       bool trimG();
-      bool trimGLowq() {
-         bool a=trimG(); bool  b=trimLowq(5,16);
+      /**
+       * First trim G, then trim low quality. Trimming is done from the 3'-end.
+       * @return true if either G or low qulaity regions removed from the 3' direction
+       */
+      bool trimGLowq(unsigned int window=6, unsigned int cutoff=10) {
+         bool a=trimG(); bool  b=trimLowq(window,cutoff);
          return a || b;
       }
       /**
        * Sequence has > 0.3 N or > 0.7 single Base
+       * @param nfrac cutoff for fraction of N based to call this sequence junk.
+       * @param bfrac cutoff for single base fraction to call this sequence junk.
        */
       bool plaguedBySingleBase(float nfrac=0.3, float bfrac=0.75) const;
       /**
+       * Use trimGLowq() then use plaguedBySingleBase()
        * @return true if trimming happened.
        */
-      bool qualityTrim();
+      bool qualityTrim(unsigned int window=6, unsigned int cutoff=10, int lencut=19);
       /**
        * @return the fraction of N bases in the sequence.
        */

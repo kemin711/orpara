@@ -7,7 +7,7 @@
 #include <math.h>
 #include "stddev.h"
 #include <numeric>
-#include <queue>
+//#include <queue>
 
 namespace orpara {
 int Fastq::minScore=999;
@@ -380,51 +380,48 @@ bool Fastq::plaguedBySingleBase(float nfrac, float bfrac) const {
    return false;
 }
 
-bool Fastq::qualityTrim() {
+bool Fastq::qualityTrim(unsigned int window, unsigned int cutoff, int lencut) {
+   bool trimmed = trimGLowq(window, cutoff);
    if (plaguedBySingleBase()) {
       clear();
       return true;
    }
-   if (trimLowq(5, 16)) {
-      if (length() < 19) clear();
-      else if (plaguedBySingleBase())
+   if (trimmed) {
+      if (length() < lencut) {
          clear();
-      return true;
-   }
-   if (!empty() && length() < 19) {
-      clear();
-      return true;
+      }
+      return  true;
    }
    return false;
 }
 
 // trim sequence like this from the right
 // TCTCTTCAGGGTCCCATGCTGGGCAGGAGGGGCCTGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+// using queue drags performance
+// need to replace it with better one
 bool Fastq::trimG() {
    static const int window=19;
    static const int cut=17;
-   queue<char> movingW;
    int GCount=0;
-   string::size_type i=length()-1;
+   string::size_type i=length()-1, ii;
+   ii=i;
+   // [i, ii] is the start end of the moving window
    for (auto x=0; x<window && i > 0; ++x) {
-      movingW.push(seq[i]);
       if (seq[i] == 'G') {
          ++GCount;
       }
       --i;
    }
-   if (movingW.size() < window || GCount < cut) {
+   if (GCount < cut) {
       return false;
    }
    while (i > 0 && GCount >= cut) {
-      if (movingW.front() == 'G') --GCount;
-      movingW.pop();
+      if (seq[ii] == 'G') --GCount;
       if (seq[i] == 'G') ++GCount;
-      movingW.push(seq[i]);
-      --i;
+      --i; --ii;
    }
-   if (i+cut < length()-1) {
-      discardTail(i+cut);
+   if (ii < length()-1) {
+      discardTail(ii);
       return true;
    }
    return false;
