@@ -9,6 +9,7 @@ Makefile.in
 *.Po
 autom4te.cache
 configure
+config.guess
 
 doc/
 fastqreduceid
