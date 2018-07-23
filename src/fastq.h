@@ -198,9 +198,9 @@ class Fastq {
        * In case the title was empty, this method
        * is equvelant to set title.
        */
-      void appendDescription(const string& extra);
-      void appendTitle(const string& extra) {
-         appendDescription(extra);
+      void appendDescription(const string& extra, char sep=' ');
+      void appendTitle(const string& extra, char sep=' ') {
+         appendDescription(extra, sep);
       }
 
       /**

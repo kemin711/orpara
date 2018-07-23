@@ -489,14 +489,16 @@ std::array<float, 5> Fastq::baseFraction() const {
    return frac;
 }
 
-void Fastq::appendDescription(const string& extra) {
+void Fastq::appendDescription(const string& extra, char sep) {
    if (extra[0] == ' ') {
       if (desc.empty()) desc = extra.substr(1);
-      else desc += extra;
+      else {
+         desc += (string(1, sep) + extra.substr(1));
+      }
    }
    else {
       if (desc.empty()) desc = extra;
-      else desc += (string(" ") + extra);
+      else desc += (string(1, sep) + extra);
    }
 }
 
