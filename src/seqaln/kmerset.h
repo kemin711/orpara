@@ -89,13 +89,13 @@ void KmerSet<K>::eat(const string& seq) {
    for (i=0; i<seq.length()-K; ++i) {
       // skip N
       if (toupper(seq[i]) != 'N') {
-         member.insert(v);
+         member.insert(int(v));
       }
       v<<=2;
       v |= KmerBase<K>::base2int(seq[i+K]);
       v &= KmerBase<K>::mask;
    }
-   member.insert(v);
+   member.insert(int(v));
 }
 
 template<int K>

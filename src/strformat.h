@@ -22,6 +22,10 @@ namespace orpara {
  * count the number of words
  */
 int wc(const string &str);  // word cound
+/**
+ * The whole string are maded of continuos stretch of digits
+ * @return true of str represent a number.
+ */
 bool isnumber(const string &str); // all digits
 /** 
  * @param dc is other allowed characters such as
