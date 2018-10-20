@@ -343,7 +343,7 @@ string getScientificSpeciesName(const string &taxon);
 
 /**
  * Discard the path prefix retain the last element
- * \/myhome/dir/filename as input will produce filename
+ * \/myhome\/dir\/filename as input will produce filename
  */
 string fileBasename(const string& pathstr);
 /**

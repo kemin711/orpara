@@ -147,7 +147,7 @@ void Fastq::writeFasta(ostream &ous, const int width) const {
 bool Fastq::read(istream &ins) {
    string line;
    getline(ins, line);
-   while (! ins.eof() && line.empty()) {
+   while (!ins.eof() && line.empty()) {
       cerr << __FILE__ << ":" << __LINE__ << ":WARN empty line inside fastq file\n";
       getline(ins, line);
    }
