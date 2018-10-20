@@ -1477,10 +1477,11 @@ int Dynaln<T>::local() {
    s2len=seq2->length();
    s1len=seq1->length();
    Smax=Smaxi=Smaxj=0;
-#ifdef DEBUG
-   cerr << "\ngap parameter inside local(): " << gapi << " " << gape << endl;
-   ST.show(cerr);
-#endif
+//#ifdef DEBUG
+   //cerr << "input sequences:\n" << *seq1 << *seq2 << endl;
+   //cerr << "\ngap parameter inside local(): " << gapi << " " << gape << endl;
+   //ST.show(cerr);
+//#endif
 
    // fill the max array with zero
    // we only need the top row for memory

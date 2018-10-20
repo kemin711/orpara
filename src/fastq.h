@@ -181,9 +181,10 @@ class Fastq {
       }
 
       string getSubSequence(int b, int len) const { return seq.substr(b,len); }
-      string getSubsequence(int b, int len) const { return seq.substr(b,len); }
+      /**
+       * @return string object starting at b (0-based index) to the end of sequence
+       */
       string getSubSequence(int b) const { return seq.substr(b); }
-      string getSubsequence(int b) const { return seq.substr(b); }
       /**
        * @return a reference to the title (description of the 
        *   fastq sequence)
