@@ -57,10 +57,11 @@ void printFasta(ostream &ous, const string& seq, unsigned int width=70);
  * @return the reverse complement of seq
  */
 string reverseComplement(const string& seq);
-/** a version for better performance 
+/** 
+ * a version for better performance 
  * Change the sequence.
  * @param seq the input. After this operation seq will
- *    be modified.
+ *    be modified to become the reverse-complement.
  */
 void reverseComplementInPlace(string& seq);
 /** 
@@ -232,14 +233,16 @@ class bioseq {
       { if (s.code != nullptr) s.code=nullptr; if (!s.title.empty()) title=std::move(s.title); }
 
       bioseq(const string &s) : seq(s), name(), title(), code(nullptr) {}
-      /** @param n name of the sequence
+      /** 
+       *  @param n name of the sequence
        *  @param s sequence 
        */
       bioseq(const string &n, const string &s) 
          : seq(s), name(n), title(), code(nullptr) {}
-      /** @param n name
-       *  @param s sequence
-       *  @param t title
+      /** 
+       * @param n name
+       * @param s sequence
+       * @param t title
        */
       bioseq(const string &n, const string &s, const string &t) 
          : seq(s), name(n), title(t), code(nullptr) {}

@@ -14,7 +14,7 @@ using namespace orpara;
 class DynalnTest : public testing::Test {
    protected:
       DynalnTest() : smbase(), ssm(20, -19),
-         psm(), nsm(),
+         psm(), nsm(), nsmN("NUC.4.4.N"),
          alnsmbase(smbase),
          alnssm(ssm),
          alnpsm(psm),
@@ -28,6 +28,7 @@ class DynalnTest : public testing::Test {
       SimpleScoreMethod ssm;
       ProteinScoreMethod psm;
       NucleicScoreMethod nsm;
+      NucleicScoreMethod nsmN;
 
       Dynaln<ScoreMethod> alnsmbase;
       Dynaln<SimpleScoreMethod> alnssm;
@@ -479,3 +480,14 @@ TEST_F(DynalnTest, doubleGaps) {
    ASSERT_GT(aln.getScore(), 0);
 }
 
+TEST_F(DynalnTest, nucmatrixN) {
+   DNA seq1("i5adapterRC", "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTNNNNNNNNGTGTAGATCTCGGTGGTCGCCGTATCATT");
+   DNA seq2("read_cause_segfault", "CGCTCAAGGCTCACCCCTCCTGCCCTGTGTCCCTACAGACACTAACAGCACATCTGGAGACCCGGTGGAGAAGAAGGACGAAACAGTTAGATCGGAAGAGCGTCGAGTAGGGAAAGAGTGTTTGGACTGGTGTAGATCTCGGGGGTCGCCG");
+   cout << "test score matrix with N\n";
+   Dynaln<NucleicScoreMethod> aligner(nsmN);
+
+   aligner.setSeq(seq1, seq2);
+   aligner.runlocal();
+   aligner.printAlign(cout);
+   ASSERT_GT(aligner.getScore(), 0);
+}
