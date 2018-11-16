@@ -147,8 +147,14 @@ void Fastq::writeFasta(ostream &ous, const int width) const {
 bool Fastq::read(istream &ins) {
    string line;
    getline(ins, line);
+   int emptyCnt=0;
    while (!ins.eof() && line.empty()) {
+      ++emptyCnt;
       cerr << __FILE__ << ":" << __LINE__ << ":WARN empty line inside fastq file\n";
+      if (emptyCnt > 500) {
+         throw runtime_error(string(__FILE__) + ":" + to_string(__LINE__) +
+               ":ERROR there are 500 empty lines possible NFS misbehaving");
+      }
       getline(ins, line);
    }
    if (ins.eof()) {
