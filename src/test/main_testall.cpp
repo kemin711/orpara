@@ -59,10 +59,10 @@ TEST(DerivativeTest, compute) {
    }
 
    vector<tuple<int,double, double>> result=computeDerivative(input);
-   for (size_t i=0; i<input.size(); ++i) {
-      cout << input[i].first << " " << input[i].second << " "
-         << get<1>(result[i]) << " " << get<2>(result[i]) << endl;
-   }
+   //for (size_t i=0; i<input.size(); ++i) {
+   //   cout << input[i].first << " " << input[i].second << " "
+    //     << get<1>(result[i]) << " " << get<2>(result[i]) << endl;
+   //}
 }
    
 

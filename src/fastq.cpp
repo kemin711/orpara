@@ -339,6 +339,11 @@ bool Fastq::trimLowq(const unsigned int window, const unsigned int cutoff) {
    int sum=0;
    for (i=0; i<window; ++i) sum += (qual[i] - conv);
 #ifdef DEBUG
+   cerr << "base value: " << conv << endl;
+   for (size_t i=0; i<length(); ++i) {
+      cerr << qual[i] << '|';
+   }
+   cerr << endl;
    cerr << "initial sum: " << sum << " cugoff=" << cutoff
       << " window=" << window << endl;
    cerr << "Running sum: " << endl;

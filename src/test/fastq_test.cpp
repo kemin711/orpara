@@ -41,3 +41,12 @@ TEST_F(FastqTest, trimG) {
    }
 }
 
+TEST_F(FastqTest, trimLowq) {
+   // for low quality sequence, we need to use lower cutoff
+   // 13 might be optimal
+   Fastq fq("lowqualtity", "GATCATCCATACTTTTCTTTAGACGTTCTTCAGGATCAAGTTTTAATGATGCTGTGTGGCTGGATTTAAATTATCTTGAAGTTGCCAAGGGAGCTCAGTCTTGTGCTGCTCGCTTTACAGCTTTCCTCTATGCAGAACTCTATGCAGATAA", "AAAA6/A///////<//////E//////////EE//////<//<//AE/<E/E/A//EE/AEE///<////A/////E//E//E////EE//E////E///<E<E/6E6//////</</E/</////<//EE//E///<////E6/E/<//");
+   cout << "original fastq:\n" << fq << endl;
+   fq.trimLowq(7, 14);
+   cout << "after trimLowq() fastq:\n" << fq << endl;
+   ASSERT_GT(fq.length(), 15);
+}
