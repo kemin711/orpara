@@ -9,7 +9,7 @@
 #include <numeric>
 //#include <queue>
 
-#define DEBUG
+//#define DEBUG
 
 namespace orpara {
 int Fastq::minScore=999;
