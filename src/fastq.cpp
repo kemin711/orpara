@@ -9,6 +9,8 @@
 #include <numeric>
 //#include <queue>
 
+#define DEBUG
+
 namespace orpara {
 int Fastq::minScore=999;
 int Fastq::maxScore=0;
@@ -330,26 +332,30 @@ bool Fastq::trimLowq(const unsigned int window, const unsigned int cutoff) {
    bool trimmed = false;
    //const int window=5;
    const int cut = cutoff*window; // single score 20
-   if (seq.length() < 10) {
-      return false;
-      //cerr << "sequence to short! discarding all\n";
+   if (seq.length() < window+2) {
+      return false; // not trimming very short sequences
    }
    unsigned int i;
    int sum=0;
    for (i=0; i<window; ++i) sum += (qual[i] - conv);
-   //cout << "initial sum: " << sum << endl;
-   //cout << "Running sum: " << endl;
+#ifdef DEBUG
+   cerr << "initial sum: " << sum << " cugoff=" << cutoff
+      << " window=" << window << endl;
+   cerr << "Running sum: " << endl;
+#endif
    for (i=0; i<seq.length()-window; ++i) {
-      //cout << sum << " | ";
+#ifdef DEBUG
+      cerr << sum << " | ";
+#endif
       if (sum < cut) {
-         /*
-         cout << "quality at " << i << " too low\n"
+#ifdef DEBUG
+         cerr << "quality at " << i << " too low\n"
             << seq.substr(i, window) << endl;
          for (int j=i; j<i+window; ++j) {
-            cout << qual[j]-conv << '|';
+            cerr << qual[j]-conv << '|';
          }
-         cout << endl;
-         */
+         cerr << endl;
+#endif
          discardTail(i);
          trimmed = true;
          break;
@@ -357,7 +363,9 @@ bool Fastq::trimLowq(const unsigned int window, const unsigned int cutoff) {
       sum -= qual[i];
       sum += qual[i+window];
    }
-   //cout << endl;
+#ifdef DEBUG
+   cout << endl;
+#endif
    return trimmed;
 }
 

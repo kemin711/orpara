@@ -149,6 +149,12 @@ class Fastq {
        * obtain the name of the sequence as string reference
        * you cannot modify this name
        * Should not contain the '@' sign.
+       * Name is the unique identifier of the sequence in the file
+       *   or even may be a group of related files.
+       *   This function does not know whether the name is unique or 
+       *   not. It is the caller's responsibility to make sure this
+       *   is true.
+       * @return name of sequence.
        */
       const string& getName() const { return name; }
       /** give a new name to this sequence
@@ -268,7 +274,7 @@ class Fastq {
        * @param window the size of the window to use default 5.
        * @return true if sequence got trimmed.
        */
-      bool trimLowq(const unsigned int window=5, const unsigned int cutoff=20);
+      bool trimLowq(const unsigned int window=5, const unsigned int cutoff=15);
       bool trimG();
       /**
        * First trim G, then trim low quality. Trimming is done from the 3'-end.
