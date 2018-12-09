@@ -863,6 +863,7 @@ class DNAQual : public DNA {
        * If this is zero, then assuming best quality.
        * This can be used to hold fasta sequences
        * where no quality score is available.
+       * TODO: convert int to unsigned char to save storeage
        */
       int *qual;
       /** This is used for efficiency.
@@ -915,6 +916,7 @@ class DNAQual : public DNA {
        * @param qs quality score.
        */
       DNAQual(const string &n, const string &s, int *qs);
+      DNAQual(const string &n, const string &s, const unsigned char *qs);
       /**
        * @param qs Qscore range from 0-40.
        *   The largest value is 93. The character encoding add 33.

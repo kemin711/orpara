@@ -8,19 +8,12 @@
 #include "stddev.h"
 #include <numeric>
 //#include <queue>
-
+#include <cstring>
 //#define DEBUG
 
 namespace orpara {
 int Fastq::minScore=999;
 int Fastq::maxScore=0;
-
-
-/*
-Fastq::Fastq() : name(), desc(), seq(), qual(0), qual_len(-1) {
-         cerr << " default constructor\n"; 
-}
-*/
 
 double Fastq::q2p(const int qval) {
    return pow(10, -(double)qval/10);
@@ -33,24 +26,25 @@ int Fastq::p2q(const double pval) {
 Fastq::~Fastq() {
    if (qual != 0) {
       delete[] qual;
-      qual = 0;
-      qual_len = 0;
-      seq.clear();
+      //qual = 0;
+      //qual_len = 0;
+      //seq.clear();
    }
 }
 
 Fastq::Fastq(const Fastq &other) 
    : name(other.name), desc(other.desc), seq(other.seq),
-      qual(new int[other.qual_len]),
+      //qual(new int[other.qual_len]),
+      qual(new unsigned char[other.qual_len]),
       qual_len(other.length()) 
 {
    //cerr << "Calling copy constructor: other object:\n"
    //   << other.name << " " << other.seq << " " << other.qual_len << endl;
    if (length() > 0) {
-      //qual = new int[length()];
-      for (unsigned int i=0; i<other.length(); ++i) {
-         qual[i]=other.qual[i];
-      }
+      memcpy(qual, other.qual, length());
+      //for (unsigned int i=0; i<other.length(); ++i) {
+      //   qual[i]=other.qual[i];
+      //}
    }
 }
 
@@ -61,7 +55,7 @@ Fastq::Fastq(Fastq &&other)
      qual(other.qual),
      qual_len(other.qual_len)
 {
-   other.qual = 0;
+   other.qual = nullptr;
 }
 
 Fastq& Fastq::operator=(const Fastq &other) {
@@ -69,52 +63,54 @@ Fastq& Fastq::operator=(const Fastq &other) {
       name=other.name;
       desc=other.desc;
       seq = other.seq;
-      if (qual_len < other.length() || qual == 0) {
+      if (qual == nullptr) {
+         qual = new unsigned char[length()];
+      }
+      else if (qual_len < other.length()) {
+         delete[] qual;
          qual_len = other.length();
-         qual = new int[length()];
+         qual = new unsigned char[length()];
       }
-      for (unsigned int i=0; i<length(); ++i) {
-         qual[i]=other.qual[i];
-      }
+      memcpy(qual, other.qual, length());
+      //for (unsigned int i=0; i<length(); ++i) {
+      //   qual[i]=other.qual[i];
+      //}
    }
    return *this;
 }
 
 Fastq& Fastq::operator=(Fastq &&other) {
    if (this != &other) {
-      delete[] qual;
-      other.qual=0;
-      name=other.name;
-      desc=other.desc;
-      seq = other.seq;
+      name=std::move(other.name);
+      desc=std::move(other.desc);
+      seq = std::move(other.seq);
       qual_len = other.qual_len;
+      if (qual != nullptr) {
+         delete[] qual;
+      }
+      qual=other.qual;
+      other.qual=nullptr;
    }
    return *this;
 }
 
+// convert from string to unsigned int
 void Fastq::encode(const string &cscore) {
-   if (qual != 0) {
+   if (qual != nullptr) {
       if (qual_len < cscore.length()) {
          delete[] qual;
-         qual = new int[cscore.length()];
+         qual = new unsigned char[cscore.length()];
          qual_len = cscore.length();
       }
    }
    else {
-      qual = new int[cscore.length()];
+      qual = new unsigned char[cscore.length()];
       qual_len = cscore.length();
    }
-
-   int mins=1000, maxs=0;
-   for (unsigned int i=0; i<cscore.length(); ++i) {
-      qual[i] = (int)cscore[i];
-      if (qual[i] > maxs) maxs = qual[i];
-      if (qual[i] < mins) mins = qual[i];
-      //cerr << qual[i] << " = " << cscore[i] << endl;
-   }
-   if (mins < minScore) minScore = mins;
-   if (maxs > maxScore) maxScore = maxs;
-   //cerr << "min score: " << mins << " max score: " << maxs << endl;
+   memcpy(qual, cscore.c_str(), qual_len);
+   //for (unsigned int i=0; i<cscore.length(); ++i) {
+   //   qual[i] = (unsigned char)cscore[i];
+   //}
 }
 
 void Fastq::decode(string &cscore) {
@@ -125,11 +121,13 @@ void Fastq::decode(string &cscore) {
 }
 
 void Fastq::writeQualAsString(ostream &ous) const {
-   for (unsigned int i=0; i<seq.length(); ++i) {
-      ous << char(qual[i]);
-   }
+   //for (unsigned int i=0; i<seq.length(); ++i) {
+   //   ous << qual[i];
+   //}
+   ous.write(reinterpret_cast<const char*>(qual), length());
 }
 
+// the sum of shift + qual[i] should not exceed 255
 void Fastq::shiftQuality(const int shift) {
    for (size_t i=0; i<seq.length(); ++i)
       qual[i] += shift;
@@ -148,6 +146,7 @@ void Fastq::writeFasta(ostream &ous, const int width) const {
 
 bool Fastq::read(istream &ins) {
    string line;
+   char dumy[3];
    getline(ins, line);
    int emptyCnt=0;
    while (!ins.eof() && line.empty()) {
@@ -175,18 +174,25 @@ bool Fastq::read(istream &ins) {
       if (hasDescription()) desc.clear();
    }
    getline(ins, seq); // sequence line
-   getline(ins, line); // + alone
-   getline(ins, line); // quality score
-   // convert char encoding into integer
-   encode(line);
-   //cout << "should be the scores: " << line << endl;
-   //if (ins.peek() == std::char_traits<char>::eof()) 
-   //   return false;
+   ins.read(dumy, 2); // two bytes
+   if (qual == nullptr) {
+      qual = new unsigned char[length()];
+      qual_len=length();
+   }
+   else if (length() > qual_len) {
+      delete[] qual;
+      qual = new unsigned char[length()];
+      qual_len=length();
+   }
+   ins.read(reinterpret_cast<char*>(qual), length()); // direc read save operation
+   ins.get(); // discard \n
    return true;
 }
 
 //     | cut here
 // ----==Site==
+// return current object missing the left part
+// current object will become the left part
 Fastq Fastq::cutLeft(const string &site) {
    Fastq newfasq;
    string::size_type i;
@@ -198,20 +204,22 @@ Fastq Fastq::cutLeft(const string &site) {
       newfasq.name=name + "_R";
       newfasq.seq = seq.substr(i);
       newfasq.qual_len = newfasq.length();
-      newfasq.qual = new int[newfasq.length()];
-      for (unsigned int j=i; j<length(); ++j) {
-         newfasq.qual[j-i]=qual[j];
-      }
+      newfasq.qual = new unsigned char[newfasq.length()];
+      //for (unsigned int j=i; j<length(); ++j) {
+      //   newfasq.qual[j-i]=qual[j];
+      //}
+      memcpy(newfasq.qual, qual+i, newfasq.length());
       name += "_L";
       seq.resize(i);
       //cerr << seq << " | " << newfasq.seq << endl;
    }
    return newfasq;
 }
-
-// --
+//             |-----> return this part
+// ---===site==------>
+// ---===site== current object
 Fastq Fastq::cutRight(const string &site) {
-   Fastq newfasq;
+   Fastq newfasq; // to be returned
    string::size_type i;
    if ((i=seq.find(site)) != string::npos) {
       if (i + site.length() == length()) {
@@ -223,10 +231,11 @@ Fastq Fastq::cutRight(const string &site) {
       newfasq.name=name + "_R";
       newfasq.seq = seq.substr(i + site.length());
       newfasq.qual_len = newfasq.length();
-      newfasq.qual = new int[newfasq.length()];
-      for (unsigned int j=i+site.length(); j<length(); ++j) {
-         newfasq.qual[j-i-site.length()]=qual[j];
-      }
+      newfasq.qual = new unsigned char[newfasq.length()];
+      //for (unsigned int j=i+site.length(); j<length(); ++j) {
+      //   newfasq.qual[j-i-site.length()]=qual[j];
+      //}
+      memcpy(newfasq.qual, qual+i+site.size(), newfasq.length());
       name += "_L";
       seq.resize(i + site.length());
       //cerr << seq << " | " << newfasq.seq << endl;
@@ -237,16 +246,18 @@ Fastq Fastq::cutRight(const string &site) {
 // 0   4  6
 // ====|======
 //     pos
+//  return the right piece, this object will become the left piece
 Fastq Fastq::cutAt(const unsigned int pos) {
    Fastq newfasq;
    if (pos >= 0 && pos < length()) {
       newfasq.name=name + "_R";
       newfasq.seq = seq.substr(pos);
       newfasq.qual_len = newfasq.length();
-      newfasq.qual = new int[newfasq.length()];
-      for (unsigned int j=pos; j<length(); ++j) {
-         newfasq.qual[j-pos]=qual[j];
-      }
+      newfasq.qual = new unsigned char[newfasq.length()];
+      //for (unsigned int j=pos; j<length(); ++j) {
+      //   newfasq.qual[j-pos]=qual[j];
+      //}
+      memcpy(newfasq.qual, qual+pos, newfasq.length());
       name += "_L";
       seq.resize(pos);
    }
@@ -264,10 +275,11 @@ void Fastq::cutAt(const unsigned int pos, Fastq &newfasq) {
       newfasq.name=name + "_R";
       newfasq.seq = seq.substr(pos);
       newfasq.qual_len = newfasq.length();
-      newfasq.qual = new int[newfasq.length()];
-      for (unsigned int j=pos; j<length(); ++j) {
-         newfasq.qual[j-pos]=qual[j];
-      }
+      newfasq.qual = new unsigned char[newfasq.length()];
+      //for (unsigned int j=pos; j<length(); ++j) {
+      //   newfasq.qual[j-pos]=qual[j];
+      //}
+      memcpy(newfasq.qual, qual+pos, newfasq.length());
       name += "_L";
       seq.resize(pos);
    }
@@ -285,7 +297,7 @@ void Fastq::discardTail(const unsigned int idx) {
 
 void Fastq::discardHead(const unsigned int idx) {
    seq = seq.substr(idx);
-   for (unsigned int i=0; i<seq.length(); ++i) {
+   for (unsigned int i=0; i+idx<seq.length(); ++i) {
       qual[i] = qual[i+idx];
    }
 }
@@ -303,7 +315,6 @@ Fastq Fastq::sub(unsigned int b, unsigned int e) const {
       }
       convert << "subsequence from " << b << " to " << e;
       string subdescription = convert.str();
-
       string subseq = seq.substr(b, e-b+1);
 
       return Fastq(subname, subdescription, subseq, qual+b);
@@ -324,7 +335,8 @@ void Fastq::write(ostream &ous) const {
    ous << endl;
    ous << seq << endl;
    ous << "+\n";
-   writeQualAsString(ous);
+   //writeQualAsString(ous);
+   ous.write(reinterpret_cast<const char*>(qual), length());
    ous << endl;
 }
 
@@ -337,7 +349,7 @@ bool Fastq::trimLowq(const unsigned int window, const unsigned int cutoff) {
    }
    unsigned int i;
    int sum=0;
-   for (i=0; i<window; ++i) sum += (qual[i] - conv);
+   for (i=0; i<window; ++i) sum += (int(qual[i]) - conv);
 #ifdef DEBUG
    cerr << "base value: " << conv << endl;
    for (size_t i=0; i<length(); ++i) {
@@ -357,7 +369,7 @@ bool Fastq::trimLowq(const unsigned int window, const unsigned int cutoff) {
          cerr << "quality at " << i << " too low\n"
             << seq.substr(i, window) << endl;
          for (int j=i; j<i+window; ++j) {
-            cerr << qual[j]-conv << '|';
+            cerr << int(qual[j])-conv << '|';
          }
          cerr << endl;
 #endif
@@ -365,8 +377,8 @@ bool Fastq::trimLowq(const unsigned int window, const unsigned int cutoff) {
          trimmed = true;
          break;
       }
-      sum -= qual[i];
-      sum += qual[i+window];
+      sum -= int(qual[i]);
+      sum += int(qual[i+window]);
    }
 #ifdef DEBUG
    cout << endl;
@@ -463,16 +475,17 @@ void Fastq::revcomp() {
 vector<int> Fastq::getQscore() const {
    vector<int> tmp(length());
    for (unsigned int i=0; i<tmp.size(); ++i) {
-      tmp[i]=qual[i]-conv;
+      tmp[i]=int(qual[i])-conv;
    }
    return tmp;
 }
 
 double Fastq::getAverageQuality() const {
-   int* qv = getQuality();
+   //int* qv = getQuality();
+   const unsigned char* qv = getQuality();
    stddev stat;
    for (size_t i=0; i<length(); ++i) {
-      stat(qv[i]);
+      stat(int(qv[i]));
    }
    return stat.getMean() - conv;
 }

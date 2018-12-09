@@ -1789,6 +1789,13 @@ DNAQual::DNAQual(const string &n, const string &s, int *qs)
       }
 }
 
+DNAQual::DNAQual(const string &n, const string &s, const unsigned char *qs)
+   : DNA(n,s), qual(new int[length()]), rc(0) {
+      for (size_t i=0; i<length(); ++i) {
+         qual[i]=int(qs[i]);
+      }
+}
+
 DNAQual::DNAQual(const string &n, const string &s, const vector<int> &qs)
    : DNA(n,s), qual(new int[length()]), rc(0) {
       for (size_t i=0; i<length(); ++i) {

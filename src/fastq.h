@@ -7,10 +7,14 @@
 #include<iostream>
 #include <vector>
 #include <array>
+#include <cstring>
 
 using namespace std;
 
 namespace orpara {
+/**
+ * TODO: convert qual from int* to unsigned char* to save space.
+ */
 class Fastq {
    private:
       /**
@@ -37,9 +41,15 @@ class Fastq {
        * For efficiency this is the ASCII value
        * 33 - 126
        * ASCII value
+       * Qualit score should use unsigned char* to save space
+       * One int use 4 bytes, char uses only one byte
        */
-      int* qual;
-      /** for implementation efficiency */
+      unsigned char* qual;
+      //int* qual;
+      /** for implementation efficiency 
+       * capacity of the qual, total memory (number of bytes) allocated
+       * seq.size() is the actual effective usage of the total memory.
+       * */
       unsigned int qual_len; // lenght of qual buffer regardless of the seq length
       /**
        * convert cscore Score in char format into the integer format
@@ -76,18 +86,30 @@ class Fastq {
        * This object can be used for reading from 
        * a stream.
        */
-      Fastq() : name(), desc(), seq(), qual(0), qual_len(0) {  }
+      Fastq() : name(), desc(), seq(), qual(nullptr), qual_len(0) {  }
       /**
        * Constructor with integer quality array
        */
       Fastq(const string &id, const string &description, const string &sequence, const int* quality)
          : name(id), desc(description), seq(sequence), 
-           qual(new int[sequence.length()]),
+           //qual(new int[sequence.length()]),
+           qual(new unsigned char[sequence.length()]),
             qual_len(sequence.length())
       { 
-          for (unsigned int i = 0; i<qual_len; ++i) 
-             qual[i] = *(quality + i);
+         const int* ptr=quality;
+          for (unsigned int i = 0; i<qual_len; ++i) {
+             //qual[i] = *(quality + i);
+             qual[i] = static_cast<unsigned char>(*ptr++);
+          }
       }
+      Fastq(const string &id, const string &description, const string &sequence, const unsigned char* quality)
+         : name(id), desc(description), seq(sequence), 
+           qual(new unsigned char[sequence.length()]),
+            qual_len(sequence.length())
+      { 
+         memcpy(qual, quality, length());
+      }
+
       /**
        * Constructor using string quality
        * @param id unique identifier for the sequence.
@@ -98,7 +120,8 @@ class Fastq {
        */
       Fastq(const string &id, const string &description, const string &sequence, const string &quality)
          : name(id), desc(description), seq(sequence), 
-           qual(new int[sequence.length()]),
+           //qual(new int[sequence.length()]),
+           qual(new unsigned char[sequence.length()]),
             qual_len(sequence.length())
       { 
           encode(quality);
@@ -108,11 +131,27 @@ class Fastq {
        */
       Fastq(const string &id, const string &sequence, const string &quality)
          : name(id), desc(), seq(sequence), 
-           qual(new int[sequence.length()]),
+           //qual(new int[sequence.length()]),
+           qual(new unsigned char[sequence.length()]),
             qual_len(sequence.length())
       { 
           encode(quality);
       }
+      /**
+       * @param quality dynamically allocated array of unsigned char
+       *    must be the same length as sequence. This object will
+       *    be responsible for managing this memory.
+       */
+      Fastq(string &&id, string &&sequence, unsigned char* quality)
+         : name(std::move(id)), desc(), seq(std::move(sequence)), 
+           qual(quality),
+            qual_len(sequence.length())
+      {  }
+      Fastq(string &&id, string&& description, string &&sequence, unsigned char* quality)
+         : name(std::move(id)), desc(std::move(description)), seq(std::move(sequence)), 
+           qual(quality),
+            qual_len(sequence.length())
+      {  }
 
       /**
        * Copy constructor
@@ -124,6 +163,10 @@ class Fastq {
       Fastq(Fastq &&other);
       ~Fastq();
       Fastq& operator=(const Fastq &other);
+      /**
+       * move assignment operator. Other will become useless after this
+       * operation.
+       */
       Fastq& operator=(Fastq &&other);
       /**
        * Use this for reading from a file.
@@ -219,10 +262,25 @@ class Fastq {
        * The method uses string's find method.
        * @param site DNA sequence in all CAPS, upper case.
        *      | cut here
-       *  ----==Site==-----
+       *  ----==site==----->
        * @return a new Fasq object to the right of site (including site).
+       *  ---- current object
+       *       returned object ==Site==----->
+       *  Left and right reference to the cutting point
+       *  meaning cut at the left side of the site
        */
       Fastq cutLeft(const string &site);
+      /**
+       * Similar to cutLeft
+       * Cut at the right side of the site
+       *              | cut here
+       *  ----==site==----->
+       *  after the operation
+       *  ----==site== current object
+       *    returned object ---->
+       * @return new object after end of site
+       *   if site is found in the sequence.
+       */
       Fastq cutRight(const string &site);
       /**
        * Cut sequence at pos. Producing Left and Right fragments.
@@ -231,6 +289,8 @@ class Fastq {
        *       +========== Right
        * ====== Left
        * 0-based index for pos. pos is part of right fragment.
+       * @return the right piece. Current object
+       *    will become the left piece.
        */
       Fastq cutAt(const unsigned int pos);
       /**
@@ -312,7 +372,7 @@ class Fastq {
        * etc calculation using this one, make sure you subtract
        * the value.
        */
-      int* getQuality() const { return qual; }
+      const unsigned char* getQuality() const { return qual; }
       void setQuality(const string& strQ) {
          encode(strQ);
       }
@@ -334,7 +394,9 @@ class Fastq {
       void shiftQuality(const int shift=-33);
 
       static int getMinScore() { return minScore; }
+      static void setMinScore(int mins) { minScore=mins; }
       static int getMaxScore() { return maxScore; }
+      static void setMaxScore(int maxs) { maxScore=maxs; }
       static int getConverter() { return conv; }
       /**
        * Q=-10*log10(p) where p is the probability of base being wrong.
@@ -345,5 +407,6 @@ class Fastq {
        */
       static int p2q(const double pval);
 };
-}
+
+} // orpara namespace end
 #endif
