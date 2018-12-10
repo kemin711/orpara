@@ -24,7 +24,7 @@ int Fastq::p2q(const double pval) {
 }
 
 Fastq::~Fastq() {
-   if (qual != 0) {
+   if (qual != nullptr) {
       delete[] qual;
       //qual = 0;
       //qual_len = 0;
@@ -34,7 +34,6 @@ Fastq::~Fastq() {
 
 Fastq::Fastq(const Fastq &other) 
    : name(other.name), desc(other.desc), seq(other.seq),
-      //qual(new int[other.qual_len]),
       qual(new unsigned char[other.qual_len]),
       qual_len(other.length()) 
 {

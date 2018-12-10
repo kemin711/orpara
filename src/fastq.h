@@ -145,12 +145,12 @@ class Fastq {
       Fastq(string &&id, string &&sequence, unsigned char* quality)
          : name(std::move(id)), desc(), seq(std::move(sequence)), 
            qual(quality),
-            qual_len(sequence.length())
+            qual_len(length())
       {  }
       Fastq(string &&id, string&& description, string &&sequence, unsigned char* quality)
          : name(std::move(id)), desc(std::move(description)), seq(std::move(sequence)), 
            qual(quality),
-            qual_len(sequence.length())
+            qual_len(length())
       {  }
 
       /**
