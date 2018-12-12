@@ -90,7 +90,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = GrishinDistance$(EXEEXT)
+bin_PROGRAMS = GrishinDistance$(EXEEXT) maxdiff$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
@@ -156,6 +156,11 @@ PROGRAMS = $(bin_PROGRAMS)
 am_GrishinDistance_OBJECTS = GrishinDistance.$(OBJEXT)
 GrishinDistance_OBJECTS = $(am_GrishinDistance_OBJECTS)
 GrishinDistance_LDADD = $(LDADD)
+GrishinDistance_DEPENDENCIES = libkemin.la
+am_maxdiff_OBJECTS = maxdiff.$(OBJEXT)
+maxdiff_OBJECTS = $(am_maxdiff_OBJECTS)
+maxdiff_LDADD = $(LDADD)
+maxdiff_DEPENDENCIES = libkemin.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -208,8 +213,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libkemin_la_SOURCES) $(GrishinDistance_SOURCES)
-DIST_SOURCES = $(libkemin_la_SOURCES) $(GrishinDistance_SOURCES)
+SOURCES = $(libkemin_la_SOURCES) $(GrishinDistance_SOURCES) \
+	$(maxdiff_SOURCES)
+DIST_SOURCES = $(libkemin_la_SOURCES) $(GrishinDistance_SOURCES) \
+	$(maxdiff_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -413,7 +420,6 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-GrishinDistance_SOURCES = GrishinDistance.cpp evolution/evolution.h
 AUTOMAKE_OPTIONS = subdir-objects
 only_headers = stddev.h seqaln/dynalnt.h seqaln/kmert.h seqaln/kmerbase.h seqaln/kmerset.h gentree.h evolution/evolution.h quicksortorder.h threadsafequeue.h derivative.h
 header_forlibs = strformat.h range.h interval.h bioseq.h codon.h Model.h FPGModel.h GModel.h fastq.h seqaln/scorematrix.h seqaln/alninfo.h seqaln/alnexaminer.h seqaln/kmer.h seqaln/kmerhelper.h ncbitaxonomy.h 
@@ -421,11 +427,13 @@ cppfiles = strformat.cpp range.cpp interval.cpp codon.cpp bioseq.cpp Model.cpp F
 pkginclude_HEADERS = $(only_headers) $(header_forlibs)
 
 # this will work with all compiler operations
-AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\""
+AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\"" 
+LDADD = libkemin.la
 lib_LTLIBRARIES = libkemin.la
 libkemin_la_SOURCES = $(header_forlibs) $(cppfiles)
 libkemin_la_LDFLAGS = -version-info 0:0:0
-#libkkemin_la_CPPFLAGS = -DMATRIXDIR=$(pkgdatadir)/matrix
+GrishinDistance_SOURCES = GrishinDistance.cpp evolution/evolution.h
+maxdiff_SOURCES = maxdiff.cpp
 SUBDIRS = . seqaln test
 all: all-recursive
 
@@ -568,6 +576,10 @@ GrishinDistance$(EXEEXT): $(GrishinDistance_OBJECTS) $(GrishinDistance_DEPENDENC
 	@rm -f GrishinDistance$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(GrishinDistance_OBJECTS) $(GrishinDistance_LDADD) $(LIBS)
 
+maxdiff$(EXEEXT): $(maxdiff_OBJECTS) $(maxdiff_DEPENDENCIES) $(EXTRA_maxdiff_DEPENDENCIES) 
+	@rm -f maxdiff$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(maxdiff_OBJECTS) $(maxdiff_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f seqaln/*.$(OBJEXT)
@@ -583,6 +595,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fastq.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maxdiff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ncbitaxonomy.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/range.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strformat.Plo@am__quote@
