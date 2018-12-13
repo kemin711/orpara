@@ -107,6 +107,7 @@ class stddev {
        * Number of data points
        */
       int getCount() const { return j; }
+      double getTotal() const { return j*getMean(); }
 		// postgres retuns the sample standard deviation
 		pair<double, double> result() const { return make_pair(avg, sqrt(SS)); }
       /**
@@ -378,6 +379,30 @@ class Bisectsorted {
       int getPivot() const {
          return pivot;
       }
+      double getLog10Ratio() const {
+         return log10(avg2.getMean()/avg1.getMean());
+      }
+      double getTotalHighLowRatio() const {
+         return avg2.getTotal()/avg1.getTotal();
+      }
+      double getTotalLowHighRatio() const {
+         return avg2.getTotal()/avg1.getTotal();
+      }
+      double getTotalLog10Ratio() const {
+         return log10(getTotalHighLowRatio());
+      }
+      bool ratioGreater(double rcut) const {
+         return getHighLowRatio() > rcut || getLowHighRatio() > rcut;
+      }
+      friend ostream& operator<<(ostream& ous, const Bisectsorted& bs) {
+         ous << "[0:" << bs.input[0] << "--" << bs.pivot-1 << ":" << bs.input[pivot-1] << "]["
+            << bs.pivot << ":" << bs.input[bs.pivot] << "--" << bs.input.size()-1 << ":" 
+            << bs.input.back() << "] low avg=" << bs.avg1 << " | high avg=" << bs.avg2 
+            << " ratio: " << bs.getHighLowRatio()  << " " 
+            << bs.getLowHighRatio() << endl;
+         return ous;
+      }
+         
       /**
        * Separate numbers into two groups
        */
@@ -421,9 +446,9 @@ class Bisectsorted {
                }
             }
          }
-         cout << "Partition: [0:" << input[0] << "--" << pivot-1 << ":" << input[pivot-1] << "]["
-            << pivot << ":" << input[pivot] << "--" << input.size()-1 << ":" << input.back()
-            << " stat low: " << avg1 << " | stat high: " << avg2 << endl;
+         //cout << "Partition: [0:" << input[0] << "--" << pivot-1 << ":" << input[pivot-1] << "]["
+         //   << pivot << ":" << input[pivot] << "--" << input.size()-1 << ":" << input.back()
+         //   << " stat low: " << avg1 << " | stat high: " << avg2 << endl;
       }
 };
 

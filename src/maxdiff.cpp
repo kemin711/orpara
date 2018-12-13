@@ -15,6 +15,9 @@ int main(int argc, char* argv[]) {
          708384169, 710398793, 720181320, 735814853, 15029402817, 15368636177, 27564355721, 28210994308};
    Bisectsorted<unsigned long> cutter(std::move(input));
    cutter.separate();
-   cout << endl << "H/L: " << cutter.getHighLowRatio() << " pivot: " << cutter.getPivot() << endl;
+   cout << endl << "H/L: " << cutter.getHighLowRatio() << " log10(H/L): " 
+      << cutter.getLog10Ratio() << " pivot: " << cutter.getPivot() << endl
+      << "total ratio: " << cutter.getTotalHighLowRatio() 
+      << "total log ratio: " << cutter.getTotalLog10Ratio() << endl;
 }
 
