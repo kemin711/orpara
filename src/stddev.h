@@ -395,7 +395,7 @@ class Bisectsorted {
          return getHighLowRatio() > rcut || getLowHighRatio() > rcut;
       }
       friend ostream& operator<<(ostream& ous, const Bisectsorted& bs) {
-         ous << "[0:" << bs.input[0] << "--" << bs.pivot-1 << ":" << bs.input[pivot-1] << "]["
+         ous << "[0:" << bs.input[0] << "--" << bs.pivot-1 << ":" << bs.input[bs.pivot-1] << "]["
             << bs.pivot << ":" << bs.input[bs.pivot] << "--" << bs.input.size()-1 << ":" 
             << bs.input.back() << "] low avg=" << bs.avg1 << " | high avg=" << bs.avg2 
             << " ratio: " << bs.getHighLowRatio()  << " " 
