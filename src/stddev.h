@@ -7,6 +7,7 @@
 #include <cmath>
 #include <iostream>
 #include <array>
+#include <vector>
 
 using namespace std;
 
@@ -342,5 +343,89 @@ class Stddev {
          }
       }
 };
+
+// use unsigned long
+/**
+ * The data must be two or more in size.
+ * And must be sorted, the direction of the sorting is
+ * unimportant.
+ */
+template<class T>
+class Bisectsorted {
+   private:
+      vector<T> input;
+      stddev avg1;
+      stddev avg2;
+      /**
+       * pivot is the start of the uppper bound
+       * [-----|P-----]
+       *  123456
+       *        789999
+       */
+      int pivot;
+
+   public:
+      Bisectsorted(const vector<T>& data) : input(data),
+            avg1(input.front()), avg2(input.back()) { }
+      Bisectsorted(vector<T>&& data) : input(std::move(data)),
+            avg1(input.front()), avg2(input.back()) { }
+      double getHighLowRatio() const {
+         return avg2.getMean()/avg1.getMean();
+      }
+      double getLowHighRatio() const {
+         return avg1.getMean()/avg2.getMean();
+      }
+      int getPivot() const {
+         return pivot;
+      }
+      /**
+       * Separate numbers into two groups
+       */
+      void separate() {
+         //  i      j
+         //  ---=====
+         int i=1;
+         int j=input.size()-2;
+         double diff1, diff2;
+         while (j > i) {
+            diff1 = abs(avg1.getMean() - input[i]);
+            diff2 = abs(avg2.getMean() - input[i]);
+            if (diff1 < diff2) {  // *--|
+               avg1(input[i]);
+               ++i;
+               pivot=i;
+            }
+            else { // all numbers from here on belong to the larger group
+               // this is the end of the algorithm
+               pivot=i;
+               while (i < j) {
+                  avg2(input[i]);
+                  ++i;
+               }
+            }
+            if (i < j) {
+               diff1 = abs(avg1.getMean() - input[j]);
+               diff2 = abs(avg2.getMean() - input[j]);
+               if (diff1 < diff2) {
+                  // from start to j all belong to the lower group
+                  pivot=j+1;
+                  while (j > i) {
+                     avg1(input[j]);
+                     --j;
+                  }
+               }
+               else {
+                  pivot = j;
+                  avg2(input[j]);
+                  --j;
+               }
+            }
+         }
+         cout << "Partition: [0:" << input[0] << "--" << pivot-1 << ":" << input[pivot-1] << "]["
+            << pivot << ":" << input[pivot] << "--" << input.size()-1 << ":" << input.back()
+            << " stat low: " << avg1 << " | stat high: " << avg2 << endl;
+      }
+};
+
 }
 #endif
