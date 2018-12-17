@@ -13,10 +13,10 @@ using namespace std;
 
 namespace orpara {
 
-/** this file use the composition design pattern
- */
-
-/** the Interval class is a lot simpler than the Range class
+/** 
+ * @brief Reprsenting all foward ranges in one dimentioanl space.
+ *
+ * the Interval class is a lot simpler than the Range class
  * that considers all 4 possibility between two ranges
  * when comparing them.  In reality, most work is done 
  * with the ranges are int the + direction such as protein
@@ -25,7 +25,6 @@ namespace orpara {
  *
  * Represets [b, e] closed interval where b <= e
  */
-
 class Interval {
    public:
       Interval() : b(-1), e(-1) { }

@@ -323,7 +323,8 @@ class Dynaln {
        */
       const string& getMiddleAln() const { return middle; }
       /** 
-       * @return the bottom line of the alignment as text
+       * @return the bottom line of the alignment as text which contains
+       *    the aligned residue with potential gat char (default - )
        */
       const string& getBottomAln() const { return bottomaln; }
       /**
@@ -915,9 +916,11 @@ class Dynaln {
 
       /** 
        * string representation of the alignment
+       * \verbatim
        * topaln    ABCDEFG-D
        * middle    |: |:   |
        * bottomaln AEXDDWMKD
+       * \endverbatim
        * The middle line use space for both mismatch and gap
        * so it is not very useful for other purpose other than
        * printing the sequence alignment in plain text format.
