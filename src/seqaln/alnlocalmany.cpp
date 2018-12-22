@@ -226,15 +226,3 @@ void shrinkSequence(bioseq &seq, int b, int e) {
    }
 }
 
-/*
-void setGapParameters(Matrix &scm, int go, int ge) {
-   if (go != 0) {
-      if (go > 0) go = -go;
-      scm.setGapInsert(go);
-   }
-   if (ge != 0) {
-      if (ge > 0) ge = -ge;
-      scm.setGapExtend(ge);
-   }
-}
-*/
