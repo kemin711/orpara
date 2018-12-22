@@ -19,7 +19,7 @@
 
 namespace orpara {
 //uncomment if you want to debug the library
-//#define DEBUG
+#define DEBUG
 
 /**
  * Exception class, not template.
@@ -1672,26 +1672,10 @@ void Dynaln<T>::countnumgaps() {
 
 template<class T>
 void Dynaln<T>::buildResult(const int delta1, const int delta2) {
-   //cerr << "trace pointer ...\n";
-   //traceback(Smaxi, Smaxj);
    tracepointer(Smaxi, Smaxj);
-   //clearResult(); // this is called just after calling global() or local()
-   //cerr << "find aln boundary ...\n";
    findAlnBoundary();
-   /* reset now done by clearResult()
-   idencnt=0;
-   simcnt=0;
-   numgaps1=0;
-   numgaps2=0;
-   topaln.clear();
-   bottomaln.clear();
-   middle.clear();
-   */
-   //cerr << "build aln info ...\n";
    buildAlnInfo(delta1, delta2);
-   //cerr << "count number of gaps ...\n";
    countnumgaps();
-   //cerr << "buildResult done\n";
 }
 
 /*

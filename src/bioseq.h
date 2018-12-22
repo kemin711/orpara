@@ -221,20 +221,29 @@ class bioseq {
        * copy constructor.
        * Will not copy code.
        */
-      bioseq(const bioseq &s) : seq(s.seq), name(s.name),
-                                title(s.title), code(nullptr) { }
+      bioseq(const bioseq &s) 
+         : seq(s.seq), name(s.name),
+            title(s.title), code(nullptr) { }
       /**
-       * Move constructor.
+       * Move constructor from another sequence.
        */
       bioseq(bioseq &&s) 
          : seq(std::move(s.seq)), 
-           name(std::move(s.name)), title(),
+           name(std::move(s.name)), title(std::move(s.title)),
            code(s.code)
-      { if (s.code != nullptr) s.code=nullptr; if (!s.title.empty()) title=std::move(s.title); }
+      { 
+         if (s.code != nullptr) s.code=nullptr; 
+         //if (!s.title.empty()) title=std::move(s.title); 
+      }
 
-      bioseq(const string &s) : seq(s), name(), title(), code(nullptr) {}
+      /**
+       * Constructor from string
+       */
+      bioseq(const string &s) 
+         : seq(s), name(), title(), code(nullptr) {}
       /** 
-       *  @param n name of the sequence
+       *  Constructor from name and string sequence
+       *  @param n name of the bioseq
        *  @param s sequence 
        */
       bioseq(const string &n, const string &s) 
@@ -247,17 +256,20 @@ class bioseq {
       bioseq(const string &n, const string &s, const string &t) 
          : seq(s), name(n), title(t), code(nullptr) {}
       //virtual ~bioseq() { 
-      virtual ~bioseq() { if (code != nullptr) delete[] code; code=nullptr; }
+      virtual ~bioseq() { if (code != nullptr) delete[] code; }
 
-      void clear() { if (code != nullptr) delete[] code; code=nullptr; seq.clear(); name.clear(); title.clear(); }
+      void clear() { 
+         if (code != nullptr) delete[] code; code=nullptr; 
+         seq.clear(); name.clear(); title.clear(); 
+      }
 
       /** change the underlying sequence
        */
       void assign(const string &s) { 
          seq=s; 
-         if (code != 0) {
+         if (code != nullptr) {
             delete[] code;
-            code=0;
+            code=nullptr;
          } 
       }
       /**
@@ -459,7 +471,8 @@ class bioseq {
        * @return <1,2> residue entropy.
        */
       pair<double,double> computeEntropy() const {
-         return entropy(seq); }
+         return entropy(seq); 
+      }
       /** 
        * @param b is the 0-based index
        * @param e is the end of the index (inclusive)
@@ -539,7 +552,7 @@ class bioseq {
       void randomize() { 
          random_shuffle(seq.begin(), seq.end()); 
          delete[] code;
-         code=0; 
+         code=nullptr; 
       }
       /** 
        * convert the underlying sequence into all lower case letters */
@@ -707,7 +720,8 @@ class DNA : public bioseq {
        * use the same coding algorithm, but DNA use a different 
        * algorithm.
        */
-      DNA(const bioseq &s) : bioseq(s)  { }
+      explicit DNA(const bioseq &s) : bioseq(s)  { }
+      explicit DNA(bioseq &&s) : bioseq(std::move(s))  { }
       //~DNA() { if (code != 0) delete[] code; }
       //~DNA() { bioseq::~bioseq(); }
       /**
@@ -739,9 +753,9 @@ class DNA : public bioseq {
        * 1-based index.
        */
       DNA subseq(int b, int e) const {
-         return bioseq::subseq(b,e); }
+         return DNA(bioseq::subseq(b,e)); }
       DNA subsequenceWithName(int b, int len=-1) const {
-         return bioseq::subsequenceWithName(b, len); }
+         return DNA(bioseq::subsequenceWithName(b, len)); }
 
       /**
        * This overwrite the bioseq getcode function.
@@ -823,7 +837,6 @@ class DNA : public bioseq {
        * for translation.
        **/
       static codon codontable;
-      //mutable int* code;
 };
 
 /** 

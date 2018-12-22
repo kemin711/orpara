@@ -170,6 +170,7 @@ class Fastq {
       Fastq& operator=(Fastq &&other);
       /**
        * Use this for reading from a file.
+       * @return true if loaded one object from the input stream
        */
       bool read(istream &in);
       /**

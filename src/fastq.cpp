@@ -145,7 +145,7 @@ void Fastq::writeFasta(ostream &ous, const int width) const {
 
 bool Fastq::read(istream &ins) {
    string line;
-   char dumy[3];
+   //char dumy[3];
    getline(ins, line);
    int emptyCnt=0;
    while (!ins.eof() && line.empty()) {
@@ -173,7 +173,8 @@ bool Fastq::read(istream &ins) {
       if (hasDescription()) desc.clear();
    }
    getline(ins, seq); // sequence line
-   ins.read(dumy, 2); // two bytes
+   //ins.read(dumy, 2); // two bytes
+   ins.ignore(3, '\n'); // two bytes may have trouble if using different delimiter
    if (qual == nullptr) {
       qual = new unsigned char[length()];
       qual_len=length();

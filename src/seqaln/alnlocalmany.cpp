@@ -10,18 +10,19 @@ using namespace std;
 using namespace orpara;
 
 void usage() {
-   cout << "alnlocal seq1.fas seq2.fastq -o outfile\n"
+   cout << "alnlocalmany seq1.fas seq2.fastq -o outfile\n"
       << "Options:\n"
-      << "        -r [1,2]  reverse complement first or second sequence\n"
-      << "        -f reference sequence file\n"
-      << "        -q fastq sequence file containing many input sequences\n"
-      << "        -b1 1-based index of sequence1 begin\n"
-      << "        -e1 1-based index of sequence1 end\n"
-      << "        -b2 1-based index of sequence2 begin\n"
-      << "        -e2 1-based index of sequence2 end\n"
-      << "        --gap-open or -g  gap open cost, default min(matrix score)*2 \n"
-      << "        --gap-extend or -e  gap extend cost, default min(matrix score)\n"
-      << "        -o output file, in summary tabular format\n"
+      << "     -r [1,2]  reverse complement first or second sequence\n"
+      << "     -f a single reference sequence in a fasta file\n"
+      << "     -q fastq sequence file containing many input sequences to be\n"
+      << "        the single reference\n"
+      << "     -b1 1-based index of sequence1 begin\n"
+      << "     -e1 1-based index of sequence1 end\n"
+      << "     -b2 1-based index of sequence2 begin\n"
+      << "     -e2 1-based index of sequence2 end\n"
+      << "     --gap-open or -g  gap open cost, default min(matrix score)*2 \n"
+      << "     --gap-extend or -e  gap extend cost, default min(matrix score)\n"
+      << "     -o output file, in summary tbular format\n"
       << "         if output file name is not specified, the program will generate one\n";
 }
 
@@ -55,6 +56,8 @@ void alignSimple(const bioseq &s1, const bioseq &s2,
 int main(int argc, char *argv[]) {
    int i = 1;
    string file1, file2, outfile;
+   file1="chr3_178935841_178936341.fas";
+   file2="CF_HD786_Old_3_prey_R1F.fastq";
    int reverseComplement = 0;
    int seq1begin=1, seq1end=-1, seq2begin=1, seq2end=-1;
    int gapOpen = 1;
@@ -101,31 +104,42 @@ int main(int argc, char *argv[]) {
       return 1;
    }
 
-   bioseq seq1, seq2;
-   seq1.read(file1); // reference
-   //seq2.read(file2);
-   ifstream inf(file2.c_str());
-   if (inf.fail()) {
-      cerr << "Failed to open " << file2 << endl;
-      return 1;
-   }
+   bioseq seq1("sqname", "ACGTCTTTTTTTTTTTTTTTTAAA");
+   bioseq seq2;
+   //seq1.read(file1); // reference
+   //ifstream inf(file2.c_str());
+   //if (inf.fail()) {
+   //   cerr << "Failed to open " << file2 << endl;
+   //   return 1;
+   //}
 
-   Fastq fastq;
-
-   if (seq1.guessType() == DNASEQ) {
-      SimpleScoreMethod sm(10, -9, -29, -3);
-      Dynaln<SimpleScoreMethod> aligner(sm);
-      DNA dnaref = DNA(seq1);
-      aligner.setSeq1(dnaref);
-
-      Dynaln<SimpleScoreMethod>::printSummaryHeader(ouf, "\t", false);
+   //Fastq fastq;
+   int numseq=0;
+   //if (seq1.guessType() == DNASEQ) {
+   if (true) {
+      //SimpleScoreMethod sm(10, -9, -29, -3);
+      //Dynaln<SimpleScoreMethod> aligner(sm);
+      //DNA dnaref(seq1);
+      //string x1,x2;
+      //x1=seq1.getName();
+      //x2=seq1.getSequence();
+      //cout << x1 << " " << x2 << endl;
+      //DNA dnaref(x1, x2);
+      //DNA dnaref("refseq", "TATTAAGTTTACTACAATTATACTAAAATAAGAACACAGATCTTCACTGAG");
+      //DNA test2("test2", "ACGTAATTGACCTTAGGGACTCTCAGTAAGGGGGTTTTAAAAAACCCCCGCGGCGTC");
+      //aligner.setSeq1(dnaref);
+      //Dynaln<SimpleScoreMethod>::printSummaryHeader(ouf, "\t", false);
       ouf << endl;
-      while (fastq.read(inf)) {
-         DNA raw(fastq.getName().substr(1), fastq.getSequence());
-         aligner.setSeq2(raw);
-         aligner.runlocal();
-         aligner.printSummary(ouf, "\t", false) << endl;
-      }
+      //aligner.setSeq2(test2);
+      //aligner.runlocal();
+      //while (fastq.read(inf)) {
+         //DNA raw(fastq.getName(), fastq.getSequence());
+         //aligner.setSeq2(raw);
+         //aligner.runlocal();
+         //aligner.local();
+         //aligner.printSummary(ouf, "\t", false) << endl;
+         //++numseq;
+      //}
    }
    else { // protein align
       if (simpleMethod) 
@@ -133,7 +147,7 @@ int main(int argc, char *argv[]) {
       else 
          alignProtein(gapOpen, gapExtend, seq1, seq2, seq1begin, seq2begin, ouf);
    }
-   cout << "aligment written to file: " << outfile << endl;
+   cout << numseq << " aligments written to file: " << outfile << endl;
 
    return 0;
 }
