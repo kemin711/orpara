@@ -11,7 +11,10 @@ using namespace std;
 
 namespace orpara {
 
-/** The Range class for sequence alignment.
+/** 
+ * @brief a directional segment in one dimentioan space
+ *
+ * The Range class for sequence alignment.
  * Abstraction of two numbers in one dimentional space.
  * Represent a line.
  *
@@ -25,7 +28,6 @@ namespace orpara {
  * [b,e] contain also the directional information.
  * with b<e as + and b>e as -
  */
-
 class Range {
 	public:
       /** This is the default object

@@ -322,6 +322,9 @@ class Fastq {
        * non-empty values are allowed.
        */
       bool empty() const { return seq.empty(); }
+      /**
+       * Will clear seq member leaving qual member unchanged.
+       */
       void clear() { seq.clear(); }
       /**
        * remove low quality part of the sequence. The algorithm is simple.
