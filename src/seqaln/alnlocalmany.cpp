@@ -2,6 +2,7 @@
 #include "scorematrix.h"
 #include "dynalnt.h"
 #include "fastq.h"
+#include <cstring>
 
 
 /** a program to tes the alignemnt classes.
@@ -10,7 +11,7 @@ using namespace std;
 using namespace orpara;
 
 void usage() {
-   cout << "alnlocalmany seq1.fas seq2.fastq -o outfile\n"
+   cerr << "alnlocalmany seq1.fas seq2.fastq -o outfile\n"
       << "Options:\n"
       << "     -r [1,2]  reverse complement first or second sequence\n"
       << "     -f a single reference sequence in a fasta file\n"
@@ -26,17 +27,6 @@ void usage() {
       << "         if output file name is not specified, the program will generate one\n";
 }
 
-/**
- * Remove the path part
- * Only works for unix path separator '/'.
- */
-string getFilePart(const string &path);
-
-/**
- * Remove the path part and suffix
- * @return the file stem only.
- */
-string getOnlyFileStem(const string &fname);
 /**
  * @param b begin of the sequence
  * @param e end of the sequence
@@ -56,7 +46,9 @@ void alignSimple(const bioseq &s1, const bioseq &s2,
 int main(int argc, char *argv[]) {
    int i = 1;
    string file1, file2, outfile;
+   // file 1 is reference file with single sequence
    file1="chr3_178935841_178936341.fas";
+   // file 2 is database to be matched
    file2="CF_HD786_Old_3_prey_R1F.fastq";
    int reverseComplement = 0;
    int seq1begin=1, seq1end=-1, seq2begin=1, seq2end=-1;
@@ -75,7 +67,12 @@ int main(int argc, char *argv[]) {
       else if (string(argv[i]) == "--gap-open" 
             || string(argv[i]) == "-g") { gapOpen=atoi(argv[++i]); }
       else if (string(argv[i]) == "--gap-extend"
-            || string(argv[i]) == "-e") { gapExtend=atoi(argv[++i]); }
+            || string(argv[i]) == "-e") { 
+         gapExtend=atoi(argv[++i]); 
+      }
+      else if (!strcmp(argv[i], "--help")) {
+         usage(); return 0;
+      }
       else {
          file1 = argv[i];
          if (i+1 < argc && argv[i+1][0] != '-') {
@@ -90,22 +87,22 @@ int main(int argc, char *argv[]) {
       return 1;
    }
    if (outfile.empty() && !file1.empty() && !file2.empty()) {
-      outfile = getOnlyFileStem(file1);
+      outfile = getFileStem(file1);
       outfile += "_";
-      outfile += getOnlyFileStem(file2);
+      outfile += getFileStem(file2);
       if (seq1begin > 1 || seq2begin > 1 || seq1end != -1 || seq2end != -1) {
          outfile += "sub";
       }
       outfile += ".aln";
    }
-   ofstream ouf(outfile.c_str());
-   if (!ouf) {
-      cerr << "Failed to open " << outfile << " for alignment output!\n";
-      return 1;
-   }
+   //ofstream ouf(outfile);
+   //if (ouf.fail()) {
+   //   cerr << "Failed to open " << outfile << " for alignment output!\n";
+   //   return 1;
+   //}
 
-   bioseq seq1("sqname", "ACGTCTTTTTTTTTTTTTTTTAAA");
-   bioseq seq2;
+   //bioseq seq1("sqname", "ACGTCTTTTTTTTTTTTTTTTAAA");
+   //bioseq seq2;
    //seq1.read(file1); // reference
    //ifstream inf(file2.c_str());
    //if (inf.fail()) {
@@ -129,7 +126,8 @@ int main(int argc, char *argv[]) {
       //DNA test2("test2", "ACGTAATTGACCTTAGGGACTCTCAGTAAGGGGGTTTTAAAAAACCCCCGCGGCGTC");
       //aligner.setSeq1(dnaref);
       //Dynaln<SimpleScoreMethod>::printSummaryHeader(ouf, "\t", false);
-      ouf << endl;
+      //ouf << endl;
+      cerr << "true\n";
       //aligner.setSeq2(test2);
       //aligner.runlocal();
       //while (fastq.read(inf)) {
@@ -142,12 +140,13 @@ int main(int argc, char *argv[]) {
       //}
    }
    else { // protein align
-      if (simpleMethod) 
-         alignSimple(seq1, seq2, seq1begin, seq2begin, ouf);
-      else 
-         alignProtein(gapOpen, gapExtend, seq1, seq2, seq1begin, seq2begin, ouf);
+      //if (simpleMethod) 
+      //   alignSimple(seq1, seq2, seq1begin, seq2begin, ouf);
+      //else 
+       //  alignProtein(gapOpen, gapExtend, seq1, seq2, seq1begin, seq2begin, ouf);
+      cerr << "not DNA\n";
    }
-   cout << numseq << " aligments written to file: " << outfile << endl;
+   //cout << numseq << " aligments written to file: " << outfile << endl;
 
    return 0;
 }
@@ -199,21 +198,6 @@ void showAlignInfo(const Dynaln<T> &aln, ostream &ous) {
       << " range2=" << aln.bottomBeginIndex()+1 << "-" << aln.bottomEndIndex()+1
       << endl;
 }
-
-string getFilePart(const string &path) {
-   string::size_type i = path.rfind('/');
-   if (i != string::npos) {
-      ++i;
-      return path.substr(i);
-   }
-   else return path;
-}
-
-string getOnlyFileStem(const string &fname) {
-   string filepart = getFilePart(fname);
-   return getFileStem(filepart);
-}
-
 
 void shrinkSequence(bioseq &seq, int b, int e) {
    if (b > 1) {
