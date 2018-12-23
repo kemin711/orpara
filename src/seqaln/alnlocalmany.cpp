@@ -17,14 +17,14 @@ class ProgParam {
       float identitycut;
       int alnlencut;
       /**
-       * Reverse complement the reference. 
-       * This make the cost smallest.
+       * Reverse complement 1 for the reference. 
+       * 2 for database
        */
-      bool revcomp;
+      int revcomp;
 
    public:
       ProgParam() 
-         : identitycut(0.8), alnlencut(45), revcomp(false) { }
+         : identitycut(0.8), alnlencut(45), revcomp(0) { }
       void setAlnlenCut(const int al) {
          alnlencut = al;
       }
@@ -38,9 +38,21 @@ class ProgParam {
          return alnlencut;
       }
       void reverseComplementReference() {
-         revcomp = true;
+         revcomp = 1;
       }
-      bool useReverseComplement() const {
+      /**
+       * Costly 
+       */
+      void reverseComplementDatabase() {
+         revcomp = 2;
+      }
+      void setRevcomp(int rv) {
+         revcomp=rv;
+      }
+      int useReverseComplement() const {
+         return revcomp;
+      }
+      int getRevcomp() const {
          return revcomp;
       }
 };
@@ -60,6 +72,9 @@ void usage() {
       << "   --alnlen-cut INTEGER a integer value to filter alignment\n"
       << "     if alignment length < this value, then will be discarded\n"
       << "   --minus-reference flag to use negative strand of reference\n"
+      << "   --minus-database flag to use negative strand of database\n"
+      << "     this is a costly operation, every sequence in db will be\n"
+      << "     reverse complemented before alignment\n"
       << "   --help will print this message\n"
       << "Positional argument:\n"
       << "   the database file can be given as the only positional argument\n"
@@ -108,6 +123,9 @@ int main(int argc, char *argv[]) {
       }
       else if (!strcmp(argv[i], "--minus-reference")) { 
          param.reverseComplementReference(); 
+      }
+      else if (!strcmp(argv[i], "--minus-database")) { 
+         param.reverseComplementDatabase(); 
       }
       else {
          dbfile = argv[i];
@@ -160,7 +178,7 @@ void alignDNAMany(const string& ref, const string& dbf, const string& outf, cons
    Dynaln<SimpleScoreMethod> aligner(sm);
    DNA dnaref;
    dnaref.read(ref);
-   if (param.useReverseComplement()) {
+   if (param.useReverseComplement() == 1) {
       dnaref.revcomp();
    }
    aligner.setSeq1(dnaref);
@@ -183,6 +201,9 @@ void alignDNAMany(const string& ref, const string& dbf, const string& outf, cons
    else {
       DNA dna; 
       while (dna.read(inf)) {
+         if (param.useReverseComplement() == 2) {
+            dna.revcomp();
+         }
          aligner.setSeq2(dna);
          aligner.runlocal();
          if (aligner.getIdentity() > param.getIdentityCut() 
@@ -201,6 +222,9 @@ void alignDNAManyFastq(Dynaln<SimpleScoreMethod>& matcher, ifstream& inf, ofstre
    Fastq fsq;
    while (fsq.read(inf)) {
       DNA raw(fsq.getName(), fsq.getSequence());
+      if (param.useReverseComplement() == 2) {
+         raw.revcomp();
+      }
       matcher.setSeq2(raw);
       matcher.runlocal();
       if (matcher.getIdentity() > param.getIdentityCut() 
@@ -210,8 +234,6 @@ void alignDNAManyFastq(Dynaln<SimpleScoreMethod>& matcher, ifstream& inf, ofstre
       }
       ++sqcnt;
    }
-   //cerr << numseq << " database sequences aligned to reference, result in "
-   //   << outf << endl;
 }
 
 void alignProteinMany(const string& ref, const string& dbf, const string& outf) {

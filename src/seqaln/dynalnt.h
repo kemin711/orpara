@@ -311,6 +311,7 @@ class Dynaln {
        * seq1begin seq1end seq2begin seq2 end
        * optional: seq1entropy_of_aligned_region
        *           seq2entropy_of_aligned_region
+       * seq1begin, seq1end, ..., used 1-based index in the sequence.
        */
       ostream& printSummary(ostream &ous, const string &dl="\t", bool wantEntropy=false) const;
       /** 
@@ -1826,7 +1827,7 @@ ostream& Dynaln<T>::printSummaryHeader(ostream &ous, const string& dl, bool want
 
 template<class T>
 ostream& Dynaln<T>::printSummary(ostream &ous, const string &dl, bool wantEntropy) const {
-   int ibase=1;
+   int ibase=1; // first base 1-based index
    ous << seq1->getName() << dl << seq1->length() << dl
       << seq2->getName() << dl << seq2->length() << dl
       << Smax << dl << idencnt << dl << simcnt << dl
