@@ -5,6 +5,9 @@
 #include <math.h>
 #include "strformat.h"
 
+// for performance we can turn off the verification of 
+// each residue, this can be costly in large inputs
+//#define VERIFY_RESIDUE
 using namespace std;
 
 namespace orpara {
@@ -323,39 +326,47 @@ bool bioseq::read(istream &ins, string &header) {
    return true;
 }
 
+// header not provided
 bool bioseq::read(istream &ins) {
-   if (ins.eof()) return false;
+   if (ins.eof() || ins.peek() == EOF) return false;
    string::size_type i;
-   clear(); // make sure the sequence starts with empty
    getline(ins,title);
    if (title[0] != '>' || title.length() < 2) {
-      cerr << "not in proper fasta format, first line of fasta file: "
-         << title << endl;
-      throw bioseqexception("fasta format problem");
+      throw bioseqexception(string(__FILE__) + ":" + to_string(__LINE__) + ":ERROR improper fasta header " + title);
    }
-   title=title.substr(1); // get rid of >
    if ((i=title.find(' ')) != string::npos) {
-      name=title.substr(0,i);
+      name=title.substr(1,i);
       title=title.substr(i+1);
    }
    else {
-      name=title;
+      name=title.substr(1);
       title.clear();
    }
-   static string line; // read sequence part, 
+   // now read sequence part, clear code if not null
+   if (code != nullptr) {
+      delete[] code; code = nullptr;
+   }
+   getline(ins,seq);
+#ifdef VERIFY_RESIDUE
+   if (isNotBioseq(seq)) {
+      throw bioseqexception("biosequence contains illegal char");
+   }
+#endif
+   if (ins.eof()) { // no more input
+      return true;
+   }
+   string line;
    getline(ins,line);
    while (!ins.eof()) {
-      if (line.length()>0 && 
-            (line.find_first_of("ABCDEFGHIKLMNPQRSTUVWXYZ*") != string::npos || 
-             line.find_first_of("abcdefghiklmnpqrstuvwxyz*") != string::npos)) 
-      {
+      if (!line.empty()) { // allowing empty lines inside sequence files
          if (!isprint(line[line.length()-1])) { // remove invisible variable
-            line.erase(line.length()-1);
+            line.resize(line.length()-1);
          }
-         if (line.find_first_not_of("ABCDEFGHIKLMNPQRSTUVWXYZ*abcdefghiklmnpqrstuvwxyz") != string::npos) 
-         {
-            throw runtime_error("sequence " + name + " contains non-bioseq character! " + line);
+#ifdef VERIFY_RESIDUE
+         if (isNotBioseq(line)) {
+            throw bioseqexception("illigal bioseq seq char in " + line);
          }
+#endif
          seq += line;
       }
       if (ins.peek() == '>') return true;
@@ -366,6 +377,53 @@ bool bioseq::read(istream &ins) {
       throw bioseqexception("empty sequence from sequence file");
    }
    ins.peek();
+   return true;
+}
+
+// this method only read one sequence from the file
+// even there are multiple sequences in the file
+bool bioseq::read(const string &file) {
+   ifstream IN(file);
+   if (IN.fail()) {
+      throw runtime_error(string(__FILE__) + ":" + to_string(__LINE__) 
+            + ":ERROR Failed to open input file: " + file);
+   }
+   // 1 read header
+   getline(IN, title);
+   if (title.front() != '>') {
+      cerr << __FILE__ << ":" << __LINE__ << ":ERROR inproper fasta-foramted sequence\n";
+      return false;
+   }
+   string::size_type i = title.find(' ');
+   if (i == string::npos) {
+      name=title.substr(1);  // first char in fasta header is '>'
+      title.clear();
+   }
+   else {
+      name=title.substr(1, i);
+      title = title.substr(i+1);
+   }
+   if (!seq.empty()) seq.clear();
+   if (code != nullptr) {
+      delete[] code;
+      code = nullptr;
+   }
+   string line;
+   getline(IN, line);
+   while (!IN.eof() && line[0] != '>') {
+      if (!isprint(line.back())) {
+         line.resize(line.size()-1);
+      }
+      if (isNotBioseq(line)){
+         cerr << line << " contain illegal sequence char\n";
+         return false;
+      }
+      seq += line;
+      getline(IN, line);
+   }
+   if (!IN.eof()) {
+      cerr << __FILE__ << ":" << __LINE__ << ":WARN more than one sequence in the file: " << file << "\n";
+   }
    return true;
 }
 
@@ -404,22 +462,6 @@ istream& operator>>(istream& ins, bioseq &sq) {
    }
    ins.peek();
    return ins;
-}
-
-// this method only read one sequence from the file
-void bioseq::read(const string &file) {
-   ifstream IN(file.c_str());
-   if (IN.fail()) {
-      cerr << "Failed to open input file: " << file << endl;
-      exit(1);
-   }
-   string headln;
-   getline(IN, headln);
-   if (read(IN, headln)) { // use the two-parameter version
-      if (!IN.eof()) {
-         cerr << "There are more than one sequence in the input file: " << file << "\n";
-      }
-   }
 }
 
 string& bioseq::importFasta(const string& fas) {
@@ -717,7 +759,7 @@ map<char,double> bioseq::getFrequency() const {
    return frequency;
 }
 
-sequenceType bioseq::guessType() const {
+SequenceType bioseq::guessType() const {
    map<char, double> residueFreq = getFrequency();
    if (residueFreq.size() == 4
          || (residueFreq['A'] + residueFreq['C']  

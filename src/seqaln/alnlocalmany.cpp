@@ -2,211 +2,249 @@
 #include "scorematrix.h"
 #include "dynalnt.h"
 #include "fastq.h"
+#include <strformat.h>
+#include <iostream>
 #include <cstring>
-
+#include <string>
 
 /** a program to tes the alignemnt classes.
  */
 using namespace std;
 using namespace orpara;
 
+class ProgParam {
+   private:
+      float identitycut;
+      int alnlencut;
+      /**
+       * Reverse complement the reference. 
+       * This make the cost smallest.
+       */
+      bool revcomp;
+
+   public:
+      ProgParam() 
+         : identitycut(0.8), alnlencut(45), revcomp(false) { }
+      void setAlnlenCut(const int al) {
+         alnlencut = al;
+      }
+      void setIdentityCut(const float ic) {
+         identitycut = ic;
+      }
+      float getIdentityCut() const {
+         return identitycut;
+      }
+      int getAlnlenCut() const {
+         return alnlencut;
+      }
+      void reverseComplementReference() {
+         revcomp = true;
+      }
+      bool useReverseComplement() const {
+         return revcomp;
+      }
+};
+
 void usage() {
-   cerr << "alnlocalmany seq1.fas seq2.fastq -o outfile\n"
+   cerr << "alnlocalmany -r REFERENCE -o OUTPUT DBFILE\n"
       << "Options:\n"
-      << "     -r [1,2]  reverse complement first or second sequence\n"
-      << "     -f a single reference sequence in a fasta file\n"
-      << "     -q fastq sequence file containing many input sequences to be\n"
-      << "        the single reference\n"
-      << "     -b1 1-based index of sequence1 begin\n"
-      << "     -e1 1-based index of sequence1 end\n"
-      << "     -b2 1-based index of sequence2 begin\n"
-      << "     -e2 1-based index of sequence2 end\n"
-      << "     --gap-open or -g  gap open cost, default min(matrix score)*2 \n"
-      << "     --gap-extend or -e  gap extend cost, default min(matrix score)\n"
-      << "     -o output file, in summary tbular format\n"
-      << "         if output file name is not specified, the program will generate one\n";
+      << "   -r reference sequence file only one sequence allowed\n"
+      << "   -o output file name if not given this program will make\n"
+      << "       one for you\n"
+      << "   -d database file contain many sequences in fasta or fastq format\n"
+      << "       The program will judge the type of sequence based on the \n"
+      << "       file suffix. *.fastq files will be treated as fastq files\n"
+      << "       and others will be treated as fasta files\n"
+      << "   --identity-cut FLOAT a fraction number (0, 1] to filter\n"
+      << "     alignments whose identity < this will be discarded\n"
+      << "   --alnlen-cut INTEGER a integer value to filter alignment\n"
+      << "     if alignment length < this value, then will be discarded\n"
+      << "   --minus-reference flag to use negative strand of reference\n"
+      << "   --help will print this message\n"
+      << "Positional argument:\n"
+      << "   the database file can be given as the only positional argument\n"
+      << "   if it is in fasta foramt. If input in fastq format, you must\n"
+      << "   use the -q option\n";
 }
 
-/**
- * @param b begin of the sequence
- * @param e end of the sequence
- * @seq will be altered to subsequence of [b, e] in 1-based index.
- */
-void shrinkSequence(bioseq &seq, int b, int e);
-//void setGapParameters(Matrix &scm, int go, int ge);
-template<class T>
-void showAlignInfo(const Dynaln<T> &aln, ostream &ous);
-void alignProtein(const int gapOpen, const int gapExtend, const bioseq &p1, const bioseq &p2, 
-      const int seq1begin, const int seq2begin, ostream &ous);
-void alignDNA(const int gapo, const int gape, const DNA &dna1, const DNA &dna2,
-      const int seq1begin, const int seq2begin, ostream &ous);
-void alignSimple(const bioseq &s1, const bioseq &s2,
-      const int seq1begin, const int seq2begin, ostream &ous);
+string makeOutputFile(const string& ref, const string& db);
+bool isDNA(const string& infile);
+bool isProtein(const string& infile);
+void alignDNAMany(const string& ref, const string& dbf, const string& outf, const ProgParam& param);
+void alignDNAManyFastq(Dynaln<SimpleScoreMethod>& matcher, 
+      ifstream& inf, ofstream& ouf, const ProgParam &param, int& sqcnt);
+void alignProteinMany(const string& ref, const string& dbf, const string& outf);
 
+/**
+ * Aling many sequences with a single reference sequence 
+ * and generate a summary file.
+ */
 int main(int argc, char *argv[]) {
-   int i = 1;
-   string file1, file2, outfile;
-   // file 1 is reference file with single sequence
-   file1="chr3_178935841_178936341.fas";
-   // file 2 is database to be matched
-   file2="CF_HD786_Old_3_prey_R1F.fastq";
-   int reverseComplement = 0;
-   int seq1begin=1, seq1end=-1, seq2begin=1, seq2end=-1;
-   int gapOpen = 1;
-   int gapExtend = 1;
-   bool simpleMethod = true;
+   string reffile, dbfile, outfile;
+   reffile="chr3_178935841_178936341.fas";
+   dbfile="CF_HD786_Old_3_prey_R1F.fastq";
+   ProgParam param;
+   int i=1;
    while (i < argc) {
-      if (string(argv[i]) == "-f") { file1=argv[++i]; }
-      else if (string(argv[i]) == "-q") { file2=argv[++i]; }
-      else if (string(argv[i]) == "-o") { outfile=argv[++i]; }
-      else if (string(argv[i]) == "-r") { reverseComplement=atoi(argv[++i]); }
-      else if (string(argv[i]) == "-b1") { seq1begin=atoi(argv[++i]); }
-      else if (string(argv[i]) == "-e1") { seq1end=atoi(argv[++i]); }
-      else if (string(argv[i]) == "-b2") { seq2begin=atoi(argv[++i]); }
-      else if (string(argv[i]) == "-e2") { seq2end=atoi(argv[++i]); }
-      else if (string(argv[i]) == "--gap-open" 
-            || string(argv[i]) == "-g") { gapOpen=atoi(argv[++i]); }
-      else if (string(argv[i]) == "--gap-extend"
-            || string(argv[i]) == "-e") { 
-         gapExtend=atoi(argv[++i]); 
+      if (!strcmp(argv[i], "--help")) {
+         usage();
+         return 0;
       }
-      else if (!strcmp(argv[i], "--help")) {
-         usage(); return 0;
+      else if (!strcmp(argv[i], "-r")) {
+         reffile=argv[++i];
+      }
+      else if (!strcmp(argv[i], "-d")) {
+         dbfile = argv[++i];
+      }
+      else if (!strcmp(argv[i], "-o")) {
+         outfile = argv[++i];
+      }
+      //else if (!strcmp(argv[i], "-q")) { dbfile=argv[++i]; }
+      else if (!strcmp(argv[i], "--identity-cut")) { 
+         param.setIdentityCut(atof(argv[++i])); 
+      }
+      else if (!strcmp(argv[i], "--alnlen-cut")) { 
+         param.setAlnlenCut(atoi(argv[++i])); 
+      }
+      else if (!strcmp(argv[i], "--minus-reference")) { 
+         param.reverseComplementReference(); 
       }
       else {
-         file1 = argv[i];
-         if (i+1 < argc && argv[i+1][0] != '-') {
-            file2 = argv[++i];
-         }
+         dbfile = argv[i];
       }
       ++i;
    }
-
-   if (file1.empty() || file2.empty()) {
-      usage();
+   if (outfile.empty() && !reffile.empty() && !dbfile.empty()) {
+      outfile=makeOutputFile(reffile, dbfile);
+   }
+   if (isDNA(reffile)) {
+      alignDNAMany(reffile, dbfile, outfile, param);
+   }
+   else if (isProtein(reffile)) {
+      alignProteinMany(reffile, dbfile, outfile);
+   }
+   else {
+      cerr << "reference of unknown type, failed\n";
       return 1;
    }
-   if (outfile.empty() && !file1.empty() && !file2.empty()) {
-      outfile = getFileStem(file1);
-      outfile += "_";
-      outfile += getFileStem(file2);
-      if (seq1begin > 1 || seq2begin > 1 || seq1end != -1 || seq2end != -1) {
-         outfile += "sub";
-      }
-      outfile += ".aln";
-   }
-   //ofstream ouf(outfile);
-   //if (ouf.fail()) {
-   //   cerr << "Failed to open " << outfile << " for alignment output!\n";
-   //   return 1;
-   //}
-
-   //bioseq seq1("sqname", "ACGTCTTTTTTTTTTTTTTTTAAA");
-   //bioseq seq2;
-   //seq1.read(file1); // reference
-   //ifstream inf(file2.c_str());
-   //if (inf.fail()) {
-   //   cerr << "Failed to open " << file2 << endl;
-   //   return 1;
-   //}
-
-   //Fastq fastq;
-   int numseq=0;
-   //if (seq1.guessType() == DNASEQ) {
-   if (true) {
-      //SimpleScoreMethod sm(10, -9, -29, -3);
-      //Dynaln<SimpleScoreMethod> aligner(sm);
-      //DNA dnaref(seq1);
-      //string x1,x2;
-      //x1=seq1.getName();
-      //x2=seq1.getSequence();
-      //cout << x1 << " " << x2 << endl;
-      //DNA dnaref(x1, x2);
-      //DNA dnaref("refseq", "TATTAAGTTTACTACAATTATACTAAAATAAGAACACAGATCTTCACTGAG");
-      //DNA test2("test2", "ACGTAATTGACCTTAGGGACTCTCAGTAAGGGGGTTTTAAAAAACCCCCGCGGCGTC");
-      //aligner.setSeq1(dnaref);
-      //Dynaln<SimpleScoreMethod>::printSummaryHeader(ouf, "\t", false);
-      //ouf << endl;
-      cerr << "true\n";
-      //aligner.setSeq2(test2);
-      //aligner.runlocal();
-      //while (fastq.read(inf)) {
-         //DNA raw(fastq.getName(), fastq.getSequence());
-         //aligner.setSeq2(raw);
-         //aligner.runlocal();
-         //aligner.local();
-         //aligner.printSummary(ouf, "\t", false) << endl;
-         //++numseq;
-      //}
-   }
-   else { // protein align
-      //if (simpleMethod) 
-      //   alignSimple(seq1, seq2, seq1begin, seq2begin, ouf);
-      //else 
-       //  alignProtein(gapOpen, gapExtend, seq1, seq2, seq1begin, seq2begin, ouf);
-      cerr << "not DNA\n";
-   }
-   //cout << numseq << " aligments written to file: " << outfile << endl;
 
    return 0;
 }
 
-void alignSimple(const bioseq &s1, const bioseq &s2,
-      const int seq1begin, const int seq2begin, ostream &ous) {
-   SimpleScoreMethod sm(10, -11, -40, -1);
-   Dynaln<SimpleScoreMethod> aln(s1, s2);
-   aln.setMatrix(sm);
-   aln.runlocal(seq1begin-1, seq2begin-1);
-   aln.printAlign(ous);
-   showAlignInfo<SimpleScoreMethod>(aln, cout);
-}
-
-void alignProtein(const int gapOpen, const int gapExtend, 
-      const bioseq &p1, const bioseq &p2, 
-      const int seq1begin, const int seq2begin, 
-      ostream &ous) 
-{
-   // protein align using default matrix
-   Dynaln<ProteinScoreMethod> alnp(p1, p2);
-   if (gapOpen < 1) 
-      alnp.setGapParameter(gapOpen, gapExtend);
-   alnp.runlocal(seq1begin-1, seq2begin-1); // seqXbegin for labeling the alignment
-   alnp.printAlign(ous);
-   showAlignInfo<ProteinScoreMethod>(alnp, cout);
-}
-
-void alignDNA(const int gapo, const int gape, const DNA &dna1, const DNA &dna2,
-      const int seq1begin, const int seq2begin, ostream &ous) {
-   Dynaln<NucleicScoreMethod> aln(dna1, dna2);
-   if (gapo < 1 || gape < 1) {
-      aln.setGapParameter(gapo, gape);
+bool isDNA(const string& infile) {
+   bioseq bsq;
+   if (!bsq.read(infile)) {
+      throw runtime_error("failed to get reference seq");
    }
-   aln.runlocal(seq1begin-1, seq2begin-1);
-   aln.printAlign(ous);
-   showAlignInfo<NucleicScoreMethod>(aln, cout);
+   if (bsq.guessType() == DNASEQ) {
+      return true;
+   }
+   return false;
+}
+bool isProtein(const string& infile) {
+   bioseq bsq;
+   if (!bsq.read(infile)) {
+      throw runtime_error("failed to get reference seq");
+   }
+   if (bsq.guessType() == PROTEINSEQ) {
+      return true;
+   }
+   return false;
 }
 
-template<class T>
-void showAlignInfo(const Dynaln<T> &aln, ostream &ous) {
-   ous << aln.getSeq1Name() << "|" << aln.getSeq2Name()
-      << " seqlength=" << aln.getSeq1Length() << "," << aln.getSeq2Length()
-      << " alnlength=" << aln.getAlnlen() 
-      << " numgap=" << aln.getNumgaps1() << "," << aln.getNumgaps2()
-      << " gaplength=" << aln.getGaplen1() << "," << aln.getGaplen2()
-      << " identity=" << aln.getIdentity() 
-      << " range1=" << aln.topBeginIndex()+1 << "-" << aln.topEndIndex()+1
-      << " range2=" << aln.bottomBeginIndex()+1 << "-" << aln.bottomEndIndex()+1
-      << endl;
-}
+// TODO: needs to be tested
+void alignDNAMany(const string& ref, const string& dbf, const string& outf, const ProgParam& param)
+{
+   // align ref to fasta file
+   SimpleScoreMethod sm(10, -9, -29, -3);
+   Dynaln<SimpleScoreMethod> aligner(sm);
+   DNA dnaref;
+   dnaref.read(ref);
+   if (param.useReverseComplement()) {
+      dnaref.revcomp();
+   }
+   aligner.setSeq1(dnaref);
+   ifstream inf(dbf);
+   if (inf.fail()) {
+      throw runtime_error("failed to open dbfile " + dbf);
+   }
+   ofstream ouf(outf);
+   if (ouf.fail()) {
+      throw runtime_error("failed to open outpufle " + outf);
+   }
+   Dynaln<SimpleScoreMethod>::printSummaryHeader(ouf, "\t", false);
+   ouf << endl;
 
-void shrinkSequence(bioseq &seq, int b, int e) {
-   if (b > 1) {
-      seq = seq.subseq(b, e);
+   int numseq=0;
+   // diverge according to different methods
+   if (endwith(dbf, ".fastq")) {
+      alignDNAManyFastq(aligner, inf, ouf, param, numseq);
    }
    else {
-      if (e != -1) {
-         seq = seq.subseq(1, e);
+      DNA dna; 
+      while (dna.read(inf)) {
+         aligner.setSeq2(dna);
+         aligner.runlocal();
+         if (aligner.getIdentity() > param.getIdentityCut() 
+               && aligner.getAlnlen() > param.getAlnlenCut()) 
+         {
+            aligner.printSummary(ouf, "\t", false) << endl;
+         }
+         ++numseq;
       }
    }
+   cerr << numseq << " database sequences aligned to reference, result in "
+      << outf << endl;
 }
 
+void alignDNAManyFastq(Dynaln<SimpleScoreMethod>& matcher, ifstream& inf, ofstream& ouf, const ProgParam &param, int& sqcnt) {
+   Fastq fsq;
+   while (fsq.read(inf)) {
+      DNA raw(fsq.getName(), fsq.getSequence());
+      matcher.setSeq2(raw);
+      matcher.runlocal();
+      if (matcher.getIdentity() > param.getIdentityCut() 
+            && matcher.getAlnlen() > param.getAlnlenCut()) 
+      {
+         matcher.printSummary(ouf, "\t", false) << endl;
+      }
+      ++sqcnt;
+   }
+   //cerr << numseq << " database sequences aligned to reference, result in "
+   //   << outf << endl;
+}
+
+void alignProteinMany(const string& ref, const string& dbf, const string& outf) {
+   Dynaln<ProteinScoreMethod> alnp;
+   Protein pref;
+   if (!pref.read(ref)) {
+      throw runtime_error("Failed to read protein reference file: " + ref);
+   }
+   alnp.setSeq1(pref);
+   //alnp.setGapParameter(gapOpen, gapExtend);
+   ifstream inf(dbf);
+   if (inf.fail()) {
+      throw runtime_error("Failed to open protein database file " + dbf);
+   }
+   ofstream ouf(outf);
+   if (ouf.fail()) {
+      throw runtime_error("Failed to open output file " + outf);
+   }
+   Protein prt;
+   while (prt.read(inf)) {
+      alnp.setSeq2(prt);
+      alnp.runlocal(); // seqXbegin for labeling the alignment
+      //alnp.printAlign(ous);
+      alnp.printSummary(ouf, "\t", false) << endl;
+   }
+   cerr << "protein alignment written to " << outf << endl;
+}
+
+string makeOutputFile(const string& ref, const string& db) {
+   string out = getFileStem(ref);
+   //string out = "blala";
+   out += "_";
+   out += getFileStem(db);
+   out += ".aln";
+   return out;
+}

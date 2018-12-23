@@ -75,7 +75,7 @@ bool loadFastaIntoMap(const string &file, map<string,string> &store);
 /** This file also defines a sequence type
  * as enum so we can save storage space
  */
-enum sequenceType {PROTEINSEQ=1, DNASEQ=2, RNASEQ=4, NUCLEIC_ACID=6, GENERIC=7, DNASEQQUAL=8, DNASEQQUALCOUNT=9, UNKNOWN=0};
+enum SequenceType {PROTEINSEQ=1, DNASEQ=2, RNASEQ=4, NUCLEIC_ACID=6, GENERIC=7, DNASEQQUAL=8, DNASEQQUALCOUNT=9, UNKNOWN=0};
 /** Algorithms about ORF:
   * prefix ORF ORF starting from 5'-END without start codon.
   * suffix ORF ORF end at 3' end without stop codon
@@ -282,9 +282,10 @@ class bioseq {
       /** 
        * Read only one sequence from fasta formated files.
        * Should not do repeated calling of this function.
-       * It will read only the first sequence if you have multiple sequences.
+       * It will read only the first sequence even if you have 
+       * multiple sequences in the file.
        **/
-      void read(const string &file);
+      bool read(const string &file);
 
       /** 
        * Repeated call of this method is fine, and this object will become the
@@ -293,7 +294,7 @@ class bioseq {
        *        rember the last header read. An empty string should be provided
        *        initially.
        * @return false if no more sequence in the input stream.
-       *         true if still got some
+       *         true if still got more
        *
        * Note: for better design, there should be a BioseqReader class.
        *       I may add one later.
@@ -301,7 +302,8 @@ class bioseq {
       bool read(istream &ins, string &header);
       /**
        * @return true if not reaching the end of file.
-       *    fasle if reached the end of file
+       *    fasle if reached the end of file. Will throw
+       *    exception if bad fasta file encountered.
        */
       bool read(istream &ins);
       /** 
@@ -560,14 +562,21 @@ class bioseq {
       /** 
        * convert the underlying sequence into all upper case letters */
       void toUpperCase();
-      virtual sequenceType getSequenceType() const { return GENERIC; }
+      virtual SequenceType getSequenceType() const { return GENERIC; }
       /**
        * Figure out the type of the underlying sequence.
        */
-      sequenceType guessType() const;
+      SequenceType guessType() const;
 
       /// debug functions ///
       void show() const;
+
+      static bool isBioseq(const string& str) {
+         return str.find_first_of("ABCDEFGHIKLMNPQRSTUVWXYZ*abcdefghiklmnpqrstuvwxyz") != string::npos;
+      }
+      static bool isNotBioseq(const string& str) {
+         return str.find_first_not_of("ABCDEFGHIKLMNPQRSTUVWXYZ*abcdefghiklmnpqrstuvwxyz") != string::npos; 
+      }
 
    protected:
       /**
@@ -651,7 +660,7 @@ class Protein : public bioseq {
       static const char* oneLetterSymbols;
       /** for good programming this method is not needed
        */
-      sequenceType getSequenceType() const { return PROTEINSEQ; }
+      SequenceType getSequenceType() const { return PROTEINSEQ; }
       bool hasStart() const { return seq[0] == 'M'; }
       bool hasStop() const { return seq[seq.length()-1] == '*'; }
       bool hasInternalStop() const;
@@ -766,7 +775,7 @@ class DNA : public bioseq {
        */
       const int* getcode() const;
 
-      sequenceType getSequenceType() const { return DNASEQ; }
+      SequenceType getSequenceType() const { return DNASEQ; }
       /** return the fraction of GC/Length of sequence
        */
       double GCContent() const;
@@ -824,7 +833,9 @@ class DNA : public bioseq {
       bool read(istream &ins);
       bool read(istream &ins, string &hd) {
          return bioseq::read(ins,hd); }
-      void read(const string &file) { bioseq::read(file); }
+      void read(const string &file) { 
+         bioseq::read(file); 
+      }
 
       static const codon& getCodonTable() { return codontable; }
       static void setCodonTable(const int ctid) { codontable.use(ctid); }
@@ -984,7 +995,7 @@ class DNAQual : public DNA {
       /**
        * I am using virtual functions, so this should not be needed anymore.
        */
-      sequenceType getSequenceType() const { return DNASEQQUAL; }
+      SequenceType getSequenceType() const { return DNASEQQUAL; }
       /** 
        * use the inplace global function more efficient
        * The sequence will be modified.
@@ -1112,7 +1123,7 @@ class DNAQualCount : public DNAQual {
       /** 
        * you normally don't use this one.  This is poor design.
        */
-      sequenceType getSequenceType() const { return DNASEQQUAL; }
+      SequenceType getSequenceType() const { return DNASEQQUAL; }
       /**
        * Make a reverse complement copy of the original sequence.
        * The name will be changed by adding _rc to the end.

@@ -19,7 +19,7 @@
 
 namespace orpara {
 //uncomment if you want to debug the library
-#define DEBUG
+//#define DEBUG
 
 /**
  * Exception class, not template.
