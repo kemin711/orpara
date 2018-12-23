@@ -287,10 +287,9 @@ bool bioseq::read(istream &ins, string &header) {
       line=header;
    }
    // now line contains the header line
-   line=line.substr(1); // get rid of >
-   i = line.find(' ');
+   i = line.find(' ', 1);
    if (i != string::npos) {
-      name=line.substr(0,i);
+      name=line.substr(1,i-1); // remove > in header
       title=line.substr(i+1);
    }
    else name=line;
@@ -335,7 +334,7 @@ bool bioseq::read(istream &ins) {
       throw bioseqexception(string(__FILE__) + ":" + to_string(__LINE__) + ":ERROR improper fasta header " + title);
    }
    if ((i=title.find(' ')) != string::npos) {
-      name=title.substr(1,i);
+      name=title.substr(1,i-1);
       title=title.substr(i+1);
    }
    else {
@@ -400,7 +399,7 @@ bool bioseq::read(const string &file) {
       title.clear();
    }
    else {
-      name=title.substr(1, i);
+      name=title.substr(1, i-1);
       title = title.substr(i+1);
    }
    if (!seq.empty()) seq.clear();
@@ -439,7 +438,7 @@ istream& operator>>(istream& ins, bioseq &sq) {
       sq.title.clear();
    }
    else {
-      sq.setName(line.substr(1, i));
+      sq.setName(line.substr(1, i-1));
       sq.setTitle(line.substr(i+1));
    }
    sq.seq.clear();
