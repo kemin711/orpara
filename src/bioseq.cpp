@@ -1373,44 +1373,51 @@ bool DNA::ambiguous() const {
 bool DNA::read(istream &ins) {
    if (ins.eof()) return false;
    string::size_type i;
-   clear(); // make sure the sequence starts with empty
+   //clear(); // make sure the sequence starts with empty
    getline(ins,title);
    if (title[0] != '>' || title.length() < 2) {
       cerr << "not in proper fasta format, first line of DNA file: "
          << title << endl;
       throw bioseqexception("fasta format problem");
    }
-   title=title.substr(1); // get rid of >
+   //title=title.substr(1); // get rid of >
    if ((i=title.find(' ')) != string::npos) {
-      name=title.substr(0,i);
+      name=title.substr(1,i);
       title=title.substr(i+1);
-      //cout << "name: " << name << "| title: |" << title << endl;
+      //if (title[0] == ' ') { title=title.substr(1); }
    }
    else {
       name=title;
       title.clear();
    }
-   static string line; // read sequence part, 
+   if (code != nullptr) {
+      delete[] code;
+      code=nullptr;
+   }
+   seq.clear();
+   string line; 
    getline(ins,line);
    while (!ins.eof()) {
-      if (line.length()>0 && 
-            line.find_first_of("ACGTURYSWKMBDHVN-acgturyswkmbdhvn") != string::npos) 
-      {
-         while (!isprint(line[line.length()-1])) { // remove invisible variable
-            line.resize(line.length()-1);
-         }
-         if (line.find('U') != string::npos || line.find('u') != string::npos) {
-            for (size_t j=0; j < line.size(); ++j) {
-               if (line[j] == 'U') line[j] = 'T';
-               else if (line[j] == 'u') line[j] = 't';
-            }
-         }
-         if (line.find_first_not_of("ACGTURYSWKMBDHVN-acgturyswkmbdhvn") != string::npos) 
-         {
-            throw runtime_error("None nucleotide symbol in line: " + line + "|");
-         }
-         seq += line;
+      if (line.empty()) {
+         getline(ins,line);
+         continue;
       }
+      while (!isprint(line.back())) { // remove invisible variable
+         line.resize(line.length()-1);
+      }
+#ifdef VERIFY_RESIDUE
+      if (line.find_first_not_of("ACGTURYSWKMBDHVN-acgturyswkmbdhvn") != string::npos) 
+      {
+         throw bioseqexception("None nucleotide symbol in line: " + line + "|");
+      }
+#endif
+      if (!line.empty() && line.find('U') != string::npos || line.find('u') != string::npos) {
+         for (size_t j=0; j < line.size(); ++j) {
+            if (line[j] == 'U') line[j] = 'T';
+            else if (line[j] == 'u') line[j] = 't';
+         }
+      }
+      seq += line;
       if (ins.peek() == '>') return true;
       getline(ins,line);
    }
