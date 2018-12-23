@@ -241,6 +241,8 @@ class bioseq {
        */
       bioseq(const string &s) 
          : seq(s), name(), title(), code(nullptr) {}
+      bioseq(string &&s) 
+         : seq(std::move(s)), name(), title(), code(nullptr) {}
       /** 
        *  Constructor from name and string sequence
        *  @param n name of the bioseq
@@ -708,7 +710,15 @@ class DNA : public bioseq {
        * Move constructor
        */
       DNA(DNA &&s) : bioseq(std::move(s))  { }
+      /**
+       * Construct DNA from a string. Making a copy
+       * of the string.
+       */
       DNA(const string &s) : bioseq(s)  { }
+      /**
+       * Construct from a string by moving it.
+       */
+      DNA(string &&s) : bioseq(std::move(s))  { }
 
       /**
        * @param n name of the sequence
@@ -765,6 +775,11 @@ class DNA : public bioseq {
          return DNA(bioseq::subseq(b,e)); }
       DNA subsequenceWithName(int b, int len=-1) const {
          return DNA(bioseq::subsequenceWithName(b, len)); }
+      /**
+       * Overload bioseq method to return the same type
+       * @param len use -1 to signal to the end of this sequence.
+       */
+      DNA subsequence(int b, int len=-1) const;
 
       /**
        * This overwrite the bioseq getcode function.

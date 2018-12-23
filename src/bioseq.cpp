@@ -954,6 +954,18 @@ DNA& DNA::operator=(const string &str) {
    return *this;
 }
 
+DNA DNA::subsequence(int b, int len) const { 
+   if (b<0 || (unsigned)b > seq.length()-1) {
+      cerr << "seq: " << seq << " b,len: " << b << ',' << len << endl;
+      throw bioseqexception("index out of bound in bioseq::subsequence");
+   }
+   if (len > -1) 
+      return DNA(seq.substr(b, len)); 
+   else 
+      return DNA(seq.substr(b)); 
+}
+
+
 // biosequence coordinate
 Protein DNA::translate(int begin, int end) const {
    string prt;
