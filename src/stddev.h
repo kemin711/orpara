@@ -22,6 +22,9 @@ using namespace std;
  * A straight implementation would have both under and over flow problems.
  */
 namespace orpara {
+/**
+ * Simple statistics for numbers
+ */
 class stddev {
 	private:
 		double var;  // variance
@@ -71,7 +74,7 @@ class stddev {
 				SS = (1-static_cast<double>(1)/(j-1))*SS + j*pow(avgnew-avg, 2);
 				var = (j-1)*(var/j + pow(avgnew-avg, 2));
 				avg = avgnew; 
-			}
+         }	
 			//cerr << "n: " << j << " avg =" << avg 
 			//	<< " sqrt(SS)= " << sqrt(SS) << endl;
 		}
@@ -129,8 +132,12 @@ class stddev {
 
       /**
        * The object has any values accumulated.
+       * @return true if this object has no data.
        */
       bool empty() const { return j==0; }
+      /**
+       * Rest this object to be used as a new object.
+       */
       void clear() {
          j=0; SS=0; avg=0; var=0; 
       }
@@ -337,6 +344,9 @@ class Stddev {
        * The object has any values accumulated.
        */
       bool empty() const { return j==0; }
+      /**
+       * Reset this object to ground state.
+       */
       void clear() {
          j=0; 
          for (size_t i=0; i<N; ++i) {
