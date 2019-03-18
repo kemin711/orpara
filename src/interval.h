@@ -81,7 +81,7 @@ class Interval {
          return overlap(i.first, i.second);
       }
       int overlap(const int bb, const int ee) const;
-      bool contains(const Interval& other) {
+      bool contains(const Interval& other) const {
          if (other.isNull()) return true;
          return b <= other.b && e >= other.e;
       }
