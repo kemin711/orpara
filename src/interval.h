@@ -120,6 +120,9 @@ class Interval {
       void clear() {
          b=-1; e=-1;
       }
+      /**
+       * This object will be come an empty object.
+       */
       void setNull() {
          b=-1; e=-1;
       }
