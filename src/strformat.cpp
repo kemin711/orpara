@@ -37,12 +37,19 @@ int wc(const string &str) {
 }
 
 bool isnumber(const string &str) {
+   if (str.empty()) {
+      cerr << "empty string is not a number!\n";
+      return false;
+   }
 	int i = 0;
 	while (isdigit(str[i])) i++;
 	return i == str.size();
 }
 
 bool isnumber(const string &str, const string dc) {
+   if (str.empty()) {
+      return false;
+   }
 	int i = 0;
 	while (i<str.size()) {
 		if (!isdigit(str[i]) && dc.find(str[i]) == string::npos) 
