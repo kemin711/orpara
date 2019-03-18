@@ -164,7 +164,9 @@ void newline(istream &ins); //removes remaining character from input stream
 /** Conversion to other types such as integer, double
  */
 int getNumber(char *&ptr);  
-/** return the first integer number in the string */
+/** 
+ * @return the first integer number in the string 
+ * */
 int getInt(const string &str);
 /** extract all integer numbers in the string 
  * @param str string contain multiple integers
