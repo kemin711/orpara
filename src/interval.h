@@ -81,6 +81,10 @@ class Interval {
          return overlap(i.first, i.second);
       }
       int overlap(const int bb, const int ee) const;
+      bool contains(const itv& other) {
+         if (other.isNull()) return true;
+         return b <= other.b && e >= other.e;
+      }
       /**
        * the distance between the two ranges
        *    |Range1|      | Range 2 |
