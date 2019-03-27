@@ -329,15 +329,44 @@ void Fastq::write(ostream &ous) const {
    if (name[0] != '@') ous << '@';
    ous << name;
    if (!desc.empty()) {
-      if (desc[0] == '@') ous << " " << desc.substr(1);
-      else ous << " " << desc;
+      ous << " " << desc;
    }
    ous << endl;
-   ous << seq << endl;
-   ous << "+\n";
-   //writeQualAsString(ous);
+   ous << seq << "\n+\n";
    ous.write(reinterpret_cast<const char*>(qual), length());
    ous << endl;
+}
+
+size_t Fastq::charSize() const {
+   int clen=0;
+   if (name[0] != '@') ++clen;
+   clen += name.size();
+   if (!desc.empty()) clen += (desc.size() + 1);
+   clen += (4 + 2*seq.size());
+   return clen;
+}
+
+char* Fastq::write(char* des) const {
+   char* ptr=des;
+   if (name[0] != '@') {
+      *ptr='@'; ++ptr;
+   }
+   memcpy(ptr, name.c_str(), name.size());
+   ptr += name.size();
+   if (!desc.empty()) {
+      *ptr=' '; ++ptr;
+      memcpy(ptr, desc.c_str(), desc.size());
+      ptr += desc.size();
+   }
+   *ptr='\n'; ++ptr;
+   memcpy(ptr, seq.c_str(), seq.size());
+   ptr += seq.size();
+   memcpy(ptr, "\n+\n", 3);
+   ptr += 3;
+   memcpy(ptr, reinterpret_cast<char*>(qual), seq.size());
+   ptr += seq.size();
+   *ptr='\n'; ++ptr;
+   return ptr;
 }
 
 bool Fastq::trimLowq(const unsigned int window, const unsigned int cutoff) {

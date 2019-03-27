@@ -24,6 +24,7 @@ class Fastq {
       string name;
       /**
        * The rest of the name line, longer description.
+       * Should remove '@' if it starts with it
        */
       string desc;
       /**
@@ -92,15 +93,14 @@ class Fastq {
        */
       Fastq(const string &id, const string &description, const string &sequence, const int* quality)
          : name(id), desc(description), seq(sequence), 
-           //qual(new int[sequence.length()]),
            qual(new unsigned char[sequence.length()]),
             qual_len(sequence.length())
       { 
          const int* ptr=quality;
           for (unsigned int i = 0; i<qual_len; ++i) {
-             //qual[i] = *(quality + i);
              qual[i] = static_cast<unsigned char>(*ptr++);
           }
+          if (!desc.empty() && desc[0] == '@') desc=desc.substr(1);
       }
       Fastq(const string &id, const string &description, const string &sequence, const unsigned char* quality)
          : name(id), desc(description), seq(sequence), 
@@ -108,6 +108,7 @@ class Fastq {
             qual_len(sequence.length())
       { 
          memcpy(qual, quality, length());
+         if (!desc.empty() && desc[0] == '@') desc=desc.substr(1);
       }
 
       /**
@@ -125,6 +126,7 @@ class Fastq {
             qual_len(sequence.length())
       { 
           encode(quality);
+          if (!desc.empty() && desc[0] == '@') desc=desc.substr(1);
       }
       /**
        * Constructor with string quality, no description field
@@ -151,7 +153,8 @@ class Fastq {
          : name(std::move(id)), desc(std::move(description)), seq(std::move(sequence)), 
            qual(quality),
             qual_len(length())
-      {  }
+      {  
+      }
 
       /**
        * Copy constructor
@@ -180,6 +183,20 @@ class Fastq {
        * The end-of-line will be written to the end of record.
        */
       void write(ostream &ou) const;
+      /**
+       * Write the object to a string buffer large enough to hold
+       * this object.
+       * @return 1 after the end position of this object in the string buffer
+       *   des----this object in string format --|1-after the end
+       *                                          ^
+       */
+      char* write(char* des) const;
+      /**
+       * This method is intended to be used by the write method.
+       * @return the length of the object if converted to
+       *   string.
+       */
+      size_t charSize() const;
       /**
        * Convinient stream output format
        */
@@ -243,8 +260,14 @@ class Fastq {
        */
       const string& getDescription() const { return desc; }
       const string& getTitle() const { return desc; }
-      void setTitle(const string &title) { desc=title; }
-      void setDescription(const string &title) { desc=title; }
+      void setTitle(const string &title) { 
+         desc=title; 
+         if (!desc.empty() && desc[0] == '@') desc=desc.substr(1);
+      }
+      void setDescription(const string &title) { 
+         desc=title; 
+         if (!desc.empty() && desc[0] == '@') desc=desc.substr(1);
+      }
       bool hasDescription() const { return !desc.empty(); }
       /**
        * Append extra information to the title.
