@@ -144,7 +144,7 @@ void Fastq::writeFasta(ostream &ous, const int width) const {
 }
 
 bool Fastq::read(istream &ins) {
-   string line;
+   static string line;
    //char dumy[3];
    getline(ins, line);
    int emptyCnt=0;

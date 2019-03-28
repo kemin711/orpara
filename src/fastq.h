@@ -174,6 +174,7 @@ class Fastq {
       /**
        * Use this for reading from a file.
        * @return true if loaded one object from the input stream
+       *    false if reached end of file and this object is not filled.
        */
       bool read(istream &in);
       /**
