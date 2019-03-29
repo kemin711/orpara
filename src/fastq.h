@@ -177,6 +177,7 @@ class Fastq {
        *    false if reached end of file and this object is not filled.
        */
       bool read(istream &in);
+      bool readUseId(istream &ins, const string& prefix, unsigned int id);
       /**
        * Write out the object in fastq format.
        * If the fastq name was not prefixed with '@' it will

@@ -189,6 +189,55 @@ bool Fastq::read(istream &ins) {
    return true;
 }
 
+// use a new id to name this sequence
+bool Fastq::readUseId(istream &ins, const string& prefix, unsigned int id) {
+   static string line;
+   //char dumy[3];
+   getline(ins, line);
+   int emptyCnt=0;
+   while (!ins.eof() && line.empty()) {
+      ++emptyCnt;
+      cerr << __FILE__ << ":" << __LINE__ << ":WARN empty line inside fastq file\n";
+      if (emptyCnt > 500) {
+         throw runtime_error(string(__FILE__) + ":" + to_string(__LINE__) +
+               ":ERROR there are 500 empty lines possible NFS misbehaving");
+      }
+      getline(ins, line);
+   }
+   if (ins.eof()) {
+      return false;
+   }
+   string::size_type i;
+   if ((i=line.find(' ')) != string::npos) {
+      //name = line.substr(1, i-1);
+      desc = line.substr(i+1);
+   }
+   else {
+      if (line.length() == 1) {
+         throw runtime_error("name empty at line " + line);
+      }
+      //name=line.substr(1);
+      if (hasDescription()) desc.clear();
+   }
+   name=prefix + to_string(id);
+   getline(ins, seq); // sequence line
+   //ins.read(dumy, 2); // two bytes
+   ins.ignore(3, '\n'); // two bytes may have trouble if using different delimiter
+   if (qual == nullptr) {
+      qual = new unsigned char[length()];
+      qual_len=length();
+   }
+   else if (length() > qual_len) {
+      delete[] qual;
+      qual = new unsigned char[length()];
+      qual_len=length();
+   }
+   ins.read(reinterpret_cast<char*>(qual), length()); // direc read save operation
+   ins.get(); // discard \n
+   return true;
+}
+
+
 //     | cut here
 // ----==Site==
 // return current object missing the left part
