@@ -144,7 +144,7 @@ void Fastq::writeFasta(ostream &ous, const int width) const {
 }
 
 bool Fastq::read(istream &ins) {
-   static string line;
+   static thread_local string line;
    //char dumy[3];
    getline(ins, line);
    int emptyCnt=0;
@@ -191,8 +191,7 @@ bool Fastq::read(istream &ins) {
 
 // use a new id to name this sequence
 bool Fastq::readUseId(istream &ins, const string& prefix, unsigned int id) {
-   static string line;
-   //char dumy[3];
+   static thread_local string line;
    getline(ins, line);
    int emptyCnt=0;
    while (!ins.eof() && line.empty()) {
@@ -209,19 +208,16 @@ bool Fastq::readUseId(istream &ins, const string& prefix, unsigned int id) {
    }
    string::size_type i;
    if ((i=line.find(' ')) != string::npos) {
-      //name = line.substr(1, i-1);
       desc = line.substr(i+1);
    }
    else {
       if (line.length() == 1) {
          throw runtime_error("name empty at line " + line);
       }
-      //name=line.substr(1);
       if (hasDescription()) desc.clear();
    }
    name=prefix + to_string(id);
    getline(ins, seq); // sequence line
-   //ins.read(dumy, 2); // two bytes
    ins.ignore(3, '\n'); // two bytes may have trouble if using different delimiter
    if (qual == nullptr) {
       qual = new unsigned char[length()];
@@ -395,7 +391,7 @@ size_t Fastq::charSize() const {
    return clen;
 }
 
-char* Fastq::write(char* des) const {
+char* Fastq::writeChar(char* des) const {
    char* ptr=des;
    if (name[0] != '@') {
       *ptr='@'; ++ptr;

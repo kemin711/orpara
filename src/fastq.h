@@ -192,7 +192,7 @@ class Fastq {
        *   des----this object in string format --|1-after the end
        *                                          ^
        */
-      char* write(char* des) const;
+      char* writeChar(char* des) const;
       /**
        * This method is intended to be used by the write method.
        * @return the length of the object if converted to
