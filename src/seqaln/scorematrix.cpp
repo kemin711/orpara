@@ -166,14 +166,18 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
    // but for matrices not recognized by isProteinMatrix we are 
    // out of luck.
    if (isProteinMatrix(name)) {
+#ifdef DEBUG
       //mtype = AMINO;
       cerr << "Reading amino acid matrix from file: " 
          << infile << " ...\n";
+#endif
    }
    else if (isNucleicMatrix(name)) {
       //mtype = NUCLEIC;
+#ifdef DEBUG
       cerr << "Reading nucleic acid matrix from file: "
-         << infile << " ...\n";
+        << infile << " ...\n";
+#endif
    }
    else {
       if (name.empty()) {
