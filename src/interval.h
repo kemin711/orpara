@@ -146,7 +146,9 @@ class Interval {
        * @return true if the range is [-1, -1]. 
        *   This is the original default state.
        */
-      bool isNull() const { return b==-1 && e==-1; }
+      bool isNull() const { 
+         return b==-1 && e==-1; 
+      }
 
       void setBegin(const int bb) { b=bb; }
       void setEnd(const int ee) { e=ee; }

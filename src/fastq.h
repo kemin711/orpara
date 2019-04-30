@@ -262,6 +262,13 @@ class Fastq {
        */
       const string& getDescription() const { return desc; }
       const string& getTitle() const { return desc; }
+      /**
+       * @return a reference to the tile that you can
+       *   edit
+       */
+      string& getTitle() {
+         return desc;
+      }
       void setTitle(const string &title) { 
          desc=title; 
          if (!desc.empty() && desc[0] == '@') desc=desc.substr(1);
