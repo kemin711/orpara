@@ -251,9 +251,13 @@ class Fastq {
 
       string getSubSequence(int b, int len) const { return seq.substr(b,len); }
       /**
+       * @param len length of the subsequence.
        * @return string object starting at b (0-based index) to the end of sequence
        */
       string getSubsequence(int b, int len) const { return seq.substr(b,len); }
+      /**
+       * @return string object starting at b (0-based index) to the end of sequence
+       */
       string getSubSequence(int b) const { return seq.substr(b); }
       string getSubsequence(int b) const { return seq.substr(b); }
       /**
@@ -333,6 +337,7 @@ class Fastq {
       void cutAt(const unsigned int pos, Fastq &tailq);
       /**
        * 0-based index, from idx (inclusive) and right removed.
+       * remove [idx, last_idx]
        */
       void discardTail(const unsigned int idx);
       /**
@@ -344,6 +349,7 @@ class Fastq {
        * Return a sub-sequence of the total with zero-indexed coordinate.
        * e must be less than the length of the sequence. 
        * inclusive meaning of coordinates.
+       * @return Fastq object of the original [b,e] Interval
        */
       Fastq sub(unsigned int b, unsigned int e) const;
 
@@ -377,7 +383,7 @@ class Fastq {
        * @return true if either G or low qulaity regions removed from the 3' direction
        */
       bool trimGLowq(unsigned int window=6, unsigned int cutoff=10) {
-         bool a=trimG(); bool  b=trimLowq(window,cutoff);
+         bool a=trimG(); bool b=trimLowq(window,cutoff);
          return a || b;
       }
       /**
@@ -392,7 +398,10 @@ class Fastq {
        */
       bool qualityTrim(unsigned int window=6, unsigned int cutoff=10, int lencut=19);
       /**
+       * To get the fraction of G you simple
+       * take returnVal[2]
        * @return the fraction of N bases in the sequence.
+       *    The index represent A, C, G, T, and N
        */
       std::array<float, 5> baseFraction() const;
       /**

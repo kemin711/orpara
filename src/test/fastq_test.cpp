@@ -50,3 +50,12 @@ TEST_F(FastqTest, trimLowq) {
    cout << "after trimLowq() fastq:\n" << fq << endl;
    ASSERT_GT(fq.length(), 15);
 }
+
+TEST_F(FastqTest, Gtail2) {
+   Fastq fq("longGtail", "GCCTTTCCACCACCCCACCCTCGCCCTACCACCACCTTGGGGGCCGGGGGCGCGGGGGCGGGGGCGGGGGGGGGGGGGCGGGGGGGGCGGGGGGCCGCGGGGGGGGGGGGGGGGGGGGCGGGGGGGGCGGGGGGGGGGGGGGGCGG", "FFFFF6FF/FF/=FFF6FFA/FF=F/F/AF6F//F////F/////F/FAA/A//F/////FFAA/A/AAFA//AAF///FFF////F/AA/A/F//F//F/F///FAFA////F/F///A/F/F///////F///A//////////");
+   cerr << "Fastq to be trimmed:\n" << fq << endl;
+   cerr << "average quality=" << fq.getAverageQuality() << endl;
+   if (fq.trimG()) {
+      cerr << "G trimmed to\n" << fq << endl;
+   }
+}

@@ -9,6 +9,7 @@
 #include <numeric>
 //#include <queue>
 #include <cstring>
+
 //#define DEBUG
 
 namespace orpara {
@@ -476,6 +477,9 @@ bool Fastq::plaguedBySingleBase(float nfrac, float bfrac) const {
    }
    else {
       for (size_t i=0; i<4; ++i) {
+#ifdef DEBUG
+         cerr << "base " << i << " << fraction=" << baseFrac[i] << endl;
+#endif
          if (baseFrac[i] > bfrac) {
             //cout << "too much repeats: " << fq << endl;
             return true;
@@ -505,8 +509,9 @@ bool Fastq::qualityTrim(unsigned int window, unsigned int cutoff, int lencut) {
 // using queue drags performance
 // need to replace it with better one
 bool Fastq::trimG() {
+   if (length() < 22) return false;
    static const int window=19;
-   static const int cut=17;
+   static const int cut=14;
    int GCount=0;
    string::size_type i=length()-1, ii;
    ii=i;
