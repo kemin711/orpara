@@ -537,6 +537,24 @@ bool Fastq::trimG() {
    return false;
 }
 
+// ACATTTCAGACAGGAATTTTGTTCATTTTAATGAACTCCCACCATTCCAGCAGCTTTTTGTGATGATCCACATGTAATTGATTGTTCAAGAGATGCCTTATTTAACAAAGTACAGTGTACAAGCATACATAAGATTATGATNGNNNN
+// usually good from the 5' end, last few bases are bad
+bool Fastq::trimN() {
+   int NCount=0;
+   string::size_type i=length()-1;
+   // [i, ii] is the start end of the moving window
+   int Ni = -1;
+   for (auto x=0; (x<15 || seq[i] == 'N') && i > 0; ++x) {
+      if (seq[i] == 'N') { Ni = i; }
+      --i;
+   }
+   if (Ni != -1) {
+      discardTail(Ni);
+      return true;
+   }
+   return false;
+}
+
 void Fastq::revcomp() {
    reverseComplementInPlace(seq);
    size_t i, L;

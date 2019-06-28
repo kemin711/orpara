@@ -153,8 +153,7 @@ class Fastq {
          : name(std::move(id)), desc(std::move(description)), seq(std::move(sequence)), 
            qual(quality),
             qual_len(length())
-      {  
-      }
+      {  }
 
       /**
        * Copy constructor
@@ -378,6 +377,10 @@ class Fastq {
        */
       bool trimLowq(const unsigned int window=5, const unsigned int cutoff=15);
       bool trimG();
+      /**
+       * Trim N from 5' and 3' end
+       */
+      bool trimN();
       /**
        * First trim G, then trim low quality. Trimming is done from the 3'-end.
        * @return true if either G or low qulaity regions removed from the 3' direction

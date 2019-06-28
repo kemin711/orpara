@@ -59,3 +59,15 @@ TEST_F(FastqTest, Gtail2) {
       cerr << "G trimmed to\n" << fq << endl;
    }
 }
+
+TEST_F(FastqTest, trimN) {
+   Fastq fq("withNtail", "ACATTTCAGACAGGAATTTTGTTCATTTTAATGAACTCCCACCATTCCAGCAGCTTTTTGTGATGATCCACATGTAATTGATTGTTCAAGAGATGCCTTATTTAACAAAGTACAGTGTACAAGCATACATAAGATTATGATNGNNNN", "AEEEAEEEE/EEEEEEEEEEEEEEEEEAEEEEEAAEEEEEEEEE/EEEEEEEEEAEAEEEEEEEEEEEEEEEEEEEAAEEEEEEAE<E<EEEEEAEEAEEEEAEEEEEEEEEEEE/EEE<EEE</AEE<EEEEAAAEEAEE#EEE#E");
+   cerr << "Fastq to be trimmed of N:\n" << fq << endl;
+   cerr << "average quality=" << fq.getAverageQuality() << endl;
+   bool trimmed=false;
+   if (fq.trimN()) {
+      cerr << "N trimmed to\n" << fq << endl;
+      trimmed = true;
+   }
+   ASSERT_TRUE(trimmed);
+}
