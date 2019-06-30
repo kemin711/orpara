@@ -314,6 +314,7 @@ set<string> digest2set(const string &str, const string &delims=",. \t");
  *    then I will return two empty strings as a pair.
  */
 pair<string,string> breakString(const string &str, const string &sep);
+string join(const vector<string>& parts, char sep=',');
 
 //////////////////////////////////////////////////////////////////////////
 

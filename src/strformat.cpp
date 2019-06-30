@@ -832,6 +832,14 @@ pair<string,string> breakString(const string &str, const string &sep) {
    return make_pair(str.substr(0,i), str.substr(i + sep.length()));
 }
 
+string join(const vector<string>& parts, char sep) {
+   string tmp = parts[0];
+   for (size_t i=1; i<parts.size(); ++i) {
+      tmp += (sep + parts[i]);
+   }
+   return tmp;
+}
+
 void trim(string &str) {
 	string::size_type idx = str.find_last_not_of(" \t\n\v\f\r");
 	str.erase(idx+1);

@@ -544,7 +544,7 @@ bool Fastq::trimN() {
    string::size_type i=length()-1;
    // [i, ii] is the start end of the moving window
    int Ni = -1;
-   for (auto x=0; (x<15 || seq[i] == 'N') && i > 0; ++x) {
+   for (auto x=0; (x<17 || seq[i] == 'N') && i > 0; ++x) {
       if (seq[i] == 'N') { Ni = i; }
       --i;
    }
