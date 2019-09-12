@@ -378,7 +378,7 @@ class Fastq {
       bool trimLowq(const unsigned int window=5, const unsigned int cutoff=15);
       bool trimG();
       /**
-       * Trim N from 5' and 3' end
+       * Trim N from 3' end
        */
       bool trimN();
       /**

@@ -106,6 +106,10 @@ class stddev {
          ous << avg << delim << getStd() << delim << j;
          return ous;
       }
+      ostream& print(ostream &ous, const char delim='\t') const {
+         ous << avg << delim << getStd() << delim << j;
+         return ous;
+      }
       /**
        * Number of data points
        */
@@ -332,6 +336,14 @@ class Stddev {
        * @return ous output stream for chaining.
        */
       ostream& print(ostream &ous, const string &delim="\t") const {
+         array<double, N> sd=getStd();
+         ous << getCount();
+         for (size_t i=0; i<N; ++i) {
+            ous << delim << avg[i] << delim << sd[i];
+         }
+         return ous;
+      }
+      ostream& print(ostream &ous, const char delim='\t') const {
          array<double, N> sd=getStd();
          ous << getCount();
          for (size_t i=0; i<N; ++i) {

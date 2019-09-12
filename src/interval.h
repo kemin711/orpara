@@ -178,7 +178,7 @@ class Interval {
        * @return length of the interval. For NULL ranges
        *   the length is defined as zero not 1.
        */
-      int length() const { if (isNull()) return 0; else return e-b+1; }
+      int length() const { if (isNull()) return 0; return e-b+1; }
 
    private:
       int b, e;
