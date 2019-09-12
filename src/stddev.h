@@ -79,7 +79,7 @@ class stddev {
 			//	<< " sqrt(SS)= " << sqrt(SS) << endl;
 		}
       /**
-       * read in n values of x
+       * read in n identical values of x
        */
       void operator()(double x, int n) {
          for (int i=0; i<n; ++i) {
