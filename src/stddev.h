@@ -351,6 +351,15 @@ class Stddev {
          }
          return ous;
       }
+      string toString(const char delim='\t') const {
+         ostringstream ostr;
+         array<double, N> sd=getStd();
+         ostr << getCount();
+         for (size_t i=0; i<N; ++i) {
+            ostr << delim << avg[i] << delim << sd[i];
+         }
+         return ostr.str();
+      }
 
       /**
        * The object has any values accumulated.
