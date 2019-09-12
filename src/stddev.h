@@ -110,6 +110,11 @@ class stddev {
          ous << avg << delim << getStd() << delim << j;
          return ous;
       }
+      string toString(const char delim='\t') const {
+         string tmp(to_string(avg));
+         tmp.append(delim).append(to_string(getStd()).append(delim).append(to_string(j));
+         return tmp;
+      }
       /**
        * Number of data points
        */
