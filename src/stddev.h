@@ -8,6 +8,7 @@
 #include <iostream>
 #include <array>
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -102,7 +103,7 @@ class stddev {
        * @param delim delimter default is TAB.
        * @return output stream for chaining.
        */
-      ostream& print(ostream &ous, const string &delim="\t") const {
+      ostream& print(ostream &ous, const string &delim) const {
          ous << avg << delim << getStd() << delim << j;
          return ous;
       }
@@ -112,7 +113,10 @@ class stddev {
       }
       string toString(const char delim='\t') const {
          string tmp(to_string(avg));
-         tmp.append(delim).append(to_string(getStd()).append(delim).append(to_string(j));
+         tmp += delim;
+         tmp += to_string(getStd());
+         tmp += delim;
+         tmp += to_string(j);
          return tmp;
       }
       /**
@@ -340,7 +344,7 @@ class Stddev {
        * @param delim delimter default is TAB.
        * @return ous output stream for chaining.
        */
-      ostream& print(ostream &ous, const string &delim="\t") const {
+      ostream& print(ostream &ous, const string &delim) const {
          array<double, N> sd=getStd();
          ous << getCount();
          for (size_t i=0; i<N; ++i) {
