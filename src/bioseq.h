@@ -250,6 +250,8 @@ class bioseq {
        */
       bioseq(const string &n, const string &s) 
          : seq(s), name(n), title(), code(nullptr) {}
+      bioseq(string &&n, string &&s) 
+         : seq(std::move(s)), name(std::move(n)), title(), code(nullptr) {}
       /** 
        * @param n name
        * @param s sequence
@@ -726,6 +728,8 @@ class DNA : public bioseq {
        */
       DNA(const string &n, const string &s) 
          : bioseq(n,s)  {}
+      DNA(string &&n, string &&s) 
+         : bioseq(std::move(n), std::move(s))  {}
       /**
        * @param n name
        * @param s sequence string
