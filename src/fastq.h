@@ -401,6 +401,11 @@ class Fastq {
        */
       bool qualityTrim(unsigned int window=6, unsigned int cutoff=10, int lencut=19);
       /**
+       * Call all the trimming methods 
+       * @return true if trimming happened.
+       */
+      bool trim();
+      /**
        * To get the fraction of G you simple
        * take returnVal[2]
        * @return the fraction of N bases in the sequence.

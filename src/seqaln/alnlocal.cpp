@@ -79,14 +79,7 @@ int main(int argc, char *argv[]) {
       else if (string(argv[i]) == "-2") { file2=argv[++i]; }
       else if (string(argv[i]) == "-o") { outfile=argv[++i]; }
       else if (string(argv[i]) == "-r") { 
-         ++i;
-         if (i<argc) {
-            reverseComplement=atoi(argv[++i]); 
-         }
-         else {
-            cerr << "you must specify a number 1 or 2\n";
-            usage(); return 1;
-         }
+         reverseComplement=atoi(argv[++i]); 
       }
       else if (string(argv[i]) == "-b1") { seq1begin=atoi(argv[++i]); }
       else if (string(argv[i]) == "-e1") { seq1end=atoi(argv[++i]); }

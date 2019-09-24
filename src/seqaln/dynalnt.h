@@ -297,6 +297,7 @@ class Dynaln {
        * @param w the window width. Default 70 char.
        */
       void printAlign(ostream &ous, const int w=70) const;
+      string alignToString(const int w=70) const;
 
       /**
        * output headers.
@@ -558,7 +559,8 @@ class Dynaln {
        * 1         11        21        31        41        51        61  
        * \endverbatim
        *
-       * The above topBeginIndex() is 6-1, the bottomBeginIndex() is 0;
+       * The above topBeginIndex() is 5 (6-1; zero based index), the 
+       * bottomBeginIndex() is 0;
        * In the printout for humans I used 1-based index.
        * @return index in sequence1 for the first aligned residue.
        */
@@ -1899,6 +1901,55 @@ void Dynaln<T>::printAlign(ostream &ous, const int w) const {
       i += w;
    }
 }
+
+template<class T>
+string Dynaln<T>::alignToString(const int w) const {
+   ostringstream ous;
+   ous << seq1->getName() << " x " << seq2->getName() << "  "
+      << seq1begin << "-" << seq1end << "/" << seq1->length()
+      << " | " 
+      << seq2begin << "-" << seq2end << "/" << seq2->length()
+      << endl
+      << "Score=" << Smax 
+      << " gap length: " << gaplen1 << " " << gaplen2
+      << " num gaps: " << numgaps1 << " " << numgaps2
+      << " idencnt=" << idencnt 
+      << " simcnt=" << simcnt
+      << " alnlen=" << topaln.length()
+      << " identity=" << setprecision(5) << getIdentity()
+      << " similarity=" << getSimilarity()
+      << endl;
+   // topaln, middle and bottomaln should be the same length
+   if (topaln.length() != middle.length() 
+         || middle.length() !=bottomaln.length()) {
+      cerr << "the final alignment string is not right\n";
+      exit(1);
+   }
+   //int i=0, i1=1, i2=1, charcnt;
+   unsigned int i=0, j;
+   //string tmp, tmp2, ruler1, ruler2;
+   string ruler(w,' '), ruler1, ruler2;
+   for (int x=0; x<w; x+=markevery) { // markevery default 10 residues
+      ruler[x]='+';
+   }
+   while (i<topaln.length()) {
+      j=i+w-1;
+      while (isdigit(topruler[j])) ++j;
+      ruler1=topruler.substr(i, j-i);
+      j=i+w-1;
+      while (isdigit(bottomruler[j])) ++j;
+      ruler2=bottomruler.substr(i, j-i);
+
+      ous << ruler1 << endl << ruler << endl
+         << topaln.substr(i,w) << endl
+         << middle.substr(i, w) << endl
+         << bottomaln.substr(i,w) << endl << ruler << endl
+         << ruler2 << endl << endl;
+      i += w;
+   }
+   return ous.str();
+}
+
 
 template<class T>
 pair<string,int> Dynaln<T>::getNucleicConsensus() const {
