@@ -439,6 +439,16 @@ class Dynaln {
       }
       string getSequence1AsString() const { return seq1->toString(); }
       string getSequence2AsString() const { return seq2->toString(); }
+      char getSeq1charAt(const int i) const {
+         if (i >= seq1->length()) 
+            throw runtime_error("index " + to_string(i) + " bigger than seq1 len");
+         return (*seq1)[i];
+      }
+      char getSeq2charAt(const int i) const {
+         if (i >= seq2->length()) 
+            throw runtime_error("index " + to_string(i) + " bigger than seq2 len");
+         return (*seq2)[i];
+      }
       /**
        * @return the number of identical residues in the alighment.
        */
