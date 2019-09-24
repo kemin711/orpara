@@ -555,6 +555,25 @@ bool Fastq::trimN() {
    return false;
 }
 
+bool Fastq::trim() {
+   bool trimmed=false;
+   trimmed = trimN();
+   bool tmpstatus;
+   if (!empty()) {
+      tmpstatus = trimG();
+      if (tmpstatus) trimmed = true;
+   }
+   if (!empty()) {
+      tmpstatus = trimLowq();
+      if (tmpstatus) trimmed = true;
+   }
+   if (plaguedBySingleBase()) {
+      clear();
+      return true;
+   }
+   return trimmed;
+}
+
 void Fastq::revcomp() {
    reverseComplementInPlace(seq);
    size_t i, L;

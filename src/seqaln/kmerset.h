@@ -17,7 +17,10 @@ class KmerSet : public KmerBase<K> {
       /**
        * Eat one sequence and convert it to  the 
        * kmer set, add the kmers to member.
-       * This object can east any number of sequences.
+       * This object can eat any number of sequences
+       * by repeated call of this method.
+       * @param seq input sequence to be converted to 
+       *    the member of this object.
        */
       void eat(const string& seq);
       /**
@@ -39,8 +42,8 @@ class KmerSet : public KmerBase<K> {
        */
       int commonReverse(const KmerSet<K>& other, const bool rc=false) const;
       /**
-       * Compute for both forward and revers
-       * return the larger of the two results.
+       * Compute for both forward and reverse to other
+       * @return the larger of the shared kmers.
        */
       int common(const KmerSet<K>& other) const {
          int f = commonForward(other);
@@ -48,8 +51,9 @@ class KmerSet : public KmerBase<K> {
          return  max(f,r);
       }
       /**
-       * Compare the kmerset of this object with
+       * Compare both the forward and reverse kmerset of this object with
        * an input sequence's forward kmerset.
+       * @return the larger of the shared kmers.
        */
       int common(const string& seq) const;
 
