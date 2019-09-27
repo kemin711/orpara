@@ -72,8 +72,16 @@ class ScoreMethod {
        */
       int getGapExtend() const { return gape; }
 
+      /**
+       * set gap oepn and extension parameters at the same time.
+       */
       void setGapParameters(int gapopen, int gapextend) {
-         gapo = gapopen; gape = gapextend; }
+         gapo = gapopen; gape = gapextend; 
+      }
+      /**
+       * @param gopen should be a negative number, if given a positive
+       *    this function will turn it to a negative number.
+       */
       void setGapOpen(int gopen) { gapo = gopen <= 0? gopen : -gopen; }
       void setGapExtend(int gextend) { gape = gextend <= 0? gextend : -gextend; }
       void show(ostream &ous) const;
@@ -637,6 +645,9 @@ class NucleicScoreMethod : public MatrixScoreMethod {
        */
       NucleicScoreMethod(const string& dir, const string& matrixName);
 
+      /**
+       * Constructor with matrix name and gap parameter
+       */
       NucleicScoreMethod(const string& matrixName, int go, int ge);
 
       /**
