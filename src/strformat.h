@@ -361,7 +361,7 @@ string fileBasename(const string& pathstr);
  */
 string fileBasename(const string& pathstr, const string& suffix);
 /**
- * The directory part will also be discarded.
+ * The directory part will be discarded.
  * @return the file part of the path excluding the last suffix.
  *   for example, /path/to/filestem.suff1.suff2 as input
  *   will produce filestem.suff1
