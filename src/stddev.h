@@ -176,7 +176,7 @@ class Stddev {
       /**
        * Constructor from one element.
        */
-		Stddev(double val[]) 
+		Stddev(const double val[]) 
          : var{0}, avg{0}, j(1), SS{0} 
       {
          for (size_t i=0; i<N; ++i) avg[i] = val[i]; 
@@ -245,7 +245,7 @@ class Stddev {
       /**
        * To be used to accumulate input values.
        */
-		void operator()(double x[]) {
+		void operator()(const double x[]) {
 			++j;
 			if (j==1) { 
             for (size_t i=0; i<N; ++i) {

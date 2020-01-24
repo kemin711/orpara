@@ -6,7 +6,9 @@
 ## this file is used to generate the library for distribution
 
 AUTOMAKE_OPTIONS = subdir-objects
-only_headers = stddev.h seqaln/dynalnt.h seqaln/kmert.h seqaln/kmerbase.h seqaln/kmerset.h gentree.h evolution/evolution.h quicksortorder.h threadsafequeue.h derivative.h
+only_headers = stddev.h seqaln/dynalnt.h seqaln/kmert.h seqaln/kmerbase.h seqaln/kmerset.h \
+				  	gentree.h evolution/evolution.h quicksortorder.h threadsafequeue.h \
+					derivative.h kmean.h insertsortlist.h
 header_forlibs = strformat.h range.h interval.h bioseq.h codon.h Model.h FPGModel.h GModel.h fastq.h seqaln/scorematrix.h seqaln/alninfo.h seqaln/alnexaminer.h seqaln/kmer.h seqaln/kmerhelper.h ncbitaxonomy.h 
 
 cppfiles = strformat.cpp range.cpp interval.cpp codon.cpp bioseq.cpp Model.cpp FPGModel.cpp fastq.cpp seqaln/scorematrix.cpp seqaln/alninfo.cpp seqaln/alnexaminer.cpp seqaln/kmer.cpp seqaln/kmerhelper.cpp ncbitaxonomy.cpp 

@@ -3,9 +3,11 @@
 #include <bioseq.h>
 #include <string>
 #include <fstream>
+#include <list>
 
 #include "../strformat.h"
 #include "../derivative.h"
+#include "../insertsortlist.h"
 
 
 using namespace std;
@@ -64,7 +66,40 @@ TEST(DerivativeTest, compute) {
     //     << get<1>(result[i]) << " " << get<2>(result[i]) << endl;
    //}
 }
-   
+ 
+TEST(InsertSortList, integerlist) {
+   std::list<int> input1{3, 7, 12, 9, 4, 2, 1, 5, 7, 8};
+   cout << "before sorting\n";
+   for (int x : input1) {
+      cout << x << ", ";
+   }
+   cout << endl;
+   insertSortList(input1);
+   for (int x : input1) {
+      cout << x << ", ";
+   }
+   cout << endl;
+}
+
+TEST(InsertSortList, stringlist) {
+   std::list<string> input1{"abcd", "xyz", "foo", "bar", "enjoy", "every", "1 moment", "live", "more", "888"};
+   cout << "before sorting\n";
+   for (auto& x : input1) {
+      cout << x << ", ";
+   }
+   cout << endl;
+   insertSortList(input1);
+   for (auto& x : input1) {
+      cout << x << ", ";
+   }
+   cout << endl;
+   cout << "reverse sort\n";
+   insertSortList(input1, [](const string& a, const string& b)->bool{ return a > b; });
+   for (auto& x : input1) {
+      cout << x << ", ";
+   }
+   cout << endl;
+}
 
 int main(int argc, char* argv[]) {
    testing::InitGoogleTest(&argc, argv);
