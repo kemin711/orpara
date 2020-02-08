@@ -8,13 +8,16 @@
 AUTOMAKE_OPTIONS = subdir-objects
 only_headers = stddev.h seqaln/dynalnt.h seqaln/kmert.h seqaln/kmerbase.h seqaln/kmerset.h \
 				  	gentree.h evolution/evolution.h quicksortorder.h threadsafequeue.h \
-					derivative.h kmean.h insertsortlist.h
+					derivative.h kmean.h insertsortlist.h cluster/hatrees.h
 header_forlibs = strformat.h range.h interval.h bioseq.h codon.h Model.h FPGModel.h \
 					  GModel.h fastq.h seqaln/scorematrix.h seqaln/alninfo.h seqaln/alnexaminer.h \
 					  seqaln/kmer.h seqaln/kmerhelper.h ncbitaxonomy.h 
+#					  alnrange.h ChainAvgrange.h 
 cppfiles = strformat.cpp range.cpp interval.cpp codon.cpp bioseq.cpp Model.cpp \
 			  FPGModel.cpp fastq.cpp seqaln/scorematrix.cpp seqaln/alninfo.cpp \
-			  seqaln/alnexaminer.cpp seqaln/kmer.cpp seqaln/kmerhelper.cpp ncbitaxonomy.cpp 
+			  seqaln/alnexaminer.cpp seqaln/kmer.cpp seqaln/kmerhelper.cpp \
+			  ncbitaxonomy.cpp 
+#alnrange.cpp ChainAvgrange.cpp
 
 pkginclude_HEADERS = $(only_headers) $(header_forlibs)
 
@@ -32,4 +35,4 @@ bin_PROGRAMS = GrishinDistance maxdiff
 GrishinDistance_SOURCES=GrishinDistance.cpp evolution/evolution.h
 maxdiff_SOURCES = maxdiff.cpp
 
-SUBDIRS = . seqaln cluster test
+SUBDIRS = . seqaln test

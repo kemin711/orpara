@@ -1,3 +1,10 @@
+I am only adding these very old not useful source code to the
+git for historical reasons.
+Most of them are not useful. Only hatrees.h may be a little useful
+All otherse are too specialized and use libpq++.h which may not
+be available now
+
+
 A dumy database will constructed from dumy strings, so that when
 using input from file a disfunctional PgDatabase object will be 
 created this will solve the problem of non-public default constructor

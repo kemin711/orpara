@@ -34,6 +34,8 @@
 // there are a lot std utilites used in this 
 // header, the following statement polute the namespace
 using namespace std;
+
+namespace orpara {
 //using namespace pqxx;
 
 template<class T> struct node
@@ -112,19 +114,31 @@ template<> struct hash<string> {
  * bedause it will require different database drivers.
  * The getCluster() method will produce a relational table.
  */
-
 template<class T> class hatrees
 {
 	public:
+      /**
+       * Default constructor
+       */
 		hatrees() { }
-      /** build a cluster object directly from multimap
+      /** 
+       * build a cluster object directly from multimap
        * Save the call to readFromMap()
+       * @param mm is all the relationships among members.
        */
 		hatrees(const std::multimap<T,T> &mm) { readFromMap(mm); }
 		~hatrees();
 		void clear() { nodes.clear(); result.clear(); }
+
 		///////// input operations /////////////////
+      /**
+       * If you have an empty object then you can
+       * take input from a multimap
+       */
 		void readFromMap(const std::multimap<T, T> &m);
+      /**
+       * Directly read from file for convenience.
+       */
 		void readFromFile(const string &file);
       /* only gecods.cpp needs this function
        * I am not compiling gecods.cpp anymore
@@ -137,13 +151,18 @@ template<class T> class hatrees
 		//void loadTable(PgDatabase &db, string tab);
 		//void loadTable(pqxx::connection &db, string tab);
 
-		/** changes the parent pointer of the nodes	*/
+		/** 
+       * changes the parent pointer of the nodes	
+       */
 		void showStore(ostream &os) const;  
 
-		/** number of unique members */
+		/** 
+       * number of unique members 
+       */
 		int getNodeCount() const { return nodes.size(); }
 		/** 
-       * in a table format: (cluster_id(representative), members) */
+       * in a table format: (cluster_id(representative), members) 
+       * */
 		void showCluster(ostream &os, bool reverse= true);
 		/** an initial id is given, the program will
        * auto_increment this id. This should work with
@@ -151,27 +170,35 @@ template<class T> class hatrees
        * */
 		void showClusterIntId(ostream &ous, int &id);
 
-		/** return the number of clusters */
+		/** 
+       * @return the number of clusters 
+       * */
 		int showClusterByLine(ostream &os);
-      /** return all the keys as a set<T> it is all the 
-       * members in the input. Useful for finding singleton
-       * clusters. */
+      /** 
+       * @return all the keys as a set<T> it is all the 
+       *   members in the input. Useful for finding singleton
+       *   clusters. 
+       */
 		set<T> keyset() const;
 		vector<T> keyarray() const;
 
-		/** produce an array of clusters, used call by reference
+		/** 
+       * produce an array of clusters, used call by reference
 		 * to avoid creating tmp and copying.
        * The result could be used for further analysis. 
        * This is one of the output methods.
        * */
 		void clusterArray(vector<set<T> > &vecset);
 
-      /** Return a relational table
-       * with two columns: | representative | member |
-       * Use this method to load into database tables.
-       * Singletons are not included in the output.
+      /** 
+       * @return a relational table
+       *   with two columns: | representative | member |
+       *   Use this method to load into database tables.
+       *   Singletons are not included in the output.
        */
-		std::multimap<T,T>& getCluster() { if (result.empty()) transform(); return result; }
+		std::multimap<T,T>& getCluster() { 
+         if (result.empty()) transform(); return result; 
+      }
 
 #ifdef USE_HASH_MAP
 	//typename hash_map<T, node<T>* >::iterator niterator;
@@ -191,14 +218,17 @@ template<class T> class hatrees
 #else
 		map<T, node<T>* > nodes;
 #endif
-		/** This is the result table:
+		/** 
+       * This is the result table:
        * representative->members 
-       * Should have another method to return a reversed result.*/
-		//multimap<T, T> cluster;  // sorted result, loaded after
+       * Should have another method to return a reversed result.
+       */
 		std::multimap<T, T> result;  // sorted result in map format
 
-		/* transform the nodStore cluster into mutimaped cluster
-		 * in a table format cluster_id -> members */
+		/** 
+       * transform the nodStore cluster into mutimaped cluster
+		 * in a table format cluster_id -> members 
+       * */
 		void transform();
 };
 
@@ -485,4 +515,5 @@ template<class T> int hatrees<T>::showClusterByLine(ostream &os) {
 	return clusterCnt;
 }
 
+} // end of orpara namespace
 #endif

@@ -1,0 +1,85 @@
+#BINARY_MYSQL=gecods_mysql testread
+# don't use postgres, it cause too much trouble to make
+#BINARY=$(BINARY_MYSQL)
+# will not make mysql dependent binaries in this project 
+# but I will keep those old source codes
+# I am also not managing these scripts althose I will keep track of them
+#SCRIPTS= clusterdump dumpclusterprt vrtclpepdump.pl
+#SCRIPTS= clusterdump dumpclusterprt 
+#SCRIPTS= dumpclusterprt 
+#HEADERS=hatrees.h alnrange.h ChainAvgrange.h
+#lib_OBJECTS=alnrange.o ChainAvgrange.o
+# these file use lipq++.h which may not be available so should not be used
+
+all: update header lib ${BINARY} 
+.PHONY : all
+
+update : ${SCRIPTS} 
+	cp $? ${BINDIR}
+	touch update
+
+header : $(HEADERS)
+	cp $? $(KZINCLUDEDIR)
+	touch $@
+
+lib : $(lib_OBJECTS)
+	ar -cruv $(KZLIBDIR)/libkemin.a $?
+	touch lib
+
+install :
+	cp ${BINARY} ${SCRIPTS} ${BINDIR}
+
+OBJS= orthopara.o clusmethod.o cluster.o 
+
+orthopara : ${OBJS}
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(LIBPQDIR) 
+	cp $@ ${BINDIR}
+
+gecods : gecods.o loadpgdb.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(LIBPQDIR) 
+	cp $@ ${BINDIR}
+
+gecods_mysql : gecods_mysql.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(MYSQLLIB) -lrt
+	cp $@ ${BINDIR}
+
+pickorthodiv : pickorthodiv.o group.o gconst.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(LIBPQDIR) 
+	cp $@ ${BINDIR}
+
+subcluster : subcluster.o scorepair.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(LIBPQDIR)
+	cp $@ ${BINDIR}
+
+breakcl : breakcl.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) -lkemin $(LIBPQDIR) 
+	cp $@ ${BINDIR}
+
+picklongrep : picklongrep.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS) $(LIBPQDIR) 
+	cp $@ ${BINDIR}
+
+testread : testread.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $^ -L$(KZLIBDIR) -lkemin
+
+clusterdump : Clusterdump.java
+	javac Clusterdump.java
+	touch clusterdump
+
+
+chimeradetect : chimeradetect.o alnrange.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	cp $@ ${BINDIR}
+
+rmfalselink : rmfalselink.o DBStat.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^  -lgsl -lgslcblas
+	cp $@ $(BINDIR)
+
+testgsl : testgsl.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ -lgsl -lgslcblas
+
+clean: 
+	touch *.h *.pm
+	-rm *.o ${BINARY}
+
+.PHONY : clean install all
