@@ -14,15 +14,10 @@ AM_CXXFLAGS = -I..
 AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\""
 
 alnlocal_SOURCES = alnlocal.cpp scorematrix.h scorematrix.cpp dynalnt.h
-
 alnlocalmany_SOURCES = alnlocalmany.cpp 
-
 #alnlocalmany_SOURCES = alnlocalmany.cpp scorematrix.h scorematrix.cpp dynalnt.h
-
 alnglobal_SOURCES = alnglobal.cpp 
-
 #alnglobal_SOURCES = alnglobal.cpp scorematrix.h scorematrix.cpp dynalnt.h
-
 #alnglobalparam_SOURCES = alnglobalparam.cpp scorematrix.h scorematrix.cpp dynalnt.h
 alnglobalparam_SOURCES = alnglobalparam.cpp 
 
