@@ -334,6 +334,12 @@ class Dynaln {
        *   represented by the first sequence. 
        */
       const bioseq& getTopSequence() const { return *seq1; }
+      const bioseq* getSeq1() const {
+         return seq1;
+      }
+      const bioseq* getSeq2() const {
+         return seq2;
+      }
       /**
        * @return a reference to a const bioseq object
        *   represented by the second sequence. 
@@ -449,6 +455,12 @@ class Dynaln {
          if (i >= seq2->length()) 
             throw runtime_error("index " + to_string(i) + " bigger than seq2 len");
          return (*seq2)[i];
+      }
+      string getSeq1Substring(int b, int len) const {
+         return seq1->substring(b,len);
+      }
+      string getSeq2Substring(int b, int len) const {
+         return seq2->substring(b,len);
       }
       /**
        * @return the number of identical residues in the alighment.
