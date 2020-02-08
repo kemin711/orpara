@@ -28,11 +28,22 @@ namespace orpara {
  */
 class stddev {
 	private:
-		double var;  // variance
+      /** 
+       * variance
+       */
+		double var;
+      /**
+       * Average
+       */
 		double avg;
-      /** the n value */
+      /** 
+       * The n value: number of data points.
+       */
 		int j;
-		double SS;  // sample variance
+      /**
+       * Sample variance
+       */
+		double SS;  
 
 	public:
       /**
@@ -60,8 +71,28 @@ class stddev {
          }
          return *this;
       }
-      stddev(stddev&& other) = default;
+
+      stddev(stddev&& other)=default;
+      //  : var(other.var), avg(other.avg), j(other.j), SS(other.SS) 
+      //{ }
+
+      /**
+       * Move assignment operator must be defined
+       * if using the 'default' keyword, then nothing 
+       * will happen: meaning values from other will
+       * not overwrite the members from this object.
+       */
       stddev& operator=(stddev&& other) = default;
+      //{
+      //   if (this != &other) {
+      //      var=other.var;
+      //      avg=other.avg;
+      //      j=other.j;
+      //      SS=other.SS;
+      //   }
+      //   return *this;
+      //}
+
       /**
        * To be used to accumulate input values.
        */
@@ -201,46 +232,48 @@ class Stddev {
          for (size_t i=0; i<N; ++i) {
             var[i]=other.var[i];
             avg[i]=other.avg[i];
-            SS[i]=other.var[i];
+            SS[i]=other.SS[i];
          }
       }
 
       Stddev(Stddev &&other) = default;
-      /* wrong syntax
-      Stddev(Stddev &&other) = default;
-         : var(std::move(other.var)), 
-            avg(std::move(other.avg)), 
-            j(j), SS(std::move(other.SS))
-      {
-         other.j=0;
-      }
-      */
+      //   : var{0}, avg{0}, j(other.j), SS{0}
+      //{
+      //   for (auto i=0; i<N; ++i) {
+      //      var[i]=other.var[i];
+      //      avg[i]=other.avg[i];
+      //      SS[i]=other.SS[i];
+      //   }
+      //}
 
       Stddev& operator=(const Stddev& other) {
          if (this != &other) {
             for (size_t i=0; i<N; ++i) {
                var[i]=other.var[i];
                avg[i]=other.avg[i];
-               j = other.j;
-               SS[i]=other.var[i];
+               SS[i]=other.SS[i];
             }
+            j = other.j;
          }
          return *this;
       }
 
+      /**
+       * Same as copy assignment, but with 
+       * C++17 you can move arrays of primitive type
+       */
       Stddev& operator=(Stddev&& other) = default;
-      /*
-      Stddev& operator=(Stddev&& other) {
-         if (this != &other) {
-            var = std::move(other.var);
-            avg = std::move(other.avg);
-            j = other.j;
-            other.j = 0;
-            SS = std::move(other.SS);
-         }
-         return *this;
-      }
-      */
+      // {
+      //   if (this != &other) {
+      //      for (size_t i=0; i<N; ++i) {
+      //         var[i]=other.var[i];
+      //         avg[i]=other.avg[i];
+      //         SS[i]=other.SS[i];
+      //      }
+      //      j = other.j;
+      //   }
+      //   return *this;
+      //}
 
       /**
        * To be used to accumulate input values.

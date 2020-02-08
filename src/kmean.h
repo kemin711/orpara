@@ -76,9 +76,9 @@ class Kmean {
                used.insert(x);
             }
          }
-         cout << "after init centroids\n";
-         showCentroid(cout);
-         cout << endl;
+         //cout << "after init centroids\n";
+         //showCentroid(cout);
+         //cout << endl;
       }
       /**
        * Put data points to their nearest centroid
@@ -100,10 +100,10 @@ class Kmean {
          while (numtry < maxiteration && diff > 0.01) {
             divide();
             diff = update();
-            cout << "total cnetroid move: " << diff << endl;
+            //cout << "total cnetroid move: " << diff << endl;
             ++numtry;
          }
-         cout << "at end of iteration numtry=" << numtry << endl;
+         //cout << "at end of iteration numtry=" << numtry << endl;
       }
 
       list<vector<T>> getCluster() const {
@@ -153,7 +153,7 @@ template<class T> void Kmean<T>::divide() {
       c.clear();
    }
    //cout << data.size() << " data points\n";
-   showCentroid(cout);
+   //showCentroid(cout);
    for (int i=0; i < data.size(); ++i) {
       double mindist=numeric_limits<double>::max();
       for (int j=0; j < centroid.size(); ++j) {
@@ -166,9 +166,9 @@ template<class T> void Kmean<T>::divide() {
       //   << minj <<  " distance " << mindist << endl;
       cluster[minj].push_back(&data[i]);
    }
-   for (int c=0; c < cluster.size(); ++c) {
-      cout << "cluster " << c << " has " << cluster[c].size() << " members\n";
-   }
+   //for (int c=0; c < cluster.size(); ++c) {
+   //   cout << "cluster " << c << " has " << cluster[c].size() << " members\n";
+   //}
 }
 
 template<class T> double Kmean<T>::update() {
