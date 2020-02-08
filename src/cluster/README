@@ -1,0 +1,65 @@
+A dumy database will constructed from dumy strings, so that when
+using input from file a disfunctional PgDatabase object will be 
+created this will solve the problem of non-public default constructor
+problem when database is not used.
+
+====================================================================
+I modified the default constructor from PgDatabase to be
+public to construct empty databases. 
+
+You have to modify the /usr/lcoal/pgsql/include/libpq++.h
+file for this program to compile.  
+
+I will modify this program in the future to remove PgDatabase
+from the member list of the clusmethod object.  It should be passed
+as an argument.
+
+dumpclusterprt dumps protein sequences from sameas relationship
+the other dump programs dumps the final cluster protein into separate
+clusters for multiple sequence alignment
+
+The java program needs to be modified to new database schemas.
+
+chimer headers:
+
+Result written to: split.tab with column headers:
+ seqid  seqlen  min_begin       max_end avg_begin       avg_end n       avg_score    avg_ngidentity   avg_coverage    median_coverage
+
+** running the chimera detection program
+
+For Lacbi1, Necha1
+
+kzhou@durian:~/proj/cluster$ ./chimeradetect_mysql -a modelaln -t alnchimera -r alnsplit -d Lacbi1 -h frylock --taxids "29883,2765,76867" --chimera-tab chimera_prt_candidate --split-tab split_candidate --ngCut 0.36 --idenCut 0.34 --chimera_covCut 0.4 --split_covCut 0.35
+
+(1) Needs to increate the identity cut 
+	--ngCut 0.4
+	--idenCut 0.38
+	--chimera_covCut 0.6
+	--split_covCut 0.5
+
+Somehow I have used the postgres database for data source and this 
+has been build into some binaries.  For the C++ interface I have
+use the old more thinner wrapper around the C API.  This is much 
+faster than the new C++ API which is much more complicated.  Because
+I have only used a few functions from the C++ API it is not 
+worth to switch to the new API.
+
+I am using the libpq++-4.0 package
+on top of 
+and postgresql-8.1.3
+
+When system is updated this package should be recompiled
+because the dynamic linking to libstdc++ will conflict.
+
+This package can be compiled on any 32 bits machine at JGI.
+
+chimera checking programs.
+I have a chimera program in /proj/range that is more useful.
+It only needs a half-alignment table
+
+New changes
+I have updated both mysql interface and the libpqxx so that
+it will be up to date.  I quickly went through the code
+and made modification that just compiled.  It is likely
+that it will cause segmentation fault becuase I did not
+carefully initialize some variables.

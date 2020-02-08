@@ -27,4 +27,4 @@ bin_PROGRAMS = GrishinDistance maxdiff
 GrishinDistance_SOURCES=GrishinDistance.cpp evolution/evolution.h
 maxdiff_SOURCES = maxdiff.cpp
 
-SUBDIRS = . seqaln test
+SUBDIRS = . seqaln cluster test

@@ -5,8 +5,8 @@
 
 using namespace std;
 
-template<class T>
-class Kmean {
+namespace orpara {
+template<class T> class Kmean {
    public:
       Kmean() : data(), cluster(), centriod(),
          rgen(std::random_device()), dice() {}
@@ -73,5 +73,5 @@ template<class T> void Kmean::run() {
 
 
 };
-
+}
 #endif
