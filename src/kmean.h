@@ -8,12 +8,12 @@
 #include "stddev.h"
 
 using namespace std;
+
 namespace orpara {
 /**
  * T could be a tuple
  */
-template<class T>
-class Kmean {
+template<class T> class Kmean {
    public:
       Kmean() : data(), cluster(), centroid(),
          rdevice(), rgen(std::random_device()), dice() {}
@@ -216,6 +216,7 @@ template<class T> void Kmean<T>::showCentroid(ostream& ous) const {
    }
 }
 
+};
 } // end of name space orpara
 
 #endif
