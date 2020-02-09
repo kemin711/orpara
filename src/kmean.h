@@ -216,7 +216,6 @@ template<class T> void Kmean<T>::showCentroid(ostream& ous) const {
    }
 }
 
-};
 } // end of name space orpara
 
 #endif

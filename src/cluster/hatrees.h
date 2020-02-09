@@ -38,33 +38,55 @@ using namespace std;
 namespace orpara {
 //using namespace pqxx;
 
+/**
+ * Node of the tree
+ */
 template<class T> struct HNode
 {
-	HNOde() :  key(), parent(this), rank(0)  { }  // point to self
-	HNOde(const T &k) : key(k), parent(this), rank(0) { }
-	HNOde(const T &k, HNOde* p) : key(k), parent(p), rank(0) { }
+	HNode() :  key(), parent(this), rank(0)  { }  // point to self
+	HNode(const T &k) : key(k), parent(this), rank(0) { }
+	HNode(T&& k) : key(std::move(k)), parent(this), rank(0) { }
+	HNode(const T &k, HNode* p) : key(k), parent(p), rank(0) { }
+	HNode(T&& k, HNode* p) : key(std::move(k)), parent(p), rank(0) { }
 	/* set parent = this is essential */
-	HNOde(const HNOde &n) : key(n.key), parent(this), rank(n.rank) { }
+	HNode(const HNode &n) : key(n.key), parent(this), rank(n.rank) { }
+	HNode(HNode&& n) : key(std::move(n.key)), parent(this), rank(n.rank) { }
 	// if use parent = n.parent then segmentation fault
-	~HNOde() { /*nothing needs to be done*/ }
-	bool operator==(const HNOde& n) const { return key==n.key; }
-	bool operator<(const HNOde &n) const { return key < n.key; }
-	//HNOde& operator=(const HNOde &n) { if (&n != this) { key = n.key; parent = n.parent; rank = n.rank; } return *this; }
-	HNOde& operator=(const HNOde &n) { if (&n != this) { key = n.key; parent = this; rank = n.rank; } return *this; }
+	~HNode() { /*nothing needs to be done*/ }
+	bool operator==(const HNode& n) const { return key==n.key; }
+	bool operator<(const HNode &n) const { return key < n.key; }
+	//HNode& operator=(const HNode &n) { if (&n != this) { key = n.key; parent = n.parent; rank = n.rank; } return *this; }
+	HNode& operator=(const HNode &n) { if (&n != this) { key = n.key; parent = this; rank = n.rank; } return *this; }
+	HNode& operator=(HNode&& n) { 
+      if (&n != this) { 
+         key = std::move(n.key); 
+         parent = this; rank = n.rank; 
+      } 
+      return *this; 
+   }
 
+   /**
+    * The look up key
+    */
 	T key;   // stored in the map<key, value>
-	HNOde<T>* parent;
+   /**
+    * Pointer to parent
+    */
+	HNode<T>* parent;
+   /**
+    * For algorithm operation
+    */
 	int rank;
 };
 
 /* tree operations */
 ///////////////////////////////////////////////////////
 /* x is not altered */
-template<class T> HNOde<T>* getRoot(HNOde<T> *x) {
+template<class T> HNode<T>* getRoot(HNode<T> *x) {
 	if (x != x->parent)  x->parent = getRoot(x->parent); 
 	return x->parent;
 }
-template<class T> void mergeRoot(HNOde<T> *&r1, HNOde<T> *&r2) {
+template<class T> void mergeRoot(HNode<T> *&r1, HNode<T> *&r2) {
 	if(r1 == r2) return;  // if both are the same set
 	if (r1->rank > r2->rank) r2->parent = r1;
 	else {
@@ -72,15 +94,15 @@ template<class T> void mergeRoot(HNOde<T> *&r1, HNOde<T> *&r2) {
 		if (r1->rank == r2->rank) r2->rank++;
 	}
 }
-template<class T> void join(HNOde<T> &x, HNOde<T> &y) {
-	HNOde<T> *r1 = getRoot(&x);  // this is necessary for the compiler
-	HNOde<T> *r2 = getRoot(&y);
+template<class T> void join(HNode<T> &x, HNode<T> &y) {
+	HNode<T> *r1 = getRoot(&x);  // this is necessary for the compiler
+	HNode<T> *r2 = getRoot(&y);
 	mergeRoot(r1, r2);
 	//mergeRoot(getRoot(&x), getRoot(&y));  // compiler got confused 
 }
-template<class T> void join(HNOde<T>* x, HNOde<T>* y) {
-	HNOde<T> *r1 = getRoot(x);  // this is necessary for the compiler
-	HNOde<T> *r2 = getRoot(y);
+template<class T> void join(HNode<T>* x, HNode<T>* y) {
+	HNode<T> *r1 = getRoot(x);  // this is necessary for the compiler
+	HNode<T> *r2 = getRoot(y);
 	mergeRoot(r1, r2);
 	//mergeRoot(getRoot(x), getRoot(y));  // compiler got confused 
 }
@@ -113,6 +135,9 @@ template<> struct hash<string> {
  * No database table output is defined in this class
  * bedause it will require different database drivers.
  * The getCluster() method will produce a relational table.
+ * The template type T must have the output operator<<
+ * implemented to use the display functions.
+ * For large object the T can ba pointer type.
  */
 template<class T> class Hatrees
 {
@@ -166,13 +191,17 @@ template<class T> class Hatrees
        * in a table format: (cluster_id(representative), members) 
        * */
 		void showCluster(ostream &os, bool reverse= true);
-		/** an initial id is given, the program will
+		/** 
+       * an initial id is given, the program will
        * auto_increment this id. This should work with
        * either string or int type of idtype.
+       * Output member <TAB> id 
+       * one row per member. 
        * */
 		void showClusterIntId(ostream &ous, int &id);
 
 		/** 
+       * Display the result to output stream.
        * @return the number of clusters 
        * */
 		int showClusterByLine(ostream &os);
@@ -198,40 +227,60 @@ template<class T> class Hatrees
        *   Use this method to load into database tables.
        *   Singletons are not included in the output.
        */
-		std::multimap<T,T>& getCluster() { 
-         if (result.empty()) transform(); return result; 
+		//std::multimap<T,T>& getCluster() { 
+		vector<pair<T,T>> getCluster() const { 
+         if (result.empty()) transform();
+         vector<T,T> res;
+         for (auto& r : result) {
+            for (auto& m : r.second) {
+               res.push_back(make_pair(r.first->key, m));
+            }
+         }
+         return res;
       }
+      /**
+       * @return a const reference to the result member.
+       */
+		const std::map<T*, vector<T>>& getResult() const { 
+         if (result.empty()) transform(); 
+         return result; 
+      }
+      int getNumberOfCluster() const {
+         if (result.empty()) transform();
+         return result.size();
+      }
+      vector<vector<T>> getClusterAsVector() const;
+      vector<set<T>> getClusterAsSet() const;
 
 #ifdef USE_HASH_MAP
-	//typename hash_map<T, HNOde<T>* >::iterator niterator;
-	//typename hash_map<T, HNOde<T>* >::const_iterator const_niterator;
-	typedef typename hash_map<T, HNOde<T>* >::iterator niterator;
-	typedef typename hash_map<T, HNOde<T>* >::const_iterator const_niterator;
+	typedef typename hash_map<T, HNode<T>* >::iterator niterator;
+	typedef typename hash_map<T, HNode<T>* >::const_iterator const_niterator;
 #else
-	typedef typename map<T, HNOde<T>* >::iterator niterator;
-	typedef typename map<T, HNOde<T>* >::const_iterator const_niterator;
-	//typename map<T, HNOde<T>* >::iterator niterator;
-	//typename map<T, HNOde<T>* >::const_iterator const_niterator;
+	typedef typename map<T, HNode<T>* >::iterator niterator;
+	typedef typename map<T, HNode<T>* >::const_iterator const_niterator;
 #endif
 
 	private:
 #ifdef USE_HASH_MAP 
-		hash_map<T, HNOde<T>* > nodes;
+		hash_map<T, HNode<T>* > nodes;
 #else
-		map<T, HNOde<T>* > nodes;
+		map<T, HNode<T>* > nodes;
 #endif
 		/** 
        * This is the result table:
        * representative->members 
        * Should have another method to return a reversed result.
+       * Essentially the same as nodes, but more easy to work with.
        */
-		std::multimap<T, T> result;  // sorted result in map format
+		//mutable map<T, vector<T>> result;
+		mutable map<T*, vector<T>> result;
 
 		/** 
        * transform the nodStore cluster into mutimaped cluster
 		 * in a table format cluster_id -> members 
+       * Maybe more efficient to store member -> representative direction.
        * */
-		void transform();
+		void transform() const;
 };
 
 ////////// Hatrees class template methods //////////////////////////
@@ -245,14 +294,14 @@ template<class T> Hatrees<T>::~Hatrees() {
 
 template<class T> void Hatrees<T>::readFromMap(const std::multimap<T, T> &m) {
 	pair<niterator, bool> p1, p2;
-	T f1, f2; 
+	//T f1, f2; 
 	typename std::multimap<T, T>::const_iterator imi = m.begin();
 
 	while (imi != m.end()) {
-		f1 = imi->first;
-		f2 = imi->second;
-		p1 = nodes.insert(pair<T, HNOde<T>* >(f1, new HNOde<T>(f1)));
-		p2 = nodes.insert(pair<T, HNOde<T>* >(f2, new HNOde<T>(f2)));
+		//f1 = imi->first;
+		//f2 = imi->second;
+		p1 = nodes.insert(pair<T, HNode<T>* >(imi->first, new HNode<T>(imi->first)));
+		p2 = nodes.insert(pair<T, HNode<T>* >(imi->second, new HNode<T>(imi->second)));
 		join(p1.first->second, p2.first->second);
 		imi++;
 	}
@@ -267,124 +316,23 @@ template<class T> void Hatrees<T>::readFromFile(const string &file) {
 	string ln;
 	pair<niterator, bool> p1, p2;
 	T f1, f2; 
-	//hash_map<T, T> xx;   // hash_map inserts duplicate key under template
-	//hash_map<T, int> hm;
-	//map<T, T> yy;
-	//int id=0;
 
 	getline(IN, ln);
 	while (!IN.eof()) {
 		istringstream ist(ln);
 		ist >> f1 >> f2;
-		/*
-		xx.insert(pair<T, T>(f1, f2));
-		yy.insert(pair<T, T>(f1, f2));
-		if (hm.find(f1) == hm.end()) {
-			hm.insert(pair<T, int>(f1, id++));
-		}
-		if (hm.find(f2) == hm.end()) {
-			hm.insert(pair<T, int>(f2, id++));
-		}
-		*/
-		p1 = nodes.insert(pair<T, HNOde<T>* >(f1, new HNOde<T>(f1)));
-		p2 = nodes.insert(pair<T, HNOde<T>* >(f2, new HNOde<T>(f2)));
+		p1 = nodes.insert(pair<T, HNode<T>* >(f1, new HNode<T>(f1)));
+		p2 = nodes.insert(pair<T, HNode<T>* >(f2, new HNode<T>(f2)));
 		join(p1.first->second, p2.first->second);
 		getline(IN, ln);
 	}
-	/*
-	cout << "Size of hash_map<string, string> is " << xx.size() << endl;
-	cout << "Size of map<string, string> is " << yy.size() << endl;
-	cout << "Size of hash_map<string, int> is " << hm.size() << endl;
-	hash_map<T, T>::iterator xxi = xx.begin();
-	map<T,T>::iterator yyi = yy.begin();
-	while (xxi != xx.end()) {
-		cout << xxi->first << "\t" << xxi->second << endl;
-		xxi++;
-	}
-	cout << "================================\n";
-	while (yyi != yy.end()) {
-		cout << yyi->first << "\t" << yyi->second << endl;
-		yyi++;
-	}
-	cout << "-----------------------------\n";
-	hash_map<T, int>::iterator hmi = hm.begin();
-	while (hmi != hm.end()) {
-		cout << hmi->first << "\t" << hmi->second << endl;
-		hmi++;
-	}
-	*/
 }
-
-/* db has the result ready; will use field 1, and 2 as input */
-//template<class T> void Hatrees<T>::readFromDB(PgDatabase &db) {
-/* removing this function so that this library will not
- * dependent on postgres
-template<class T> void Hatrees<T>::readFromDB(pqxx::result &qres) {
-	pair<niterator, bool> p1, p2;
-	T f1, f2; 
-	string ln, tmp;
-
-	int i;
-	for (i=0; i< qres.size(); i++) {
-		//ln = db.GetValue(i,0);
-		qres[i][0].to(ln);
-      qres[i][1].to(tmp);
-		//ln.append("\t").append(db.GetValue(i,1));
-		ln.append("\t").append(tmp);
-      
-		istringstream ist(ln);
-		ist >> f1 >> f2;
-		p1 = nodes.insert(pair<T, HNOde<T>* >(f1, new HNOde<T>(f1)));
-		p2 = nodes.insert(pair<T, HNOde<T>* >(f2, new HNOde<T>(f2)));
-		join(p1.first->second, p2.first->second);
-	}
-}
-*/
-/* load into relational table(member_key, member_representative) */
-//template<class T> void Hatrees<T>::loadTable(PgDatabase &db,string tab) {
-/* disable to make this library less dependent on postgress 
- * installation
-template<class T> void Hatrees<T>::loadTable(pqxx::connection &db,string tab) {
-	string queryBase = "insert into " + tab + " values(";
-	
-	niterator it = nodes.begin();
-	HNOde<T>* root;
-	cerr << "Loading into table member_key\tgroup_representative\n";
-   work Xaction(db, "forinsertion");
-
-	while (it != nodes.end()) {
-		root = getRoot(it->second->parent);
-		string query = queryBase;
-		ostringstream ous;
-		ous << '\'' << it->first << "','" << root->key << "')";
-		query += ous.str();
-      try {
-         Xaction.exec(query);
-      }
-      catch (exception &err) {
-         cerr << err.what() << endl;
-         exit(1);
-      }
-      Xaction.commit();
-      */
-      /*
-		if (!db.ExecCommandOk(query.c_str())) {
-			cerr << query << " failed\n";
-			exit(1);
-		}
-      */
-/*
-		it++;
-	}
-	cerr << "Total number of unique keys is " << nodes.size() << endl;
-}
-*/
 
 /* members->cluster_id sorted according to members if using <map>
  * if using hash_map then not in any order */
 template<class T> void Hatrees<T>::showStore(ostream &os) const {
 	const_niterator it = nodes.begin();
-	HNOde<T>* root;
+	HNode<T>* root;
 	os << "key\tcluster_representative\n";
 	while (it != nodes.end()) {
 		root = getRoot(it->second->parent);
@@ -410,53 +358,63 @@ template<class T> vector<T> Hatrees<T>::keyarray()  const {
 	vector<T> tmp;
 	const_niterator it = nodes.begin();
 	while (it != nodes.end()) {
-		//cout << it->first << "   ";  //debug
 		tmp.push_back(it->first);
 		it++;
 	}
 	return tmp;
 }
 
-/* return a vector of clusters as sets of members */
-template<class T> void Hatrees<T>::clusterArray(vector< set<T> > &vecset) {
-	if (result.empty()) transform();
-	vecset.clear();  // just in case it has something already in it
-
-	typename std::multimap<T, T>::const_iterator mi = result.begin();
-	while (mi != result.end()) {
-		set<T> tmpset;
-		tmpset.insert(mi->second);
-		//os << mi->second;
-		T cluster_id = mi->first;
-		mi++;
-		while (mi != result.end() && mi->first == cluster_id) {
-			//os << '\t' << mi->second;
-			tmpset.insert(mi->second);
-			mi++;
-		}
-		vecset.push_back(tmpset);
-		//os << endl;
+template<class T> void Hatrees<T>::transform() const {
+	const_niterator it = nodes.begin();
+	HNode<T>* root;
+	while (it != nodes.end()) {
+		root = getRoot(it->second->parent);
+		//result[root->key].push_back(it->first);
+		result[root].push_back(it->first);
+		it++;
 	}
 }
+
+/* return a vector of clusters as sets of members */
+template<class T> void Hatrees<T>::clusterArray(vector<set<T>> &vecset) {
+	if (result.empty()) transform();
+	vecset.clear();  // just in case it has something already in it
+   for (auto& r : result) {
+		set<T> tmpset(r.second.begin(), r.second.end());
+		vecset.push_back(std::move(tmpset));
+	}
+}
+
+template<class T> 
+vector<vector<T>> Hatrees<T>::getClusterAsVector() const
+{
+   if (result.empty()) transform();
+	vector<vector<T>> res;
+   for (auto& r : result) {
+      res.push_back(r.second);
+	}
+   return res;
+}
+
+template<class T> 
+vector<set<T>> Hatrees<T>::getClusterAsSet() const {
+	if (result.empty()) transform();
+   vector<set<T>> res;
+   for (auto& r : result) {
+		res.push_back(set<T>(r.second.begin(), r.second.end()));
+	}
+   return res;
+}
+
 
 // you can provide a inital id to name the clusters
 // This function will increment this id for each cluster
 template<class T> void Hatrees<T>::showClusterIntId(ostream &ous, int &id) {
 	if (result.empty()) transform();
-	typename std::multimap<T, T>::const_iterator mi = result.begin();
-	while (mi != result.end()) {
-		Set<T> tmpset;
-		ous << mi->second << '\t' << id << endl;
-		//tmpset.insert(mi->second);
-		T cluster_id = mi->first;
-		mi++;
-		while (mi != result.end() && mi->first == cluster_id) {
-			//tmpset.insert(mi->second);
-			ous << mi->second << '\t' << id << endl;
-			mi++;
-		}
-		//vecset.push_back(tmpset);
-		//os << endl;
+   for (auto& r : result) {
+      for (auto& x : r.second) {
+         ous << x << '\t' << id << endl;
+      }
 		++id;
 	}
 }
@@ -466,55 +424,40 @@ template<class T> void Hatrees<T>::showClusterIntId(ostream &ous, int &id) {
  * */
 template<class T> void Hatrees<T>::showCluster(ostream &os, bool reverse) {
 	if (result.empty()) transform();
-
-	typename std::multimap<T, T>::const_iterator mi = result.begin();
+   int memberCnt=0;
 	if (reverse) {
-		while (mi != result.end()) {
-			os << mi->second << '\t' << mi->first << endl;
-			mi++;
+      for (auto& r : result) {
+         for (auto& m : r.second) {
+            os << m << '\t' << r.first->key << endl;
+            ++memberCnt;
+         }
 		}
 	}
 	else {
-		while (mi != result.end()) {
-			os << mi->first << '\t' << mi->second << endl;
-			mi++;
+      for (auto& r : result) {
+         for (auto& m : r.second) {
+            os << r.first->key << '\t' << m << endl;
+            ++memberCnt;
+         }
 		}
 	}
-	//os << "Total members: " << result.size() << endl;
-	//for db loading, this line causes trouble
-	cerr << "Total members: " << result.size() << endl;
+	cerr << "Total members: " << memberCnt << endl;
 }
 
-template<class T> void Hatrees<T>::transform() {
-	niterator it = nodes.begin();
-	HNOde<T>* root;
-	while (it != nodes.end()) {
-		root = getRoot(it->second->parent);
-		result.insert(pair<T, T>(root->key, it->first));
-		it++;
-	}
-}
-
-/** Display one cluster per line, with all members on the same line
+/* Display one cluster per line, with all members on the same line
  * */
 template<class T> int Hatrees<T>::showClusterByLine(ostream &os) {
 	if (result.empty()) transform();
 	os << "Output format: one cluster per line\n\n";
-	int clusterCnt=0;
-	typename std::multimap<T, T>::const_iterator mi = result.begin();
-	while (mi != result.end()) {
-		clusterCnt++;
-		os << mi->second;
-		T cluster_id = mi->first;
-		mi++;
-		while (mi != result.end() && mi->first == cluster_id) {
-			os << '\t' << mi->second;
-			mi++;
-		}
-		os << "\n\n";
-	}
-	os << "Total " << clusterCnt << " clusters\n";
-	return clusterCnt;
+   for (auto& r : result) {
+      os << r.second[0];
+      for (int i=1; i<r.second.size(); ++i) {
+         os << '\t' << r.second[i];
+      }
+      os << endl;
+   }
+	os << "Total " << getNumberOfCluster() << " clusters\n";
+	return getNumberOfCluster();
 }
 
 } // end of orpara namespace
