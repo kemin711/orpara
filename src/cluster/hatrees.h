@@ -273,7 +273,7 @@ template<class T> class Hatrees
        * Essentially the same as nodes, but more easy to work with.
        */
 		//mutable map<T, vector<T>> result;
-		mutable map<T*, vector<T>> result;
+		mutable map<HNode<T>*, vector<T>> result;
 
 		/** 
        * transform the nodStore cluster into mutimaped cluster
