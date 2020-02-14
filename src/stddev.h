@@ -154,6 +154,15 @@ class stddev {
        * Number of data points
        */
       int getCount() const { return j; }
+      /**
+       * This is not a truely authentic operation.
+       * We only use it for special situations for
+       * the purpose of updating the count information
+       * and ignoring all other features.
+       */
+      void reduceCount(int c) {
+         j -= c; if (c < 0) c=0;
+      }
       double getTotal() const { return j*getMean(); }
 		// postgres retuns the sample standard deviation
 		pair<double, double> result() const { return make_pair(avg, sqrt(SS)); }
@@ -356,6 +365,9 @@ class Stddev {
        * Number of data points
        */
       int getCount() const { return j; }
+      void reduceCount(int c) {
+         j -= c; if (c < 0) c=0;
+      }
 		// postgres retuns the sample standard deviation
 		pair<array<double,N>, array<double,N> > result() const { 
          return make_pair(getAverage(), getStd()); 
