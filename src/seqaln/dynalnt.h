@@ -137,6 +137,12 @@ class Dynaln {
          setGapParameterFromMatrix();
          if (!validInput()) throw AlnInputException("Matrix and Input sequence type mismatch");
       }
+      /**
+       * Constructor from all known resources.
+       * @param s1 a const reference to first sequence.
+       * @param s2 const reference to second sequence.
+       * @param sm scoring matrix used by this aligner.
+       */
       Dynaln(const bioseq &s1, const bioseq &s2, const T &sm) 
          : ST(sm), seq1(&s1), seq2(&s2), 
             S(nullptr), Ssize(0), M(nullptr), IX(nullptr), IY(nullptr), alnidx(), 
