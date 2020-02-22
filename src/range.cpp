@@ -460,10 +460,10 @@ int Range::compareByDirection(const Range &r) const {
       else {
          cerr << *this << " compareByDirection() " << r << endl;
          cerr << "entered an impossible state inside compareByDirection()\n";
-         //exit(1);
          return 99;
       }
    }
+   return 9;
 }
 
 bool Range::before(const Range &r) const {
