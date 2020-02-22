@@ -132,7 +132,7 @@ int IntervalPile::merge(Interval *ip, const int cut) {
    return olp;
 }
 
-int IntervalPile::add(Interval *i) {
+void IntervalPile::add(Interval *i) {
    Interval::merge(i);
    members.push_back(i);
    i=0;

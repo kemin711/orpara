@@ -403,8 +403,9 @@ int Range::compareByDirection(const Range &r) const {
          if (b > r.b) return 1;
          if (e < r.e) return -1;
          if (e > r.e) return 1;
-         cerr << "no possible compareByDirection()\n";
-         exit(1);
+         cerr << __FILE__ << ":" << __LINE__ << ": no possible compareByDirection()\n";
+         return 0; // should not reach here
+         //exit(1);
       }
       else { // - direction
          if (b>r.b) return -1;
@@ -414,7 +415,8 @@ int Range::compareByDirection(const Range &r) const {
          if (e<r.e) return 1;
          cerr << "Comparing " << *this << " with "
             << r << " not possible Range::compareByDirection()\n";
-         exit(1);
+         //exit(1);
+         return 0;
       }
    }
    else if (direction() == '+') {
@@ -426,8 +428,7 @@ int Range::compareByDirection(const Range &r) const {
          return 1;
       }
       else {
-         cerr << " r has no direction\n";
-         exit(1);
+         throw logic_error(string(__FILE__) + ":" + to_string(__LINE__) + ":ERROR  r has no direction");
       }
    }
    else if (direction() == '-') {
@@ -440,8 +441,9 @@ int Range::compareByDirection(const Range &r) const {
          return -1;
       }
       else {
-         cerr << "r has no direction\n";
-         exit(1);
+         //cerr << "r has no direction\n";
+         throw logic_error(string(__FILE__) + ":" + to_string(__LINE__) + ":ERROR  r has no direction");
+         //exit(1);
       }
    }
    else if (length() == 1) {
@@ -458,7 +460,8 @@ int Range::compareByDirection(const Range &r) const {
       else {
          cerr << *this << " compareByDirection() " << r << endl;
          cerr << "entered an impossible state inside compareByDirection()\n";
-         exit(1);
+         //exit(1);
+         return 99;
       }
    }
 }
@@ -905,5 +908,6 @@ ostream& RangeChain::tableRows(ostream &ous, const string &prefix) const {
    for (i=chain.begin(); i != chain.end(); i++) {
       ous << prefix << "\t" << cnt++ << "\t" << (*i)->begin() << "\t" << (*i)->end() << endl;;
    }
+   return ous;
 }
 } // orpara namespace

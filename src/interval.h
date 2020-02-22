@@ -226,7 +226,7 @@ class IntervalPile : public Interval {
        *
        * @param i input Interval. After function call i becomes 0.
        */
-      int add(Interval *i);
+      void add(Interval *i);
       /** the number of Intervals in this object
        */
       int size() const { return members.size(); }

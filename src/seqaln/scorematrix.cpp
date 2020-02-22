@@ -182,16 +182,20 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
    else {
       if (name.empty()) {
          cerr << "Name is empty inside read!\n";
-         exit(1);
+         throw runtime_error(string(__FILE__) + ":" + to_string(__LINE__) + ":ERROR Empty matrix name");
+         //exit(1);
       }
       cerr << "matrix " << name << " is not known in the path: " << path << endl;
-      exit(1);
+      //throw runtime_error("matrix: " + name + " unknown type in " + path);
+      //exit(1);
+      return false;
    }
 
    ifstream IN(infile.c_str());
    if (IN.fail()) {
       cerr << "Failed to open " << infile << " while trying to read scoring matrix\n";
-      exit(1);
+      throw runtime_error("bad matrix file: " + infile);
+      //exit(1);
    }
    string line;
    // read the comment and discard them
@@ -206,7 +210,8 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
    for (i=0; i<row.size(); i++) {
       if (row[i].size()>1) {
          cerr << "Violated the one-letter length" << row[i] << endl;
-         exit(1);
+         //exit(1);
+         return false;
       }
       symb[i]=row[i][0];
    }
@@ -226,8 +231,9 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
    while (!IN.eof() && !line.empty()) {
       row=dissect(line, " \t");
       if (row.size() != numsymbol + 1) {
-         cerr << "One row must have " << numsymbol << "elements\n";
-         exit(1);
+         cerr << __FILE__ << ":" << __LINE__ << ":ERROR One row must have " << numsymbol << "elements\n";
+         //exit(1);
+         return false;
       }
       /*
       if (mtype == NUCLEIC) {
@@ -258,6 +264,7 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
       getline(IN, line);
    }
    //setDefaultGapParameter();
+   return true;
 }
 
 void MatrixScoreMethod::deallocateWords() {
