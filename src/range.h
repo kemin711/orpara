@@ -53,7 +53,7 @@ class Range {
       Range(int p) : b(p), e(p) { }
       /** copy the b and e members */
 		Range& operator=(const Range &r);
-		~Range() { }
+		virtual ~Range() { }
       /** shift to the right operation */
       Range operator+(int c) const { return Range(b+c, e+c); }
       /** shift to the left */
@@ -592,7 +592,9 @@ class RangeChain : public Range {
       RangeChain(const string &raw);
 		RangeChain(const Range &r) : sumolp(0) { 
 			chain.push_back(new Range(r)); }
-      /** use delete to deallocate memory in each list node */
+      /** 
+       * deallocate memory in each list node 
+       */
 		~RangeChain();
       RangeChain& operator=(const RangeChain &rc);
 
@@ -719,7 +721,8 @@ class RangeChain : public Range {
        * Depends on the direction of the underlying ranges.
        */
 		list<Range*> chain;
-      /** this is the sum of overlaps during the add() operation.
+      /** 
+       * this is the sum of overlaps during the add() operation.
        */
 		int sumolp; 
 };

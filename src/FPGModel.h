@@ -28,7 +28,8 @@ class fpkey {
       if (qid > k.qid) return false;
       if (tid < k.tid) return true;
       if (tid > k.tid) return false;
-      if (fpnum < k.fpnum) return true; return false;
+      if (fpnum < k.fpnum) { return true; }
+      return false;
    }
    bool operator>(const fpkey &k) const { return !(*this < k); }
    string qid, tid;

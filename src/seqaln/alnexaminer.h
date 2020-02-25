@@ -46,7 +46,9 @@ class Alnexaminer {
        * Identical char for displaying sequence alignment.
        */
       static char idenchar;
-      /** the window size is not supposed to change very oftern */
+      /** 
+       * the window size is not supposed to change very oftern 
+       */
       static int w;
       static const int zeroZone=10;
       /**

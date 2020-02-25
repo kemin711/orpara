@@ -192,7 +192,8 @@ class Dynaln {
             C1=o.C1; C2=o.C2; S=o.S; 
             o.C1=o.C2=o.S=nullptr;
             Ssize=o.Ssize;
-            if (M != nullptr) delete M; if (IX != nullptr) delete IX;
+            if (M != nullptr) delete M; 
+            if (IX != nullptr) delete IX;
             if (IY != nullptr) delete IY;
             M=o.M; IX=o.IX; IY=o.IY; 
             o.M=o.IX=o.IY=0;

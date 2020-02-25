@@ -294,25 +294,23 @@ Fastq Fastq::cutRight(const string &site) {
 //     pos
 //  return the right piece, this object will become the left piece
 Fastq Fastq::cutAt(const unsigned int pos) {
-   Fastq newfasq;
-   if (pos >= 0 && pos < length()) {
-      newfasq.name=name + "_R";
-      newfasq.seq = seq.substr(pos);
-      newfasq.qual_len = newfasq.length();
-      newfasq.qual = new unsigned char[newfasq.length()];
-      //for (unsigned int j=pos; j<length(); ++j) {
-      //   newfasq.qual[j-pos]=qual[j];
-      //}
-      memcpy(newfasq.qual, qual+pos, newfasq.length());
-      name += "_L";
-      seq.resize(pos);
-   }
-   else {
-      cerr << pos << " outside the range of fastq sequence with length: " 
-         << length() << endl;
-      //throw exception("cut index outside fastq end");
+   if (pos >= length()) {
       throw range_error("cut index outside fastq end");
    }
+   if (pos == 0) { // special case
+      cerr << __FILE__ << ":" << __LINE__ << ":WARNING Are you sure to cut from 0\n";
+      Fastq tmp = std::move(*this);
+      clear();
+      return tmp;
+   }
+   Fastq newfasq;
+   newfasq.name=name + "_R";
+   newfasq.seq = seq.substr(pos);
+   newfasq.qual_len = newfasq.length();
+   newfasq.qual = new unsigned char[newfasq.length()];
+   memcpy(newfasq.qual, qual+pos, newfasq.length());
+   name += "_L";
+   seq.resize(pos);
    return newfasq;
 }
 
@@ -349,26 +347,29 @@ void Fastq::discardHead(const unsigned int idx) {
 }
 
 Fastq Fastq::sub(unsigned int b, unsigned int e) const {
-   if (b >= 0 && e < length()) {
-      ostringstream convert;
-      convert << name << "_sub" << b << "_" << e;
-      string subname = convert.str();
-
-      convert.str("");
-      convert.clear();
-      if (!desc.empty()) {
-         convert << desc << " ";
-      }
-      convert << "subsequence from " << b << " to " << e;
-      string subdescription = convert.str();
-      string subseq = seq.substr(b, e-b+1);
-
-      return Fastq(subname, subdescription, subseq, qual+b);
-   }
-   else {
+   if (e >= length()) {
       cerr << "range: " << b << " - " << e << " outside fastq sequence\n";
       throw range_error("sub operation out of range");
    }
+   if (b == 0) {
+      cerr << __FILE__ << ":" << __LINE__ << ":WARN taking subseq of entire sequence\n";
+      return *this;
+   }
+   // b >0 e<length
+   ostringstream convert;
+   convert << name << "_sub" << b << "_" << e;
+   string subname = convert.str();
+
+   convert.str("");
+   convert.clear();
+   if (!desc.empty()) {
+      convert << desc << " ";
+   }
+   convert << "subsequence from " << b << " to " << e;
+   string subdescription = convert.str();
+   string subseq = seq.substr(b, e-b+1);
+
+   return Fastq(subname, subdescription, subseq, qual+b);
 }
 
 void Fastq::write(ostream &ous) const {
@@ -496,7 +497,7 @@ bool Fastq::qualityTrim(unsigned int window, unsigned int cutoff, int lencut) {
       return true;
    }
    if (trimmed) {
-      if (length() < lencut) {
+      if (length() < (unsigned)lencut) {
          clear();
       }
       return  true;
@@ -540,7 +541,7 @@ bool Fastq::trimG() {
 // ACATTTCAGACAGGAATTTTGTTCATTTTAATGAACTCCCACCATTCCAGCAGCTTTTTGTGATGATCCACATGTAATTGATTGTTCAAGAGATGCCTTATTTAACAAAGTACAGTGTACAAGCATACATAAGATTATGATNGNNNN
 // usually good from the 5' end, last few bases are bad
 bool Fastq::trimN() {
-   int NCount=0;
+   //int NCount=0;
    string::size_type i=length()-1;
    // [i, ii] is the start end of the moving window
    int Ni = -1;

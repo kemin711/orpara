@@ -121,7 +121,7 @@ void Taxon::loadTaxName(const string &infile) {
    // 3. add duplicated using unqiue names rather than names
    cout << withUnique.size() << " has unique names\n";
    cnt=0;
-   for (auto i=0; i<withUnique.size(); ++i) {
+   for (size_t i=0; i<withUnique.size(); ++i) {
       if (duplicatedName.find(get<1>(withUnique[i])) != duplicatedName.end()) {
          //cout << "adding unique name " << get<0>(withUnique[i]) << " "
          //   << get<1>(withUnique[i]) << " " << get<2>(withUnique[i]) << endl;
@@ -251,7 +251,7 @@ void NCBITaxonomy::updateCount(int taxid, int cnt) {
 void NCBITaxonomy::countTaxon(const vector<tuple<string, int, string> > &taxcnt) {
    cerr << "counting taxon hits from " << taxcnt.size() << " nodes\n";
    string taxname;
-   for (auto i=0; i<taxcnt.size(); ++i) {
+   for (size_t i=0; i<taxcnt.size(); ++i) {
       taxname = get<2>(taxcnt[i]);
       //cerr << "working on " << i << " " << taxname << endl;
       //string taxname = removeSquare(taxname); // some taxname may have square bracket, 
@@ -317,7 +317,7 @@ vector<tuple<string, int, string> > NCBITaxonomy::readMapping(const string &file
 ///////////// visitor class ////////////////////////////////////////
 vector<pair<string,int> > TaxonVisitor::getTaxonCount() const {
    vector<pair<string,int> > tmp;
-   for (auto i=0; i<result.size(); ++i) {
+   for (size_t i=0; i<result.size(); ++i) {
       tmp.push_back(make_pair(result[i].getName(), result[i].getCount()));
    }
    return tmp;

@@ -203,8 +203,8 @@ int alignSimpleSelf(const string &seqfile, const Progparam &param) {
    int backwardCnt=0;
    time_t timer1, timer2;
    time(&timer1);
-   for (int i=0; i<allseq.size()-1; ++i) {
-      for (int j=i+1; j<allseq.size(); ++j) {
+   for (size_t i=0; i<allseq.size()-1; ++i) {
+      for (size_t j=i+1; j<allseq.size(); ++j) {
          //cerr << "working on " << i << "," << j << " ";
          aln.setseq(allseq[i], allseq[j]);
          aln.runglobal();

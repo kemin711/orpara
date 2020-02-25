@@ -198,11 +198,11 @@ int alignSimpleSelf(const string &seqfile, const Progparam &param, const string 
    int cnt=0;
    int every=100;
    vector<vector<string> > resultMatrix;
-   for (int i=0; i<allseq.size()-1; ++i) {
+   for (size_t i=0; i<allseq.size()-1; ++i) {
       vector<string> score_identity;
       aln.setSeq1(allseq[i]);
       rcaln.setSeq1(allseq[i]);
-      for (int j=i+1; j<allseq.size(); ++j) {
+      for (size_t j=i+1; j<allseq.size(); ++j) {
          ++cnt;
          aln.setSeq2(allseq[j]);
          aln.runlocal();

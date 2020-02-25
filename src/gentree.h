@@ -22,15 +22,17 @@ template<class T> struct node {
     * Default constructor.
     * Parent is self, child and sibling are 0.
     */
-	node() : data(), child(0), sibling(0), parent(this) {}
+	node() : data(), child(0), sibling(0), parent(this) { }
 
-	node(const T& val) : child(0), sibling(0), parent(this), data(val) { }
+	node(const T& val) 
+      : data(val), child(0), sibling(0), parent(this) { }
 	/** 
     * Constructor from data value and parent
     * @param val the data value of the node
     * @param p the parent pointer
     */
-	node(const T& val, node<T> *p) : child(0), sibling(0), data(val), parent(p) { }
+	node(const T& val, node<T> *p) 
+      : data(val), child(0), sibling(0), parent(p) { }
    // not sure you need to have a destructor
    //~node();
 

@@ -24,6 +24,16 @@ int multiplyRange(const pair<int,int> &r1, const pair<int,int> &r2);
  * (3, -3, -4, -3) 0.782609 num nodes explored: 13799
  */
 int main(int argc, char* argv[]) {
+   int i=1; 
+   while (i < argc) {
+      if (!strcmp(argv[i], "--help")) {
+         cerr << "just test\n";
+      }
+      else {
+         cerr << "your options: " << argv[i] << endl;
+      }
+      ++i;
+   }
    string seq1="AGCGTTGTCCGGATTTATTGGGCGTAAAGCGAGCGCAGGCGGTTAGATAAGTCTGAAGTGAAAGGCAGTGGCTCAACCATTGTAGGCTTTGGAAACTGTTTAACTTGAGTGCAGAAGGGGAGAGTGGAATTCCATGTGTAGCGGTGAAATGCGTAGATATGTGGAGGAATACCGAT";
    string seq2="AGCGTTAATCGGAATTACTGGGCGTAAAGCGGGCGCAGACGGTTACTTAAGTCAGATGTGAAATCCCCGGGCTCAACCTGGGAACTGCGTTTGAAACTGGGTGACTAGAGTATGTCAGAGGGGGGTAGAATTCCACGTGTAGCAGTGAAATGCGTAGAGATGTGGAGGAATACCGAT";
    //string seq1="ACGGTTGC";
@@ -84,7 +94,7 @@ void scanGapParameter(const string &seq1, const string &seq2, int matchScore, in
    cout << endl;
    for (auto ptr=result.begin(); ptr != result.end(); ++ptr) {
       cout << matchScore << '\t' << mismatchScore << '\t';
-      for (int j=0; j<(*ptr).size(); ++j) {
+      for (size_t j=0; j<(*ptr).size(); ++j) {
          cout << (*ptr)[j] << '\t';
       }
       cout << maxidentity << '\t' << seconds << '\t' 

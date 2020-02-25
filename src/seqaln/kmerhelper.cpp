@@ -42,13 +42,13 @@ vector<int> hashArray(const string &s, const int w) {
    vector<int> tmp(s.length()-w+1);
    // mask is 00011-w-111 total 64 bits
    unsigned int M=(2<<(2*w-1))-1;
-   size_t i;
+   int i;
    for (i=0; i<w; ++i) {
       v <<=2; 
       v |= b2i(s[i]);
    }
    cout << "mask value: " << bitset<32>(M) << endl;
-   for (i=0; i<s.length()-w; ++i) {
+   for (i=0; i < (int)s.length()-w; ++i) {
       //cout << bitset<32>(v) << endl;
       tmp[i]=v;
       v <<=2;

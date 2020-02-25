@@ -14,16 +14,23 @@ using namespace std;
 //using namespace KZUtility;
 
 namespace orpara {
-// efficient for vectors with less than a few hudrend elements
-// large sets needs to use the set algorithm
+/**
+ * efficient for vectors with less than a few hudrend elements
+ * large sets needs to use the set algorithm
+ * @return true of two containers share common elements.
+ */
 bool intersect(vector<string> &s1, vector<string> &s2) {
-	for (int i=0; i<s1.size(); i++) {
-		for (int j=0; j<s2.size(); j++) {
+	for (unsigned int i=0; i<s1.size(); i++) {
+		for (unsigned int j=0; j < s2.size(); j++) {
 			if (s1[i] == s2[j]) return true;
 		}
 	}
 	return false;
 }
+
+/**
+ * @return the number of words in the string
+ */
 int wc(const string &str) {
 	string::size_type i = str.find_first_not_of(' ');
 	int count = 0;
@@ -41,7 +48,7 @@ bool isnumber(const string &str) {
       cerr << "empty string is not a number!\n";
       return false;
    }
-	int i = 0;
+   string::size_type i = 0;
 	while (isdigit(str[i])) i++;
 	return i == str.size();
 }
@@ -50,7 +57,7 @@ bool isnumber(const string &str, const string dc) {
    if (str.empty()) {
       return false;
    }
-	int i = 0;
+   string::size_type i = 0;
 	while (i<str.size()) {
 		if (!isdigit(str[i]) && dc.find(str[i]) == string::npos) 
 			return false;
@@ -69,7 +76,7 @@ bool isInt(const char str[]) {
 }
 
 bool isupper(const string &str) {
-	int i = 0;
+   string::size_type i = 0;
 	while (i<str.length()) {
 		if (isalpha(str[i]) && !std::isupper(str[i]))
 			return false;
@@ -105,22 +112,22 @@ void upper(const char lo[], char *up)
 /* return a new string with lowercases */
 string getLower(const string &str) {
 	string tmp = str;
-	for (int i=0; i<tmp.size(); i++) 
+	for (string::size_type i=0; i<tmp.size(); i++) 
 		tmp[i] = tolower(tmp[i]);
 	return tmp;
 }
 void strTolower(string &str) {
-	for (int i=0; i<str.size(); i++) 
+	for (string::size_type i=0; i<str.size(); i++) 
 		str[i] = tolower(str[i]);
 }
 void strTolower(const string &str1, string &str2) {
 	str2=str1;
-	for (int i=0; i<str2.size(); i++) 
+	for (string::size_type i=0; i<str2.size(); i++) 
 		str2[i] = tolower(str2[i]);
 }
 
 void strToupper(string &str) {
-	for (int i=0; i<str.length(); i++)
+	for (string::size_type i=0; i<str.length(); i++)
 		str[i] = toupper(str[i]);
 }
 
@@ -136,8 +143,9 @@ string lc(const string& str) {
 
 string uc(const string& str) {
    string tmp(str);
-   for (auto i=0; i<tmp.size(); ++i) {
-      tmp[i]=toupper(str[i]);
+   for (string::size_type i=0; i<tmp.size(); ++i) {
+      if (!std::isupper(tmp[i]))
+         tmp[i]=toupper(tmp[i]);
    }
    return tmp;
 }
@@ -245,19 +253,24 @@ void removeWhiteChar(string& str) {
    if (i < str.size()-1) str.resize(i);
 }
 
+/**
+ * @return a new string with all c deleted in str
+ */
 string delall(const string& str, const char c) {
-	string tmp = str;
-	int i=0;
-	while (i<tmp.length()) {
-		if (tmp[i] == c) tmp.erase(i, 1);
-		++i;
-	}
+	string tmp;
+   tmp.reserve(str.size());
+   for (const char x : str) {
+      if (x != c) tmp += x;
+   }
 	return tmp;
 }
 
+/**
+ * Same as delall
+ */
 string deleteChr(const string &str, char c) {
    string tmp;
-   for (int i=0; i<str.size(); i++) {
+   for (string::size_type i=0; i<str.size(); i++) {
       if (str[i] != c) {
          tmp.push_back(str[i]);
       }
@@ -268,7 +281,7 @@ string deleteChr(const string &str, char c) {
 
 string delall(const string& str, const string& c) {
 	string tmp = str;
-	int i;
+   string::size_type i;
 	i = tmp.find_first_of(c);
 	while (i != string::npos) {
 		tmp.erase(i, 1);
@@ -412,9 +425,12 @@ int getNumber(char *&ptr)
 	 return (atoi(number));
 } 
 				
+/**
+ * Collect all integer numbers from str
+ */
 vector<int> getAllInt(const string &str) {
-   int i=0;
-   int b;
+   string::size_type i=0;
+   string::size_type b;
    vector<int> tmp;
    while (i<str.size()) {
       while (i<str.size() && !isdigit(str[i])) ++i;
@@ -427,13 +443,13 @@ vector<int> getAllInt(const string &str) {
 }
 
 int getInt(const string &str) {
-   int i=0;
+   string::size_type i=0;
    while (i<str.size() && !isdigit(str[i])) ++i;
    if (i==str.size()) {
       cerr << "string " << str << " has no digit!";
       exit(1);
    }
-   int j=i+1;
+   string::size_type j=i+1;
    while (j<str.size() && isdigit(str[j])) ++j;
    return atoi(str.substr(i,j-i).c_str());
 }
@@ -625,20 +641,20 @@ string acronymWithDigit(const string &str, int n) {
 
 string acronymWithTag(const string&str, int n) {
 	vector<string> tmpv = dissect(str, " ,");
-	int i;
+   string::size_type i;
 	string tmp;
 	for (i=0; i<tmpv.size(); i++) {
-		if (tmpv[i].length() > n) tmp += tmpv[i].substr(0,n);
+		if (tmpv[i].length() > (unsigned int)n) tmp += tmpv[i].substr(0,n);
 		else tmp += tmpv[i];
 	}
 	string lwd = tmpv[tmpv.size()-1];
 	i = lwd.length()-1;
-	if (n<lwd.length() && isdigit(lwd[i])) {
+	if ((unsigned int)n < lwd.length() && isdigit(lwd[i])) {
 		--i;
 		while (i>0 && (isdigit(lwd[i]) || lwd[i] == '-'
 				|| lwd[i] == '.')) --i;
 		++i; // pointing to the digit or -
-		if (i>=n) tmp += lwd.substr(i);
+		if (i >= (unsigned int)n) tmp += lwd.substr(i);
 	}
 	return tmp;
 }
@@ -845,11 +861,15 @@ void trim(string &str) {
 	str.erase(idx+1);
 }
 
+/**
+ * remove space in front of str
+ */
 void trimLeadingSpace(string &str) {
-   int i=0;
+   string::size_type i=0;
    while (i<str.size() && isspace(str[i])) ++i;
    str=str.substr(i);
 }
+
 string trimSpace(const string &str) {
    if (str.empty()) return str;
    string::size_type i,j; 
@@ -901,7 +921,7 @@ string chopFirstWord(const string &str) {
 
 void writeSequence(const string &seq, ostream &ous, const int width) 
 {
-	int i=0;
+   string::size_type i=0;
 	while (i<seq.length()) {
 		ous << seq.substr(i, width) << endl;
 		i += width;
@@ -926,7 +946,7 @@ vector<int> extractInt(const string &str) {
 
 string str2upper(const string &str) {
    string tmp(str);
-	for (int i=0; i<tmp.length(); i++)
+	for (string::size_type i=0; i<tmp.length(); i++)
 		tmp[i] = toupper(tmp[i]);
    return tmp;
 }

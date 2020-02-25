@@ -200,7 +200,7 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
    string line;
    // read the comment and discard them
    getline(IN, line);
-   while (!IN.eof() && line[0] == '#' || line.length()<2) {
+   while (!IN.eof() && (line[0] == '#' || line.length()<2)) {
       getline(IN, line);
    }
    unsigned int i;
@@ -230,7 +230,7 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
    // read the whole matrix
    while (!IN.eof() && !line.empty()) {
       row=dissect(line, " \t");
-      if (row.size() != numsymbol + 1) {
+      if ((int)row.size() != numsymbol + 1) {
          cerr << __FILE__ << ":" << __LINE__ << ":ERROR One row must have " << numsymbol << "elements\n";
          //exit(1);
          return false;
@@ -249,7 +249,7 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
       */
       r = hashfunc(row[0][0]);
 
-      for (i=0; i<numsymbol; i++) {
+      for (i=0; i < (unsigned)numsymbol; i++) {
          ss=atoi(row[i+1].c_str());
          if (ss > maxs) maxs=ss;
          if (ss < mins) mins=ss;
@@ -269,7 +269,7 @@ bool MatrixScoreMethod::read(int (*hashfunc)(char)) {
 
 void MatrixScoreMethod::deallocateWords() {
    if (words != nullptr) {
-      for (size_t i=0; i<wordsArraySize; i++) {
+      for (auto i=0; i<wordsArraySize; i++) {
          delete[] words[i];
       }
       delete[] words;
@@ -308,7 +308,7 @@ MatrixScoreMethod::MatrixScoreMethod(const MatrixScoreMethod& mt)
   : ScoreMethod(mt),
       path(mt.path), name(mt.name), 
       mat{0}, symb{' '}, numsymbol(mt.numsymbol),
-      maxs(mt.maxs), mins(mt.mins), 
+      mins(mt.mins), maxs(mt.maxs), 
       words(nullptr), wordsArraySize(0), wordSize(0)
 {
    setMatrix(mt.mat, 32);
@@ -407,8 +407,8 @@ void MatrixScoreMethod::show(ostream &ous, int (*hashfunc)(char)) const {
 void MatrixScoreMethod::growWord(const vector<string> &in, vector<string> &ou) const {
    if (!ou.empty()) ou.clear();
    //cerr << "growing words from " << in.size() << endl;
-   for (int i=0; i<in.size(); i++) {
-      for (int j=0; j<numsymbol; j++) {
+   for (size_t i=0; i<in.size(); i++) {
+      for (size_t j=0; j < (size_t)numsymbol; j++) {
          ou.push_back(in[i] + symb[j]);
      }
    }
@@ -548,7 +548,7 @@ int MatrixScoreMethod::similarWord_debug(ostream &ous, const char* w, int ws, in
       else selfscore=score;
    }
    vector<pair<char*, int> > neighborwords; 
-   for (int j=0; j<wordscore.size(); j++) {
+   for (j=0; j < (int)wordscore.size(); j++) {
       if (wordscore[j].second > fractioncutoff*selfscore) {
          neighborwords.push_back(wordscore[j]);
       }
@@ -556,7 +556,7 @@ int MatrixScoreMethod::similarWord_debug(ostream &ous, const char* w, int ws, in
    if (!neighborwords.empty()) {
       ous << "Words similar to " << w << " cutoff=" << cutoff << endl;
       ous << "selfscore=" << selfscore << " maxscore=" << maxscore << endl;
-      for (i=0; i<neighborwords.size(); i++) {
+      for (i=0; i< (int)neighborwords.size(); i++) {
          ous << neighborwords[i].first << "->" 
             << neighborwords[i].second << "; ";
       }
@@ -589,7 +589,7 @@ int MatrixScoreMethod::similarWord(vector<char*> &neighbor, const char* w, int w
    }
    if (!neighbor.empty()) neighbor.clear();
    //vector<pair<char*, int> > neighborwords; 
-   for (int j=0; j<wordscore.size(); j++) {
+   for (j=0; j < (int)wordscore.size(); j++) {
       if (wordscore[j].second > fractioncutoff*selfscore) {
          neighbor.push_back(wordscore[j].first);
       }
@@ -617,8 +617,8 @@ int MatrixScoreMethod::score(const int* x, const int* y, const int len) const {
 }
 
 void MatrixScoreMethod::setMatrix(const int source[][32], const int size) {
-   for (size_t i=0; i < size; i++) {
-      for (size_t j=0; j < size; j++) {
+   for (int i=0; i < size; i++) {
+      for (int j=0; j < size; j++) {
          mat[i][j]=source[i][j];
       }
    }

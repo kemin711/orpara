@@ -8,12 +8,12 @@ int Alnexaminer::w=30;
 
 void Alnexaminer::buildMovingSum() {
    int movingSum=0;
-   size_t i;
-   for (i=0; i<w; ++i) {
+   int i;
+   for (i=0; i < w; ++i) {
       if (middle[i] == idenchar) ++movingSum;
    }
    i=0;
-   while (i<middle.length()-w) {
+   while (i < (int)(middle.length()-w)) {
       wsum[i]=movingSum;
       if (middle[i+w] == idenchar) ++movingSum;
       else --movingSum;
@@ -25,15 +25,15 @@ void Alnexaminer::buildMovingSum() {
 
 bool Alnexaminer::allZeros(int i) {
    int leftIdx=(i-zeroZone) < 0 ? 0 : i-zeroZone;
-   int rightIdx=(i+zeroZone) > deriv.size() ? deriv.size() : i+zeroZone;
-   size_t k;
+   int rightIdx=(i+zeroZone) > (int)deriv.size() ? deriv.size() : i+zeroZone;
+   int k;
    for (k=leftIdx; k<i; ++k) {
       if (deriv[k] != 0) {
          return false;
       }
    }
    // the left are all zeros in zero zone
-   for (k=i+1; k<rightIdx; ++k) {
+   for (k=i+1; k < rightIdx; ++k) {
       if (deriv[k] != 0) {
          return false;
       }
@@ -43,8 +43,8 @@ bool Alnexaminer::allZeros(int i) {
 
 vector<int> Alnexaminer::findTransitionPoint() {
    vector<int> transition;
-   size_t i=0;
-   while (i<deriv.size()-w) {
+   int i=0;
+   while (i < int(deriv.size()-w)) {
       if (deriv[i] != 0) {
          if (allZeros(i)) { // not a boundary point
             i += zeroZone; continue;
@@ -52,9 +52,9 @@ vector<int> Alnexaminer::findTransitionPoint() {
          int sumL=0;
          int sumR=0;
          int Ileft = (i-w < 0) ? 0 : i-w;
-         int Iright = ((i+w) > deriv.size()) ? deriv.size() : i+w;
-         for (size_t j=Ileft; j<i; ++j) sumL += deriv[j]*deriv[j];
-         for (size_t j=i+1; j<Iright; ++j) sumR += deriv[j]*deriv[j];
+         int Iright = (i+w) > (int)deriv.size() ? deriv.size() : i+w;
+         for (int j=Ileft; j<i; ++j) sumL += deriv[j]*deriv[j];
+         for (int j=i+1; j<Iright; ++j) sumR += deriv[j]*deriv[j];
          if (abs(sumL - sumR) > 1) {
             transition.push_back(i);
             i += w;
@@ -85,7 +85,7 @@ int pairDiff(const pair<int,int> &p) {
 }
 
 void Alnexaminer::saveSegment(int bb, int ee) {
-   if (bb > middle.length()) {
+   if (bb > (int)middle.length()) {
       cerr << "bb outof range\n";
    }
    segment.push_back(Alnseg(bb, ee, computeIdentity(middle.substr(bb, ee-bb))));
@@ -99,39 +99,26 @@ bool Alnexaminer::findBoundary() {
    //cout << endl;
    // collect raw results
    vector<pair<int,int> > range;
-   size_t i=0;
-   while (i<transit.size()) {
+   int i=0;
+   while (i < (int)transit.size()) {
       int start=transit[i];
       int e=start;
       ++i;
-      while (i<transit.size() && transit[i] - e < 3*w) {
-         e = transit[i];
-         ++i;
+      while (i < (int)transit.size() && transit[i] - e < 3*w) {
+         e = transit[i]; ++i;
       }
-      //cout << start << "-" << e << endl;
       range.push_back(make_pair(start,e));
    }
    if (range.empty()) {  // some debug output
-      //cerr << middle << endl;
-      //cerr << "wsum:\n";
-      //copy(wsum.begin(), wsum.end(), ostream_iterator<int>(cerr, ", "));
-      //cerr << endl << "derivative\n";
-      //copy(deriv.begin(), deriv.end(), ostream_iterator<int>(cerr, ", "));
-      //cerr << endl << "transit points\n";
-      //copy(transit.begin(), transit.end(), ostream_iterator<int>(cerr, ", "));
-      //cerr << endl;
-      //cerr << "empty range! There is no boundayr. Alignment is uniform.\n";
       return false;
-      //throw runtime_error("empty range");
-
    }
    // move result to the nearest segment boundary
-   for (i=0; i<range.size(); ++i) {
+   for (i=0; i < (int)range.size(); ++i) {
       range[i].first += w;
-      while (range[i].first < middle.length() && middle[range[i].first] != ' ') 
+      while (range[i].first < (int)middle.length() && middle[range[i].first] != ' ') 
          ++(range[i].first);
       range[i].second += w;
-      if (range[i].second > middle.length()) {
+      if (range[i].second > (int)middle.length()) {
          range[i].second=middle.length();
       }
       if (int(middle.size())-int(range[i].second) < 3*w) {
@@ -139,7 +126,7 @@ bool Alnexaminer::findBoundary() {
       }
       else {
          range[i].second += 2*w;
-         if (range[i].second > middle.length()) 
+         if (range[i].second > (int)middle.length()) 
             range[i].second = middle.length();
          while (middle[range[i].second] != ' ') --range[i].second;
          ++(range[i].second);
@@ -149,7 +136,7 @@ bool Alnexaminer::findBoundary() {
    if (range.size() > 1) {
       vector<pair<int,int> > combined(1, range[0]);
       i=1;
-      while (i < range.size()) {
+      while (i < (int)range.size()) {
          if (range[i].first - combined.back().second < w) {
             combined.back().second = range[i].second;
          }
@@ -162,16 +149,18 @@ bool Alnexaminer::findBoundary() {
          range=combined;
    }
    // transform into final results
-   if (range[0].first > 0 && range[0].first < 2*w) { range[0].first=0; }
+   if (range[0].first > 0 && range[0].first < 2*w) { 
+      range[0].first=0; 
+   }
    int lastEnd=0;
-   for (i=0; i<range.size(); ++i) {
+   for (i=0; i < (int)range.size(); ++i) {
       if (range[i].first - lastEnd > 0) {
          saveSegment(lastEnd, range[i].first);
       }
       saveSegment(range[i].first, range[i].second);
       lastEnd=range[i].second;
    }
-   if (lastEnd < middle.length()) {
+   if (lastEnd < (int)middle.length()) {
       saveSegment(lastEnd, middle.length());
    }
    return true;

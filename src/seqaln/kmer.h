@@ -125,7 +125,13 @@ class KmerCount {
        * count will the number of kmer observed from input sequences.
        */
       vector<long double> count;
+      /**
+       * Kmer count for the reverse complement strand
+       */
       vector<long double> rccount;
+      /**
+       * Number of sequences used
+       */
       int numseq;
       long int totalkmer;
       mutable vector<double> freq, rcfreq;
@@ -148,7 +154,7 @@ class KmerCount {
        * c perameter does not seem to be used.
        * Look like a typo error.
        */
-      void operator()(const string &seq, int c);
+      //void operator()(const string &seq, int c);
       /**
        * Operator taking input sequences
        * @param seq the whole sequence to be digested into kmers

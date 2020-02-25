@@ -262,8 +262,14 @@ class bioseq {
       //virtual ~bioseq() { 
       virtual ~bioseq() { if (code != nullptr) delete[] code; }
 
+      /**
+       * restore this object to pure empty state
+       */
       void clear() { 
-         if (code != nullptr) delete[] code; code=nullptr; 
+         if (code != nullptr) {
+            delete[] code; 
+            code=nullptr; 
+         }
          seq.clear(); name.clear(); title.clear(); 
       }
 
@@ -420,15 +426,16 @@ class bioseq {
       void appendName(const string &aux) { name += aux; }
       void setTitle(const string &t) { title=t; }
       /**
-       * Add extra text to the title, add extra space.
+       * Add extra text to the title using space 
+       * as separator.
        */
-      void appendTitle(const string &aux) { title += " " + aux; }
+      //void appendTitle(const string &aux) { title += " " + aux; }
       /**
        * Usper specify the separator for the additional text
        * @para aux additional string to append to the end of title.
-       * @param sep seprator such as ', ' or '; '
+       * @param sep seprator such as ', ' or '; ', default is SPACE.
        */
-      void appendTitle(const string &aux, const string &sep);
+      void appendTitle(const string &aux, const string &sep="");
       bool hasTitle() const { return !title.empty(); }
       /**
        * @return the sequence id or name

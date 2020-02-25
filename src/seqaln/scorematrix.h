@@ -496,7 +496,7 @@ class MatrixScoreMethod : public ScoreMethod {
       /**
        * actual size of wordSize
        */
-      mutable int wordSize;  // recoreds the size of words
+      mutable int wordSize;  
 
       /**
        * Default installed matrix location.

@@ -578,7 +578,7 @@ string Range::asDelimitedString(const char delimiter) const {
 ////////////// RangeChain Class ////////////////////
 
 RangeChain::RangeChain(const RangeChain &ch) 
-   : chain(), sumolp(ch.sumolp) 
+   : Range(ch), chain(), sumolp(ch.sumolp) 
 {
    list<Range*>::const_iterator lit;
    for (lit=ch.chain.begin(); lit != ch.chain.end(); ++lit) {
@@ -591,21 +591,19 @@ RangeChain::~RangeChain() {
 	for (it=chain.begin(); it != chain.end(); it++) {
 		delete (*it);
 	}
-//	chain.clear();
 }
 
 RangeChain::RangeChain(const string &raw) {
    vector<string> r=split(raw, ',');
-   for (int i=0; i<r.size(); i++) {
-      //vector<string> tmp=split(r[i], '-');
-      int s = r[i].find('-');
+   //for (int i=0; i<r.size(); i++) {
+   for (auto& x : r) { // x should be b-e 123-567 format
+      string::size_type s = x.find('-');
       if (s == string::npos) {
-      //if (tmp.size() != 2) {
-         cerr << "input string must be in the format b1-e1,b2-e2,...\n";
-         exit(1);
+         cerr << __FILE__ << ":" << __LINE__ << ":ERROR input string must be in the format b1-e1,b2-e2,...\n";
+         throw runtime_error("input string for RangeChain " 
+               + raw + " not in format b1-e1,b2-e2,...");
       }
-      //chain.push_back(new Range(atoi(tmp[0].c_str()), atoi(tmp[1].c_str())));
-      chain.push_back(new Range(atoi(r[i].substr(0,s).c_str()), atoi(r[i].substr(s+1).c_str())));
+      chain.push_back(new Range(stoi(x.substr(0,s)), stoi(x.substr(s+1))));
    }
 }
 
@@ -625,19 +623,10 @@ RangeChain& RangeChain::operator=(const RangeChain &rc) {
    }
    return *this;
 }
-/** Several helper functions for sorting and find
- * operation on list<Range*>
- */
-//bool RangeAfterPtr(const Range *r1, const Range *r2) {
-//   return r1->compareDirectional(*r2) == 1;
-//}
+
 bool lessRangeByDirectional(const Range *r1, const Range *r2) {
    return r1->lessByDirection(r2);
 }
-//bool greaterRangeByDirectional(const Range *r1, const Range *r2) {
-//   return r1->greaterByDirection(r2);
-//}
-
 
 /** this one is doing the merging
  * If overlap with any exon then it will merge the underlying exon; otherwise
@@ -648,20 +637,12 @@ bool lessRangeByDirectional(const Range *r1, const Range *r2) {
  */
 void RangeChain::add(const Range &r, bool sd) {
 	list<Range*>::iterator it, b, del;
-	//typedef list<Range*>::iterator LIT;
-	//vector<LIT> savedit;
-   char dir=direction();
+   //char dir=direction();
    chain.sort(lessRangeByDirectional);
-   //if (dir == '+') chain.sort();
-   //else if (dir == '-') chain.sort(RangeAfterPtr);
-   //else {
-   //   cerr << "Bad state, not allowing mixed range directions\n";
-   //   exit(1);
-   //}
 
 	it=chain.begin();
 	int mergenum=0;
-   bool inserted=false;
+   //bool inserted=false;
 	int olp;
 	while (it != chain.end()) {
 		if ( (olp=(*it)->overlap(r,sd)) > 0 ) {

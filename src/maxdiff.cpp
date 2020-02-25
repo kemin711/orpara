@@ -1,12 +1,25 @@
 #include <iostream>
 #include "stddev.h"
 #include <vector>
-#
+#include <cstring>
 
 using namespace std;
 using namespace orpara;
 
+/**
+ * For testing partition function from stddev.h
+ */
 int main(int argc, char* argv[]) {
+   if (argc == 1) {
+      cerr << "testing no need for any arguments\n";
+   }
+   int i=1;
+   while (i < argc) {
+      if (!strcmp(argv[i], "--help")) {
+         cerr << "just a test\n";
+      }
+      ++i;
+   }
    vector<unsigned long> input{476232019, 487787336, 490498321, 500103870, 529907050, 540695814, 541056067, 546623159,
          552267810, 552818236, 557372854, 560951249, 565116326, 568780772, 574660216, 578322332,
          582110850, 595405819, 604857617, 618781588, 621258109, 623640992, 632250899, 632329067,

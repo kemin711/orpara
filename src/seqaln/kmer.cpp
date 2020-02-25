@@ -56,13 +56,15 @@ vector<int> Kmer::hashArray(const string &s, const int w) {
    vector<int> tmp(s.length()-w+1);
    // mask is 00011-w-111 total 64 bits
    unsigned int M=(2<<(2*w-1))-1;
-   size_t i;
+   int i;
    for (i=0; i<w; ++i) {
       v <<=2; 
       v |= b2i(s[i]);
    }
-   cout << "mask value: " << bitset<32>(M) << endl;
-   for (i=0; i<s.length()-w; ++i) {
+#ifdef DEBUG
+   cerr << "mask value: " << bitset<32>(M) << endl;
+#endif
+   for (i=0; i < (int)s.length()-w; ++i) {
       //cout << bitset<32>(v) << endl;
       tmp[i]=v;
       v <<=2;
@@ -70,8 +72,10 @@ vector<int> Kmer::hashArray(const string &s, const int w) {
       v &= M;
    }
    tmp[i]=v;
-   cout << "length of string: " << s.length()
+#ifdef DEBUG
+   cerr << __FILE__ << ":" << __LINE__ << ":INFO length of string: " << s.length()
       << " length of hash: " << tmp.size() << endl;
+#endif
    return tmp;
 }
 
@@ -94,14 +98,14 @@ void Kmer::buildMask(int mersz) {
 
 void Kmer::kmer2int() {
    // calculate kmer integer hash value for all kmers in the sequence
-   size_t i;
+   int i;
    unsigned int v=0;
    // build the intial hash value for the first kmer.
    for (i=0; i<k; ++i) {
       v <<= 2;
       v |= b2i(seq[i]);
    }
-   for (i=0; i<seq.length()-k; ++i) {
+   for (i=0; i < (int)seq.length()-k; ++i) {
       hashval[i]=v;
       v<<=2;
       v |= b2i(seq[i+k]);
@@ -190,9 +194,8 @@ void Kmer::showFragment() const {
 
 // simply accumulate kmer counts
 // forgot about location
+/*
 void KmerCount::operator()(const string &seq, int c) {
-   //cerr << "string:\n" << seq << endl;
-   //cerr << "length: " << seq.length() << endl;
    size_t i;
    unsigned int v=0;
     for (i=0; i<k; ++i) { // first kmer
@@ -226,7 +229,7 @@ void KmerCount::operator()(const string &seq, int c) {
 
 
 }
-
+*/
 
 void KmerCount::operator()(const string &seq) {
    //cerr << "string:\n" << seq << endl;

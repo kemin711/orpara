@@ -202,11 +202,11 @@ void findAllPepORFIndex(list<Range> &orfrange, const string &ss, unsigned int cu
    // Mi is the start, Si is the stop index
    if (!orfrange.empty()) orfrange.clear();
    unsigned int partialcut = max(cutoff/2, (unsigned)25);
-   int Si=-1;
+   string::size_type Si=0;
    string::size_type Mi;
-   while ((Mi = ss.find('M', unsigned(Si+1))) != string::npos) {
+   while (Si != string::npos && (Mi = ss.find('M', Si)) != string::npos) {
       Si=ss.find('*', Mi+1);
-      if ((unsigned)Si != string::npos) { // found stop *
+      if (Si != string::npos) { // found stop *
          if (Si-Mi > cutoff) {
             orfrange.push_back(Range(Mi,Si));
          }
@@ -217,16 +217,17 @@ void findAllPepORFIndex(list<Range> &orfrange, const string &ss, unsigned int cu
          }
          break;
       }
+      ++Si;
    }
    // no FULL ORF found, should not have limits,
    // should always find something
    if (orfrange.empty()) {
       if (ss.length() > partialcut+1) {
          Si=ss.find('*');
-         if ((unsigned)Si == string::npos) {
+         if (Si == string::npos) {
             orfrange.push_back(Range(0,ss.length()-1));
          }
-         else if ((unsigned)Si > partialcut) {
+         else if (Si > partialcut) {
             orfrange.push_back(Range(0,Si));
          }
       }
@@ -235,10 +236,10 @@ void findAllPepORFIndex(list<Range> &orfrange, const string &ss, unsigned int cu
    // if first full ORF starts after 100 there is a chance of a prefix-ORF
    if (orfrange.front().begin() > 90) {
       Si=ss.find('*');
-      if ((unsigned)Si != string::npos && Si < orfrange.front().begin()) {
+      if (Si != string::npos && (int)Si < orfrange.front().begin()) {
          // Stop before first full ORF over 100aa,
          // and N-partial ORF longer than 35
-         if ((unsigned)Si > partialcut && orfrange.front().begin()-Si > 90) {
+         if (Si > partialcut && orfrange.front().begin()-Si > 90) {
             orfrange.push_front(Range(0,Si));
          }
       }
@@ -904,7 +905,7 @@ void bioseq::appendTitle(const string &aux, const string &sep) {
       title = aux; 
    }
    else {
-      title += (", " + aux);
+      title += (sep + aux);
    }
 }
 
@@ -1422,7 +1423,8 @@ bool DNA::read(istream &ins) {
          throw bioseqexception("None nucleotide symbol in line: " + line + "|");
       }
 #endif
-      if (!line.empty() && line.find('U') != string::npos || line.find('u') != string::npos) {
+      if (!line.empty() && 
+            (line.find('U') != string::npos || line.find('u') != string::npos)) {
          for (size_t j=0; j < line.size(); ++j) {
             if (line[j] == 'U') line[j] = 'T';
             else if (line[j] == 'u') line[j] = 't';
@@ -1787,7 +1789,8 @@ bool Protein::hasInternalStop() const {
 }
 
 int Protein::countInternalStops() {
-   unsigned int i=0,j, count=0;
+   string::size_type i=0, j;
+   int count=0;
    while (i < seq.size()-1 && (j=seq.find("*", i)) != string::npos) {
       ++count;
       i=j+1;
