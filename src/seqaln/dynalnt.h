@@ -1525,7 +1525,7 @@ int Dynaln<T>::local() {
    int leftM=0; 
    int leftIx=0;
    int leftIy=0;
-   int CM, CIx, CIy, backptr, currScore; // current values
+   int CM=0, CIx=0, CIy=0, backptr, currScore; // current values
    /*
     * Use 3 arrays, plus left M,Ix,Iy to represent the 3 matrices: match, insert gap in X,
     * insert gap in Y.

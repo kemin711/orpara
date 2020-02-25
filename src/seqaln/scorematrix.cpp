@@ -534,7 +534,7 @@ int MatrixScoreMethod::similarWord_debug(ostream &ous, const char* w, int ws, in
       exit(1);
    }
    //cout << "Words similar to " << w << " cutoff=" << cutoff << endl;
-   int maxscore=0, selfscore;
+   int maxscore=0, selfscore=0;
    vector<pair<char*, int> > wordscore; 
    int i,j,k, score;
    for (k=0; k<wordsArraySize; k++) {
@@ -574,12 +574,13 @@ int MatrixScoreMethod::similarWord(vector<char*> &neighbor, const char* w, int w
       exit(1);
    }
    //int maxscore=0, selfscore;
-   int selfscore;
+   int selfscore=0;
    vector<pair<char*, int> > wordscore; 
    int i,j,k, score;
    for (k=0; k<wordsArraySize; k++) {
       score=0;
-      for (i=0; i<wordSize; i++) score += lookup(w[i], words[k][i]);
+      for (i=0; i<wordSize; i++) 
+          score += lookup(w[i], words[k][i]);
       if (strcmp(w, words[k])) {
          //if (score > maxscore) maxscore=score;
          if (score > cutoff)
@@ -594,17 +595,6 @@ int MatrixScoreMethod::similarWord(vector<char*> &neighbor, const char* w, int w
          neighbor.push_back(wordscore[j].first);
       }
    }
-   /*
-   if (!neighborwords.empty()) {
-      ous << "Words similar to " << w << " cutoff=" << cutoff << endl;
-      ous << "selfscore=" << selfscore << " maxscore=" << maxscore << endl;
-      for (i=0; i<neighborwords.size(); i++) {
-         ous << neighborwords[i].first << "->" 
-            << neighborwords[i].second << "; ";
-      }
-      ous << "\n------------------------------------\n";
-   }
-   */
    return neighbor.size();
 }
 

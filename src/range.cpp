@@ -720,7 +720,7 @@ pair<int,int> RangeChain::exonOverlap(const RangeChain &rc) const {
    list<Range*>::const_iterator i, j;
    i=chain.begin();
    j=rc.chain.begin();
-   int olp, sumolp=0, numolp=0;
+   int olp=0, sumolp=0, numolp=0;
    while (i != chain.end()) {
       j=rc.chain.begin();
       while (j != rc.chain.end() && (olp=(*i)->overlap(**j, true)) == 0) {
