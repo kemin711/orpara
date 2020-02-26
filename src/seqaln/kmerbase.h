@@ -36,7 +36,6 @@ template <int K> class KmerBase {
        */
       static unsigned int revcompKmerInt(unsigned int hv) {
          unsigned int hvc = (~hv);
-         size_t i;
          unsigned int res=(3&hvc);
          for (size_t i=0; i<K-1; ++i) {
             res <<= 2;

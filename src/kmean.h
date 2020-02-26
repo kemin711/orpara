@@ -43,7 +43,7 @@ template<class T> class Kmean {
       }
 
       ~Kmean() {
-         for (int i=0; i<centroid.size(); ++i) {
+         for (size_t i=0; i<centroid.size(); ++i) {
             delete[] centroid[i];
             //delete[] new_centriod[i];
          }
@@ -63,7 +63,7 @@ template<class T> class Kmean {
          data[0].assign(centroid[0]);
          data[data.size()-1].assign(centroid[1]);
          set<int> used;
-         for (int i=2; i< centroid.size(); ++i) {
+         for (size_t i=2; i< centroid.size(); ++i) {
             if (i == 2) {
                data[data.size()/2].assign(centroid[2]);
                used.insert(data.size()/2);
@@ -108,7 +108,7 @@ template<class T> class Kmean {
 
       list<vector<T>> getCluster() const {
          list<vector<T>> res;
-         for (int c=0; c<cluster.size(); ++c) {
+         for (size_t c=0; c<cluster.size(); ++c) {
             vector<T> tmp; tmp.reserve(cluster[c].size());
             for (T* p : cluster[c]) {
                tmp.push_back(*p);
@@ -152,29 +152,22 @@ template<class T> void Kmean<T>::divide() {
    for (auto& c : cluster) {
       c.clear();
    }
-   //cout << data.size() << " data points\n";
-   //showCentroid(cout);
-   for (int i=0; i < data.size(); ++i) {
+   for (size_t i=0; i < data.size(); ++i) {
       double mindist=numeric_limits<double>::max();
-      for (int j=0; j < centroid.size(); ++j) {
+      for (size_t j=0; j < centroid.size(); ++j) {
          double d = data[i].distance(centroid[j]);
          if (d < mindist) {
             mindist=d; minj=j;
          }
       }
-      //cout << "data " << i << " is closest to centroid "
-      //   << minj <<  " distance " << mindist << endl;
       cluster[minj].push_back(&data[i]);
    }
-   //for (int c=0; c < cluster.size(); ++c) {
-   //   cout << "cluster " << c << " has " << cluster[c].size() << " members\n";
-   //}
 }
 
 template<class T> double Kmean<T>::update() {
    double point[T::dimension];
    double sumDiff=0;
-   for (int c=0; c<centroid.size(); ++c) {
+   for (size_t c=0; c<centroid.size(); ++c) {
       Stddev<T::dimension> avgCenter;
       for (const T* ptr : cluster[c]) {
          ptr->assign(point);
