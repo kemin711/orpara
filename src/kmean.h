@@ -147,7 +147,7 @@ template<class T> class Kmean {
 };
 
 template<class T> void Kmean<T>::divide() {
-   int minj;
+   int minj=-1; // impossible value 
    // clear each cluster
    for (auto& c : cluster) {
       c.clear();
