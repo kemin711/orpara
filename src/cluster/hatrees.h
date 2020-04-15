@@ -253,11 +253,11 @@ template<class T> class Hatrees
       vector<set<T>> getClusterAsSet() const;
 
 #ifdef USE_HASH_MAP
-	typedef typename hash_map<T, HNode<T>* >::iterator niterator;
-	typedef typename hash_map<T, HNode<T>* >::const_iterator const_niterator;
+      typedef typename hash_map<T, HNode<T>* >::iterator niterator;
+      typedef typename hash_map<T, HNode<T>* >::const_iterator const_niterator;
 #else
-	typedef typename map<T, HNode<T>* >::iterator niterator;
-	typedef typename map<T, HNode<T>* >::const_iterator const_niterator;
+      typedef typename map<T, HNode<T>* >::iterator niterator;
+      typedef typename map<T, HNode<T>* >::const_iterator const_niterator;
 #endif
 
 	private:
@@ -284,6 +284,7 @@ template<class T> class Hatrees
 };
 
 ////////// Hatrees class template methods //////////////////////////
+
 template<class T> Hatrees<T>::~Hatrees() { 
 	niterator MI = nodes.begin();
 	while (MI != nodes.end()) {
@@ -294,14 +295,15 @@ template<class T> Hatrees<T>::~Hatrees() {
 
 template<class T> void Hatrees<T>::readFromMap(const std::multimap<T, T> &m) {
 	pair<niterator, bool> p1, p2;
-	//T f1, f2; 
-	typename std::multimap<T, T>::const_iterator imi = m.begin();
-
+   HNode<T>* tmpPtr=nullptr;
+   auto imi = m.begin();
 	while (imi != m.end()) {
-		//f1 = imi->first;
-		//f2 = imi->second;
-		p1 = nodes.insert(pair<T, HNode<T>* >(imi->first, new HNode<T>(imi->first)));
-		p2 = nodes.insert(pair<T, HNode<T>* >(imi->second, new HNode<T>(imi->second)));
+      tmpPtr = new HNode<T>(imi->first);
+		p1 = nodes.insert(make_pair(imi->first, tmpPtr));
+      if (!p1.second) delete tmpPtr;
+      tmpPtr = new HNode<T>(imi->second);
+		p2 = nodes.insert(make_pair(imi->second, tmpPtr));
+      if (!p2.second) delete tmpPtr;
 		join(p1.first->second, p2.first->second);
 		imi++;
 	}
@@ -316,13 +318,18 @@ template<class T> void Hatrees<T>::readFromFile(const string &file) {
 	string ln;
 	pair<niterator, bool> p1, p2;
 	T f1, f2; 
+   HNode<T>* tmpPtr;
 
 	getline(IN, ln);
 	while (!IN.eof()) {
 		istringstream ist(ln);
 		ist >> f1 >> f2;
-		p1 = nodes.insert(pair<T, HNode<T>* >(f1, new HNode<T>(f1)));
-		p2 = nodes.insert(pair<T, HNode<T>* >(f2, new HNode<T>(f2)));
+      tmpPtr = new HNode<T>(f1);
+		p1 = nodes.insert(make_pair(f1, tmpPtr));
+      if (!p1.second) delete tmpPtr;
+      tmpPtr = new HNode<T>(f2);
+		p2 = nodes.insert(pair<T, HNode<T>* >(f2, tmpPtr));
+      if (!p2.second) delete tmpPtr;
 		join(p1.first->second, p2.first->second);
 		getline(IN, ln);
 	}
