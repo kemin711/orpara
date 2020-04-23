@@ -298,6 +298,7 @@ template<class T> void Hatrees<T>::readFromMap(const std::multimap<T, T> &m) {
    HNode<T>* tmpPtr=nullptr;
    auto imi = m.begin();
 	while (imi != m.end()) {
+      // cold do look up then insert not sure which is better
       tmpPtr = new HNode<T>(imi->first);
 		p1 = nodes.insert(make_pair(imi->first, tmpPtr));
       if (!p1.second) delete tmpPtr;
