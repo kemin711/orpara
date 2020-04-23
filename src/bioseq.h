@@ -273,7 +273,8 @@ class bioseq {
          seq.clear(); name.clear(); title.clear(); 
       }
 
-      /** change the underlying sequence
+      /** 
+       * change the underlying sequence
        */
       void assign(const string &s) { 
          seq=s; 
@@ -284,8 +285,11 @@ class bioseq {
       }
       /**
        * alias for assign
+       * Update the underlying sequence with s.
+       * @param s input sequence
        */
       void setSequence(const string &s) { assign(s); }
+      void setSequence(string &&s);
 
       ///////////////// input function //////////////////////
       

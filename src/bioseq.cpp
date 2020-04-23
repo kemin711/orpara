@@ -909,6 +909,22 @@ void bioseq::appendTitle(const string &aux, const string &sep) {
    }
 }
 
+void bioseq::assign(string &&s) { 
+   seq=std::move(s); 
+   if (code != nullptr) { // lazy action
+      delete[] code;
+      code=nullptr;
+   } 
+}
+
+void bioseq::setSequence(string &&s) {
+   seq=std::move(s); 
+   if (code != nullptr) { // lazy action
+      delete[] code;
+      code=nullptr;
+   } 
+}
+
 //////////////   DNA Class ////////////////////////////
 
 
