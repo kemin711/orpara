@@ -524,6 +524,12 @@ class Dynaln {
        * @return total gap length in the second sequence.
        */
       int getGaplen2() const { return gaplen2; }
+      /**
+       * Edit distance is the alignment length - identical count
+       */
+      int getEditDistance() const {
+         return getAlnlen() - getIdentical();
+      }
 
       /**
        * The aligned portion has no gap and 100% identity
@@ -547,6 +553,16 @@ class Dynaln {
        *         of a matched pair of residues.
        */
       const list<pair<int, int> >& getAlnindex() const { return alnidx; }
+      /**
+       * @return the alignment detail in Cigar format as defined in Samtools
+       *   using seq1 as reference.
+       */
+      vector<pair<char,int>> getCigar1() const;
+      /**
+       * @return the alignment detail in Cigar format as defined in Samtools
+       *   using seq2 as reference.
+       */
+      vector<pair<char,int>> getCigar2() const;
       vector<pair<int, int> > getAlnindexVector() const {
          return vector<pair<int,int> >(alnidx.begin(), alnidx.end());
       }
@@ -894,7 +910,7 @@ class Dynaln {
        * alnidx contains the final alignment result.
        * This is the primary result of the alignment algorithm.
        *
-       * The numbers are the index in the two sequences.
+       * The numbers are the indices in the two sequences.
        * -1 for a gap.
        * we can print this result in many different ways
        * Many secondary results are computed from this data structure.
@@ -2015,6 +2031,89 @@ pair<string,string> Dynaln<T>::getNucleicConsensus2() const {
    else {
       return pair<string, string>(tmpt, tmpb);
    }
+}
+
+template<class T> vector<pair<char,int>> Dynaln<T>::getCigar1() const {
+   vector<pair<char,int>> res;
+   list<pair<int,int>>::const_iterator i=alnidx.cbegin();
+   if (topBeginIndex() > 0) {
+      res.push_back(make_pair('S', topBeginIndex()));
+   }
+   char C;
+   int cnt;
+   while (i != alnidx.cend()) {
+      cnt=0;
+      if (i->first > -1) {
+         if (i->second > -1) {
+            C='M';
+            while (i != alnidx.cend() && i->first > -1 && i->second > -1) {
+               ++cnt; ++i;
+            }
+         }
+         else { // seq2 is gap
+            C='D';
+            while (i != alnidx.cend() && i->first > -1 && i->second == -1) {
+               ++cnt; ++i;
+            }
+         }
+      }
+      else { // seq1 is gap, seq2 cannot be gap
+         if (i->second == -1) {
+            throw runtime_error("not possible for two gaps to algin");
+         }
+         C='I';
+         while (i != alnidx.cend() && i->first == -1 && i->second > -1) {
+            ++cnt; ++i;
+         }
+      }
+      res.push_back(make_pair(C, cnt));
+   }
+   if (topEndIndex() < seq1->length()-1) { // end with soft clip
+      res.push_back(make_pair('S', seq1->length()-1-topEndIndex()));
+   }
+   return res;
+}
+
+template<class T> 
+vector<pair<char,int>> Dynaln<T>::getCigar2() const {
+   vector<pair<char,int>> res;
+   list<pair<int,int>>::const_iterator i=alnidx.cbegin();
+   if (bottomBeginIndex() > 0) {
+      res.push_back(make_pair('S', bottomBeginIndex()));
+   }
+   char C;
+   int cnt;
+   while (i !=  alnidx.cend()) {
+      cnt=0;
+      if (i->first > -1) {
+         if (i->second > -1) {
+            C='M';
+            while (i != alnidx.cend() && i->first > -1 && i->second > -1) {
+               ++cnt; ++i;
+            }
+         }
+         else { // seq2 is gap
+            C='I';
+            while (i != alnidx.cend() && i->first > -1 && i->second == -1) {
+               ++cnt; ++i;
+            }
+         }
+      }
+      else { // seq1 is gap, seq2 cannot be gap
+         if (i->second == -1) {
+            throw runtime_error("not possible for two gaps to algin");
+         }
+         C='D';
+         while (i != alnidx.cend() && i->first == -1 && i->second > -1) {
+            ++cnt; ++i;
+         }
+      }
+      res.push_back(make_pair(C, cnt));
+   }
+   if (bottomEndIndex() < seq2->length()-1) { // end with soft clip
+      res.push_back(make_pair('S', seq2->length()-1-bottomEndIndex()));
+   }
+   return res;
 }
 
 template<class T>
