@@ -283,6 +283,7 @@ class bioseq {
             code=nullptr;
          } 
       }
+      void assign(string&& s);
       /**
        * alias for assign
        * Update the underlying sequence with s.
