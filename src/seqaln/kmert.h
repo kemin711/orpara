@@ -34,7 +34,7 @@ namespace orpara {
  * storing the location information.
  * @see KmerCount
  */
-template<int K> 
+template<unsigned int K> 
 class Kmert : public KmerBase<K> {
    private:
       /**
@@ -51,7 +51,7 @@ class Kmert : public KmerBase<K> {
        * hashed kmer interger value for position from 0 to L-k+1
        * This is tied to the input sequence length.
        */
-      vector<int> hashval;
+      vector<uint64_t> hashval;
       /** 
        * The locations of each kmer in the input sequence.
        * First index is the kmer's hash value.
@@ -127,7 +127,7 @@ class Kmert : public KmerBase<K> {
       /**
        * obtain the result
        */
-      const vector<int>& getHashValue() const {
+      const vector<uint64_t>& getHashValue() const {
          return hashval;
       }
 
