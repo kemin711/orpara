@@ -2110,7 +2110,7 @@ vector<pair<char,int>> Dynaln<T>::getCigar2() const {
       }
       res.push_back(make_pair(C, cnt));
    }
-   if (bottomEndIndex() < seq2->length()-1) { // end with soft clip
+   if (bottomEndIndex() < int(seq2->length()-1)) { // end with soft clip
       res.push_back(make_pair('S', seq2->length()-1-bottomEndIndex()));
    }
    return res;
