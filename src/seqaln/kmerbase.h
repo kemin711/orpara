@@ -53,6 +53,29 @@ template <int K> class KmerBase {
          return v;
       }
 
+      static string oneMer2String(uint64_t merval) {
+         string tmp(K, 'A');
+         int i=K-1;
+         while (i > -1) {
+            unsigned int code = (merval & 3U);
+            if (code == 1U) {
+               tmp[i]='C';
+            }
+            else if (code == 2U) {
+               tmp[i]='G';
+            }
+            else if (code == 3U) {
+               tmp[i]='T';
+            }
+            else {
+               throw illigal_argument("bad character code: " + to_string(code));
+            }
+            merval >>= 2;
+            --i;
+         }
+         return tmp;
+      }
+
       /**
        * This method should not be used for performance.
        * Instead copy paste this piece of code for particular 
