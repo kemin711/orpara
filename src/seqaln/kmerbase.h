@@ -53,15 +53,20 @@ template <int K> class KmerBase {
          return v;
       }
 
-      static uint64_t* chop(const string& seq) {
+      /**
+       * This method should not be used for performance.
+       * Instead copy paste this piece of code for particular 
+       * situations.
+       */
+      static uint64_t* kmerize(const string& seq) {
          uint64_t* res = new uint64_t[seq.size()-K+1];
          int i;
          uint64_t v=0;
-         for (i=0; i<K-1; ++i) { // first kmer except the last base
+         for (i=0; i<K; ++i) { // first kmer except the last base
             v <<= 2;
             v |= base2int(seq[i]);
          }
-         for (i=0; i < seq.length()-K+1; ++i) { // rolling update
+         for (i=0; i < seq.length()-K; ++i) { // rolling update
             v<<=2;
             v |= base2int(seq[i+K]);
             v &= mask;
@@ -101,7 +106,7 @@ template <int K> class KmerBase {
       static uint64_t getLeftMask() { return maskL; }
       static uint64_t getRightMask() { return maskR; }
 
-   protected:
+   public:
       /** 
        * mask is pow(4,K)-1 
        * 1000...0 63 0's
@@ -110,25 +115,25 @@ template <int K> class KmerBase {
        * K=3  --6---
        * 00000111111
        */
-      static uint64_t mask;
+      static const uint64_t mask;
       /**
        * K-1 left word from kmer
        * For K=3
        * 111100
        */
-      static uint64_t maskL;
+      static const uint64_t maskL;
       /**
        * K-1 right word from kmer
        * For K=3
        * 001111
        */
-      static uint64_t maskR;
+      static const uint64_t maskR;
 };
 
 template<int K>
-uint64_t KmerBase<K>::mask = ((~uint64_t(0))<<(64-2*K))>>(64-2*K);
-template<int K> uint64_t KmerBase<K>::maskL=KmerBase<K>::mask << 2;
-template<int K> uint64_t KmerBase<K>::maskR=KmerBase<K>::mask >> 2;
+const uint64_t KmerBase<K>::mask = ((~uint64_t(0))<<(64-2*K))>>(64-2*K);
+template<int K> const uint64_t KmerBase<K>::maskL=KmerBase<K>::mask << 2;
+template<int K> const uint64_t KmerBase<K>::maskR=KmerBase<K>::mask >> 2;
 
 
 #endif
