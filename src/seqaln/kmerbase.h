@@ -67,9 +67,9 @@ template <int K> class KmerBase {
             else if (code == 3U) {
                tmp[i]='T';
             }
-            else {
-               throw illigal_argument("bad character code: " + to_string(code));
-            }
+            //else {  // 0 for A default nothing needs to be done
+            //   throw illigal_argument("bad character code: " + to_string(code));
+            //}
             merval >>= 2;
             --i;
          }
