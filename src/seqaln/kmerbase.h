@@ -53,6 +53,9 @@ template <int K> class KmerBase {
          return v;
       }
 
+      /**
+       * K mer to string
+       */
       static string oneMer2String(uint64_t merval) {
          string tmp(K, 'A');
          int i=K-1;
@@ -68,7 +71,33 @@ template <int K> class KmerBase {
                tmp[i]='T';
             }
             else {
-               throw illigal_argument("bad character code: " + to_string(code));
+               throw invalid_argument("bad character code: " + to_string(code));
+            }
+            merval >>= 2;
+            --i;
+         }
+         return tmp;
+      }
+
+      /**
+       * K-1 mer to string
+       */
+      static string oneM1mer2String(uint64_t merval) {
+         string tmp(K-1, 'A');
+         int i=K-2;
+         while (i > -1) {
+            unsigned int code = (merval & 3U);
+            if (code == 1U) {
+               tmp[i]='C';
+            }
+            else if (code == 2U) {
+               tmp[i]='G';
+            }
+            else if (code == 3U) {
+               tmp[i]='T';
+            }
+            else {
+               throw invalid_argument("bad character code: " + to_string(code));
             }
             merval >>= 2;
             --i;
