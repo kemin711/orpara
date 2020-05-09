@@ -196,19 +196,16 @@ void Kmert<K>::kmer2int() {
    size_t i;
    unsigned int v=0;
    // build the intial hash value for the first kmer.
-   for (i=0; i<K; ++i) {
+   for (i=0; i<K-1; ++i) {
       v <<= 2;
-      //v |= b2i(seq[i]);
       v |= base2int(seq[i]);
    }
-   for (i=0; i<seq.length()-K; ++i) {
-      hashval[i]=v;
+   for (i=0; i<seq.length()-K+1; ++i) {
       v<<=2;
-      //v |= b2i(seq[i+K]);
       v |= base2int(seq[i+K]);
       v &= mask;
+      hashval[i]=v;
    }
-   hashval[i]=v;
 }
 
 template<int K>
