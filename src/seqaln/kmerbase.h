@@ -62,11 +62,11 @@ template <int K> class KmerBase {
          uint64_t* res = new uint64_t[seq.size()-K+1];
          int i;
          uint64_t v=0;
-         for (i=0; i<K; ++i) { // first kmer except the last base
+         for (i=0; i<K-1; ++i) { // first kmer except the last base
             v <<= 2;
             v |= base2int(seq[i]);
          }
-         for (i=0; i < seq.length()-K; ++i) { // rolling update
+         for (i=0; i < seq.length()-K+1; ++i) { // rolling update
             v<<=2;
             v |= base2int(seq[i+K]);
             v &= mask;
