@@ -37,6 +37,7 @@ template <int K> class KmerBase {
                return -1;
          }
       }
+      static const char[4] int2base;
       /**
        * For building the first kmer
        */
@@ -186,6 +187,7 @@ template<int K>
 const uint64_t KmerBase<K>::mask = ((~uint64_t(0))<<(64-2*K))>>(64-2*K);
 template<int K> const uint64_t KmerBase<K>::maskL=KmerBase<K>::mask << 2;
 template<int K> const uint64_t KmerBase<K>::maskR=KmerBase<K>::mask >> 2;
+template<int K> const char[4] KmerBase<K>::int2base{'A', 'C', 'G', 'T'};
 
 
 #endif
