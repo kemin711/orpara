@@ -216,6 +216,7 @@ class MatrixScoreMethod : public ScoreMethod {
        * Default matrix constructor.
        * Only intialize the gap paremeter according to the parent class
        * initializer. will set the default path to the matrix directory.
+       * gapopen=-20 gapextend=-1 inherited from ScoreMethod
        */
       MatrixScoreMethod() 
          : ScoreMethod(), path(default_path), name(), mat{0}, 
@@ -224,6 +225,8 @@ class MatrixScoreMethod : public ScoreMethod {
             words(nullptr), wordsArraySize(0), wordSize(0) { }
       /**
        * Fixed gap open and gap extension.
+       * @param go gap open score
+       * @param ge gap extention score
        */
       MatrixScoreMethod(int go, int ge) 
          : ScoreMethod(go, ge), path(default_path), name(), mat{0}, 
@@ -621,12 +624,19 @@ class ProteinScoreMethod : public MatrixScoreMethod {
 class NucleicScoreMethod : public MatrixScoreMethod {
    public:
       // the default_numsymbol needs to be checked!
+      /**
+       * Gapopen=-20, Gapextend=-1 inherited from MatrixScoreMethod
+       */
       NucleicScoreMethod() 
          : MatrixScoreMethod() 
       { 
          copyFrom(default_name, default_symb, default_numsymbol, default_mat); 
       }
 
+      /**
+       * @param go gap open score
+       * @param ge gat extend score
+       */
       NucleicScoreMethod(int go, int ge) 
          : MatrixScoreMethod(go, ge) 
       {
