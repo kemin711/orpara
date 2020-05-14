@@ -2068,7 +2068,7 @@ template<class T> vector<pair<char,int>> Dynaln<T>::getCigar1() const {
       }
       res.push_back(make_pair(C, cnt));
    }
-   if (topEndIndex() < seq1->length()-1) { // end with soft clip
+   if (topEndIndex() < int(seq1->length()-1)) { // end with soft clip
       res.push_back(make_pair('S', seq1->length()-1-topEndIndex()));
    }
    return res;
