@@ -2036,8 +2036,8 @@ pair<string,string> Dynaln<T>::getNucleicConsensus2() const {
 template<class T> vector<pair<char,int>> Dynaln<T>::getCigar1() const {
    vector<pair<char,int>> res;
    list<pair<int,int>>::const_iterator i=alnidx.cbegin();
-   if (topBeginIndex() > 0) {
-      res.push_back(make_pair('S', topBeginIndex()));
+   if (bottomBeginIndex() > 0) {
+      res.push_back(make_pair('S', bottomBeginIndex()));
    }
    char C;
    int cnt;
@@ -2068,8 +2068,8 @@ template<class T> vector<pair<char,int>> Dynaln<T>::getCigar1() const {
       }
       res.push_back(make_pair(C, cnt));
    }
-   if (topEndIndex() < int(seq1->length()-1)) { // end with soft clip
-      res.push_back(make_pair('S', seq1->length()-1-topEndIndex()));
+   if (bottomEndIndex() < int(seq2->length()-1)) { // end with soft clip
+      res.push_back(make_pair('S', seq2->length()-1-bottomEndIndex()));
    }
    return res;
 }
@@ -2078,8 +2078,8 @@ template<class T>
 vector<pair<char,int>> Dynaln<T>::getCigar2() const {
    vector<pair<char,int>> res;
    list<pair<int,int>>::const_iterator i=alnidx.cbegin();
-   if (bottomBeginIndex() > 0) {
-      res.push_back(make_pair('S', bottomBeginIndex()));
+   if (topBeginIndex() > 0) {
+      res.push_back(make_pair('S', topBeginIndex()));
    }
    char C;
    int cnt;
@@ -2110,8 +2110,8 @@ vector<pair<char,int>> Dynaln<T>::getCigar2() const {
       }
       res.push_back(make_pair(C, cnt));
    }
-   if (bottomEndIndex() < int(seq2->length()-1)) { // end with soft clip
-      res.push_back(make_pair('S', seq2->length()-1-bottomEndIndex()));
+   if (topEndIndex() < int(seq1->length()-1)) { // end with soft clip
+      res.push_back(make_pair('S', seq1->length()-1-topEndIndex()));
    }
    return res;
 }
