@@ -56,7 +56,7 @@ void alignProtein(const int gapOpen, const int gapExtend, const bioseq &p1, cons
 void alignDNA(const int gapo, const int gape, const DNA &dna1, const DNA &dna2,
       const int seq1begin, const int seq2begin, ostream &ous);
 void alignSimple(const bioseq &s1, const bioseq &s2,
-      const int seq1begin, const int seq2begin, ostream &ous);
+      const int seq1begin, const int seq2begin, ostream &ous, const int gapo, const int gape);
 /**
  * This method is only for DNA sequences.
  * It will align the rc of the second sequence if the forward direction
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
    string file1, file2, outfile;
    int reverseComplement = 0;
    int seq1begin=1, seq1end=-1, seq2begin=1, seq2end=-1;
-   int gapOpen = 1;
+   int gapOpen = 40;
    int gapExtend = 1;
    bool simpleMethod = true;
    bool SELF_ALIGN=false;
@@ -154,16 +154,20 @@ int main(int argc, char *argv[]) {
       else if (reverseComplement > 0) {
          cerr << "you can only use 1 or 2 for the -r option\n";
       }
-      if (simpleMethod) 
-         alignSimple(dna1, dna2, seq1begin, seq2begin, ouf);
-      else 
+      if (simpleMethod) {
+         cerr << "using simple methods for DNA\n";
+         alignSimple(dna1, dna2, seq1begin, seq2begin, ouf, gapOpen, gapExtend);
+      }
+      else {
          alignDNA(gapOpen, gapExtend, dna1, dna2, seq1begin, seq2begin, ouf);
+      }
    }
    else { // protein align
       if (simpleMethod) 
-         alignSimple(seq1, seq2, seq1begin, seq2begin, ouf);
-      else 
+         alignSimple(seq1, seq2, seq1begin, seq2begin, ouf, gapOpen, gapExtend);
+      else {
          alignProtein(gapOpen, gapExtend, seq1, seq2, seq1begin, seq2begin, ouf);
+      }
    }
    cout << "aligment written to file: " << outfile << endl;
 
@@ -267,8 +271,11 @@ int alignSimpleSelf(const string &seqfile, const Progparam &param, const string 
 
 
 void alignSimple(const bioseq &s1, const bioseq &s2,
-      const int seq1begin, const int seq2begin, ostream &ous) {
-   SimpleScoreMethod sm(10, -11, -40, -1);
+      const int seq1begin, const int seq2begin, ostream &ous, int gapo, int gape) 
+{
+   if (gapo > 0) gapo *= -1;
+   if (gape > 0) gape *= -1;
+   SimpleScoreMethod sm(10, -11, gapo, gape);
    Dynaln<SimpleScoreMethod> aln(s1, s2);
    aln.setMatrix(sm);
    aln.runlocal(seq1begin-1, seq2begin-1);
