@@ -279,6 +279,8 @@ class Dynaln {
        *                     2  
        *                    topBeginIndex() is 19 not 0
        * @param delta1 the marking of the position of the first sequence.
+       *
+       * Note: this method calls buildAlnInfo()
        */
       void buildResult(const int delta1=0, const int delta2=0);
       /** This method will build the alignment information
@@ -341,6 +343,9 @@ class Dynaln {
        *   represented by the first sequence. 
        */
       const bioseq& getTopSequence() const { return *seq1; }
+      /**
+       * @return a pointer to const bioseq of sequence 1
+       */
       const bioseq* getSeq1() const {
          return seq1;
       }
@@ -529,6 +534,67 @@ class Dynaln {
        */
       int getEditDistance() const {
          return getAlnlen() - getIdentical();
+      }
+      /**
+       * Helper function to Delete one gap
+       * @return true if numgaps1 or numgaps2 is zero;
+       */
+      bool removeOneGap() {
+         --gaplen1;
+         --gaplen2;
+         if (gaplen1 < 1) {
+            cerr << "gaplen1 is zero now\n";
+            --numgaps1;
+         }
+         if (gaplen2 < 1) --numgaps2;
+         if (numgaps1 < 1 || numgaps2 < 1) { // done
+            if (!topaln.empty()) { 
+               cerr << "topaln is empty rebuildAlinifo()\n";
+               //buildAlnInfo();
+            }
+            else {
+               cerr << "no need to rebuild align info\n";
+            }
+            return true;
+         }
+         return false;
+      }
+
+      /**
+       * @return true if fixed at least one stagger gap
+       */
+      bool fixStagger() {
+         if (numgaps1 < 1 || numgaps2 < 1) return false;
+         list<pair<int,int>>::iterator it, last;
+         it = std::next(alnidx.begin());
+         last = std::prev(alnidx.end());
+         bool gapfixed=false;
+         while (it != last) {
+            if (it->first == -1) {
+               if (prev(it)->second == -1) { // staggered gap
+                  // ACG--CGGT ==afterfix=> ACG-CGGT
+                  // TT-ACGTAC              TTACGTAC
+                  prev(it)->second = it->second;
+                  it = alnidx.erase(it);
+                  if (removeOneGap())  return true;
+                  gapfixed=true;
+               }
+               else if (next(it)->second == -1) {
+                  // ACG--TACGGT ==afterfix=> ACG-TACGGT
+                  // TCGAC-ACGTT              TCGACACGTT
+                  next(it)->second = it->second;
+                  it = alnidx.erase(it);
+                  if (removeOneGap()) return true;
+                  gapfixed=true;
+               }
+            }
+            else {
+               if (it->second == -1) {
+               }
+            }
+            ++it;
+         }
+         return gapfixed;
       }
 
       /**
@@ -797,7 +863,9 @@ class Dynaln {
       void showParameters() const;
 
    protected:
-      /** set gap values */
+      /** 
+       * set gap values for gaplen1, gaplen2, numgaps1, and numgaps2
+       */
       void countnumgaps();
       /** this method is used to clear secondary results that
        * are derived from the first phase of alignment (usually
@@ -999,7 +1067,8 @@ class LSDynaln : public Dynaln<T> {
       LSDynaln(const bioseq &s1, const bioseq &s2, const string &mat) 
          : Dynaln<T>(s1, s2, mat) { }
       ~LSDynaln();
-      /** the linear space version
+      /** 
+       * Linear space version of dynamic alignment of two sequences.
        * b1: begin index of sequence1 (0-based index)
        * e1: one-passed the end index of sequence1 (0-based index)
        * @return the best score
@@ -1012,10 +1081,6 @@ class LSDynaln : public Dynaln<T> {
       int runlocal(const int delta1=0, const int delta2=0) {
          local(); buildResult(delta1, delta2); return this->Smax; 
       }
-      //void global();
-      /* globalLS in reverse direction
-       */
-      //int globalR(int b1, int e1, int b2, int e2);
       
       /* b1, e1, b2, and e2 are 0-based index of the 
        * first and the second sequences respectively.
@@ -1104,8 +1169,6 @@ class LSDynaln : public Dynaln<T> {
        */
       void allocmem();
       int *MR, *IXR, *IYR;
-      //int *SR;  // for LOCAL this is used to memorize the traceback pointer
-      //int *ItopR; // not used in local
 };
 
 //////////// class definition ///////////////////////////
@@ -1699,22 +1762,32 @@ int Dynaln<T>::local() {
 
 template<class T>
 void Dynaln<T>::countnumgaps() {
-   list<pair<int,int> >::const_iterator li=alnidx.begin();
+   list<pair<int,int> >::const_iterator li=alnidx.cbegin();
    numgaps1=0;
    numgaps2=0;
+   gaplen1=0;
+   gaplen2=0;
    if (alnidx.empty()) return;
-   while (li != alnidx.end()) {
+   while (li != alnidx.cend()) {
       if (li->first == -1) {
+         ++gaplen1;
          ++numgaps1;
-         while (li != alnidx.end() && li->first == -1) ++li;
+         ++li;
+         while (li != alnidx.cend() && li->first == -1) {
+            ++gaplen1; ++li;
+         }
       }
       else ++li;
    }
-   li=alnidx.begin();
-   while (li != alnidx.end()) {
+   li=alnidx.cbegin();
+   while (li != alnidx.cend()) {
       if (li->second == -1) {
+         ++gaplen2;
          ++numgaps2;
-         while (li != alnidx.end() && li->second == -1) ++li;
+         ++li;
+         while (li != alnidx.cend() && li->second == -1) {
+            ++gaplen2; ++li;
+         }
       }
       else ++li;
    }
@@ -1732,6 +1805,7 @@ void Dynaln<T>::buildResult(const int delta1, const int delta2) {
 /*
  * marking at every 10 this could become a parameter if you
  * use very long sequence to do the alignment
+ * No longer count gaps, these two operations are now separated.
  */
 template<class T>
 void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
@@ -1741,17 +1815,19 @@ void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
       middle.clear();
       return;
    }
-   list<pair<int, int> >::const_iterator lit= alnidx.begin();
-   int i,j,counter;
-   counter=0;
+   if (!topaln.empty()) topaln.clear();
+   if (!bottomaln.empty()) bottomaln.clear();
+   if (!middle.empty()) middle.clear();
+
+   list<pair<int, int> >::const_iterator lit= alnidx.cbegin();
+   int i,j,counter=0;
    char topchar, bottomchar;
    vector<int> topmark(alnidx.size(),-1);
    vector<int> bottommark(alnidx.size(),-1);
 
-   while (lit != alnidx.end()) {
+   while (lit != alnidx.cend()) {
       i=lit->first; // top sequence index
       j=lit->second; // bottom sequence index
-      //if (counter % 10 == 0) {
       if (counter % markevery == 0) {
          if (i>-1) { 
             topmark[counter]=i+1+delta1;
@@ -1762,21 +1838,17 @@ void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
       }
       if (i>=0) {
          topchar=toupper((*seq1)[i]); 
-         //topchar=(*seq1)[i];
       }
       else {
          topchar=gapchar;
-         ++gaplen1;
       }
       topaln += topchar;
 
       if (j>=0) {
-         //bottomchar = (*seq2)[j];
          bottomchar = toupper((*seq2)[j]);
       }
       else {
          bottomchar = gapchar;
-         ++gaplen2;
       }
       bottomaln += bottomchar;
 
@@ -2141,19 +2213,6 @@ template<class T>
 string Dynaln<T>::toDelimitedString(const string &dl, int ibase) const {
    ostringstream ous;
    try {
-      /* production version
-      ous << seq1->getName() << dl << seq1->length() << dl
-         << seq2->getName() << dl << seq2->length() << dl
-         << Smax << dl << idencnt << dl << simcnt << dl
-         << alnidx.size() << dl
-         << numgaps1 << dl << numgaps2 << dl
-         << gaplen1 << dl << gaplen2 << dl
-         << seq1begin << dl <<  seq1end << dl
-         << seq2begin << dl <<  seq2end << dl
-         << setprecision(4)
-         << (seq1->computeEntropy(seq1begin, seq1end)).first << dl
-         << (seq2->computeEntropy(seq2begin, seq2end)).first << dl;
-      */
       // debug version, so we know which line crashed
       //pair<double,double> tmp=seq1->computeEntropy();
       //cerr << tmp.first << " " << tmp.second << endl;
@@ -2248,37 +2307,26 @@ string Dynaln<T>::getBottomAlnByTopPosition(int tpos1, int tpos2) const {
 //void Dynaln::allocmemLS() {
 template<class T>
 void LSDynaln<T>::allocmem() {
-   int Nr = this->seq1->length()+1;
    int Nc = this->seq2->length()+1;
    if (this->M == 0) {
       this->Ssize=2*Nc;
       this->numcol=Nc;
-      //S = new int[Nc];
       this->M=new int[this->Ssize];
       this->IX = new int[this->Ssize];
       this->IY = new int[this->Ssize];
-      //Itop = new int[Nc];  // top insert Y array
-      //SR = new int[Nc];
       MR=new int[this->Ssize];
       IXR = new int[this->Ssize];
       IYR = new int[this->Ssize];
    }
    else {
       if (this->Ssize < 2*Nc) {
-         //delete[] S; 
          delete[] this->M; delete[] this->IX; delete[] this->IY;
-         //delete[] SR; 
          delete[] MR; delete[] IXR; delete[] IYR;
-
          this->Ssize=2*Nc;
          this->numcol=Nc;
-
-         //S = new int[Nc];
          this->M=new int[this->Ssize];
          this->IX = new int[this->Ssize];
          this->IY = new int[this->Ssize];
-         //Itop = new int[Nc];  // top insert Y array
-         //SR = new int[Nc];
          MR=new int[this->Ssize];
          IXR = new int[this->Ssize];
          IYR = new int[this->Ssize];
@@ -2436,6 +2484,7 @@ int LSDynaln<T>::global() {
    }
    this->Smax=path(0,this->seq1->length()-1, 0, this->seq2->length()-1);
    this->clearResult();
+   return this->Smax;
 }
 
 // b1 < e1 && b2 < e2
@@ -2742,8 +2791,8 @@ template<class T>
 void LSDynaln<T>::buildResult(const int delta1, const int delta2) {
    //cerr << " *** calling LSDynaln buildResult() \n";
    list<pair<int, int> >::const_iterator lit= this->alnidx.begin();
-   int i,j;
-   char topchar, bottomchar;
+   //int i,j;
+   //char topchar, bottomchar;
    //clearResult();
    // find sequence begin and end, removing intial gaps
    // The local version produce this result in the
@@ -2816,9 +2865,9 @@ int LSDynaln<T>::local() {
       MR[(j<<1)+1]=-1;
    }
    this->M[col]=this->IX[col]=this->IY[col]=0;
-   int *Mdia, *Mleft, *Mtop;
-   int *IXdia, *IXleft, *IXtop;
-   int *IYdia, *IYleft, *IYtop;
+   int *Mdia, *Mleft; //, *Mtop;
+   int *IXdia, *IXleft; //, *IXtop;
+   int *IYdia, *IYleft; //, *IYtop;
    // use MR array to remember the position
    // in the scoring matrix, the first column was set to -1
 

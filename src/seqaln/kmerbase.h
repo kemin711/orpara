@@ -113,7 +113,7 @@ template <int K> class KmerBase {
        */
       static uint64_t* kmerize(const string& seq) {
          uint64_t* res = new uint64_t[seq.size()-K+1];
-         int i;
+         unsigned int i;
          uint64_t v=0;
          for (i=0; i<K-1; ++i) { // first kmer except the last base
             v <<= 2;

@@ -162,8 +162,48 @@ class SimpleScoreMethod : public ScoreMethod {
       void setMatch(int match) { matchs = match; }
       void setMismatch(int mis) { mismatchs = mis; }
 
-   private:
+   protected:
       int matchs, mismatchs;
+};
+
+/**
+ * This class has a way of dealing with N bases
+ */
+class SimpleScoreMethodN : public SimpleScoreMethod {
+   public:
+      SimpleScoreMethodN() 
+         : SimpleScoreMethod(), nmatchs(0) {}
+      SimpleScoreMethodN(int match, int mismatch) 
+         : SimpleScoreMethod(match, mismatch), 
+            nmatchs(0) { }
+      SimpleScoreMethodN(int match, int mismatch, int nval) 
+         : SimpleScoreMethod(match, mismatch), nmatchs(nval) { }
+      SimpleScoreMethodN(int match, int mismatch, int gapOpen, int gapExtend) 
+         : SimpleScoreMethod(match, mismatch, gapOpen, gapExtend), 
+            nmatchs(0) {}
+      SimpleScoreMethodN(const SimpleScoreMethodN &meth) 
+         : SimpleScoreMethod(meth), nmatchs(meth.nmatchs) 
+           { }
+      SimpleScoreMethodN& operator=(const SimpleScoreMethodN &mt);
+      void setNmatch(int nval) { nmatchs = nval; }
+      int lookup(const char r1, const char r2) const { 
+         if (r1 == r2) return matchs; 
+         if (r1 == 'N' || r1 == 'n' || r2 == 'N' || r2 == 'n') {
+            return nmatchs;
+         }
+         return mismatchs; 
+      }
+      /**
+       * look up the score for two interger representation of the two residues.
+       * Same algorith as the char version.
+       */
+      int lookup(const int c1, const int c2) const { 
+         if (c1 == c2) return matchs; 
+         if (c1 > 3 || c2 > 3) return nmatchs;
+         return mismatchs; }
+
+   private:
+      int nmatchs;
 };
 
 void expandCombination(char** &buff, int &buffsize, int &ws, const char* alphabet, int alphabetsize);

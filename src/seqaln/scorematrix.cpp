@@ -39,6 +39,13 @@ SimpleScoreMethod& SimpleScoreMethod::operator=(const SimpleScoreMethod &mt) {
    return *this;
 }
 
+SimpleScoreMethodN& SimpleScoreMethodN::operator=(const SimpleScoreMethodN &mt) {
+   if (this != &mt) {
+      SimpleScoreMethod::operator=(mt);
+      nmatchs=mt.nmatchs;
+   }
+   return *this;
+}
 
 ////////// MatrixScoreMethod   the the scoring matrix class ///////////
 
