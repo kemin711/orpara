@@ -500,5 +500,9 @@ TEST_F(DynalnTest, simplematrixLongN) {
    aligner.runlocal();
    aligner.printAlign(cout, 80);
    ASSERT_TRUE(aligner.getIdentity() > 0.5);
+   string nonseq = aligner.getNCorrectedBottomSequence();
+   cout << "N-corrected\n" << nonseq << endl
+      << "original:\n" << nseq << endl;
+   ASSERT_TRUE(nonseq.size() == nseq.length());
 }
 

@@ -16,6 +16,7 @@
 #include <sstream>
 #include "strformat.h"
 #include <typeinfo>
+#include "randombase.h"
 
 namespace orpara {
 //uncomment if you want to debug the library
@@ -357,6 +358,11 @@ class Dynaln {
        *   represented by the second sequence. 
        */
       const bioseq& getBottomSequence() const { return *seq2; }
+      /**
+       * @return a string with N-corrected sequence according
+       * to top sequence.
+       */
+      string getNCorrectedBottomSequence() const; 
       /**
        * return the consensus sequence, and the number of residues
        * that are different.
@@ -2299,6 +2305,44 @@ string Dynaln<T>::getBottomAlnByTopPosition(int tpos1, int tpos2) const {
       ++itr; ++e;
    }
    return getBottomAln().substr(b, e-b+1);
+}
+
+// only apply to DNA or RNA sequence
+template<class T> string Dynaln<T>::getNCorrectedBottomSequence() const {
+   static RandomBase& rb = RandomBase::getInstance();
+   string tmp;
+   tmp.reserve(getSeq2Length());
+   if (alnidx.front().second > 0) {
+      tmp += seq2->substring(0, alnidx.front().second);
+      for (string::size_type i=0; i < tmp.size(); ++i) {
+         if (tmp[i] == 'N' || tmp[i] == 'n') {
+            tmp[i] = rb();
+         }
+      }
+   }
+   for (auto& p : alnidx) {
+      if (p.second == -1) continue;
+      if (C2[p.second] > 3) {
+         if (p.first == -1) { // top gap get random base
+         }
+         else {
+            tmp.push_back((*seq1)[p.first]); 
+         }
+      }
+      else {
+         tmp.push_back((*seq2)[p.second]);
+      }
+   }
+   if (alnidx.back().second < int(getSeq2Length()-1)) {
+      string tail = seq2->substring(alnidx.back().second+1);
+      for (string::size_type i=0; i<tail.size(); ++i) {
+         if (tail[i] == 'N' || tail[i] == 'n') {
+            tail[i] = rb();
+         }
+      }
+      tmp += tail;
+   }
+   return tmp;
 }
 
 ////////////////// Linear Space Algorithms ///////////////////////////////

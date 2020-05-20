@@ -5,6 +5,8 @@
 
 using namespace std;
 
+namespace orpara {
+
 /**
  * Ambiguous base 
  * code         Complement
@@ -27,7 +29,7 @@ using namespace std;
  */
 class RandomBase {
    public:
-      static const RandomBase& getInstance() {
+      static RandomBase& getInstance() {
          static RandomBase single;
          return single;
       }
@@ -41,7 +43,7 @@ class RandomBase {
          return baseN[udis4(mteng)];
       }
       char operator()(char ambiguous) {
-         char AM=toupper(aaambiguous);
+         char AM=toupper(ambiguous);
          switch(AM) {
             case 'N' : case 'X': return baseN[udis4(mteng)];
             case 'Y': return baseY[udis2(mteng)];
@@ -66,7 +68,7 @@ class RandomBase {
            baseW{'A', 'T'}, baseS{'C', 'G'},
            baseK{'G', 'T'}, baseM{'A', 'C'},
            baseD{'A', 'G', 'T'}, baseV{'A', 'C', 'G'},
-           baseH{'A', 'C', 'T'}, baseB{'C', 'G', 'T'},
+           baseH{'A', 'C', 'T'}, baseB{'C', 'G', 'T'}
       { }
       std::random_device randev;
       std::mt19937_64 mteng;
@@ -85,6 +87,5 @@ class RandomBase {
       char baseH[3];
       char baseB[3];
 };
-
-
+}
 #endif
