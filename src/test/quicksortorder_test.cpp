@@ -32,11 +32,11 @@ TEST(QuicksortorderTest, PartitionVector) {
    int q_idx = partition<int>(input, 0, input.size()-1);
    cout << "pivot element: " << q_idx << " " << input[q_idx] << endl;
    cout << "smaller portion:\n";
-   for (size_t i=0; i<q_idx; ++i) {
+   for (auto i=0; i<q_idx; ++i) {
       cout << input[i] << " ";
    }
    cout << "\nlarger portion:\n";
-   for (size_t i=q_idx+1; i<input.size(); ++i) {
+   for (int i=q_idx+1; i < (int)input.size(); ++i) {
       cout << input[i] << " ";
    }
    cout << endl;
@@ -48,11 +48,11 @@ TEST(QuicksortorderTest, PartitionLargest) {
    int q_idx = partition<int>(input, 0, input.size()-1);
    cout << "pivot element: " << q_idx << " " << input[q_idx] << endl;
    cout << "smaller portion:\n";
-   for (size_t i=0; i<q_idx; ++i) {
+   for (int i=0; i<q_idx; ++i) {
       cout << input[i] << " ";
    }
    cout << "\nlarger portion:\n";
-   if (q_idx == input.size()-1) {
+   if (q_idx == int(input.size()-1)) {
       cout << "empty\n";
    }
    else {
@@ -74,7 +74,7 @@ TEST(QuicksortorderTest, PartitionSmallest) {
       cout << "empty\n";
    }
    else {
-      for (size_t i=0; i<q_idx; ++i) {
+      for (int i=0; i<q_idx; ++i) {
          cout << input[i] << " ";
       }
    }
@@ -96,7 +96,7 @@ TEST(QuicksortorderTest, RandomPartitionVector) {
    int q_idx = RandomPartition<int>()(input, 0, input.size()-1);
    cout << "Random pivot element: " << q_idx << " (" << input[q_idx] << ")\n";
    cout << "smaller portion:\n";
-   for (size_t i=0; i<q_idx; ++i) {
+   for (int i=0; i<q_idx; ++i) {
       cout << input[i] << " ";
    }
    cout << "\nlarger portion:\n";
@@ -119,7 +119,7 @@ TEST(QuicksortorderTest, RandomPartitionFunction) {
    int q_idx = randomPartition<int>(input, 0, input.size()-1);
    cout << "Random pivot element: " << q_idx << " " << input[q_idx] << endl;
    cout << "smaller portion:\n";
-   for (size_t i=0; i<q_idx; ++i) {
+   for (int i=0; i<q_idx; ++i) {
       cout << input[i] << " ";
    }
    cout << "\nlarger portion:\n";

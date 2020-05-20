@@ -1,6 +1,7 @@
 #include "scorematrix.h"
 #include "bioseq.h"
 #include "dynalnt.h"
+#include <cstring>
 
 /** a program to tes the alignemnt classes.
  */
@@ -29,7 +30,9 @@ void usage() {
       << "        --gap-open or -g  gap open cost, default min(matrix score)*2 \n"
       << "        --gap-extend or -e  gap extend cost, default min(matrix score)\n"
       << "        --self dna.fas file. Now only works for DNA sequences\n"
-      << "        -o output file\n";
+      << "        -o output file\n"
+      << "        -m match score default 10\n"
+      << "        -x mismatch score default -20\n";
 }
 
 /**
@@ -56,7 +59,8 @@ void alignProtein(const int gapOpen, const int gapExtend, const bioseq &p1, cons
 void alignDNA(const int gapo, const int gape, const DNA &dna1, const DNA &dna2,
       const int seq1begin, const int seq2begin, ostream &ous);
 void alignSimple(const bioseq &s1, const bioseq &s2,
-      const int seq1begin, const int seq2begin, ostream &ous);
+      const int seq1begin, const int seq2begin, ostream &ous, const int gapo, const int gape,
+      int match, int mismatch);
 /**
  * This method is only for DNA sequences.
  * It will align the rc of the second sequence if the forward direction
@@ -69,8 +73,10 @@ int main(int argc, char *argv[]) {
    string file1, file2, outfile;
    int reverseComplement = 0;
    int seq1begin=1, seq1end=-1, seq2begin=1, seq2end=-1;
-   int gapOpen = 1;
+   int gapOpen = 40;
    int gapExtend = 1;
+   int match=10;
+   int mismatch=-20;
    bool simpleMethod = true;
    bool SELF_ALIGN=false;
    Progparam param;
@@ -89,6 +95,13 @@ int main(int argc, char *argv[]) {
             || string(argv[i]) == "-g") { gapOpen=atoi(argv[++i]); }
       else if (string(argv[i]) == "--gap-extend"
             || string(argv[i]) == "-e") { gapExtend=atoi(argv[++i]); }
+      else if (!strcmp(argv[i], "-m")) {
+         match=atoi(argv[++i]);
+      }
+      else if (!strcmp(argv[i], "-x")) {
+         mismatch=atoi(argv[++i]);
+         if (mismatch > 0) mismatch *= -1;
+      }
       else if (string(argv[i]) == "--self") { 
          SELF_ALIGN=true;
          file1=string(argv[++i]); 
@@ -154,16 +167,20 @@ int main(int argc, char *argv[]) {
       else if (reverseComplement > 0) {
          cerr << "you can only use 1 or 2 for the -r option\n";
       }
-      if (simpleMethod) 
-         alignSimple(dna1, dna2, seq1begin, seq2begin, ouf);
-      else 
+      if (simpleMethod) {
+         cerr << "using simple methods for DNA\n";
+         alignSimple(dna1, dna2, seq1begin, seq2begin, ouf, gapOpen, gapExtend, match, mismatch);
+      }
+      else {
          alignDNA(gapOpen, gapExtend, dna1, dna2, seq1begin, seq2begin, ouf);
+      }
    }
    else { // protein align
       if (simpleMethod) 
-         alignSimple(seq1, seq2, seq1begin, seq2begin, ouf);
-      else 
+         alignSimple(seq1, seq2, seq1begin, seq2begin, ouf, gapOpen, gapExtend, match, mismatch);
+      else {
          alignProtein(gapOpen, gapExtend, seq1, seq2, seq1begin, seq2begin, ouf);
+      }
    }
    cout << "aligment written to file: " << outfile << endl;
 
@@ -265,15 +282,23 @@ int alignSimpleSelf(const string &seqfile, const Progparam &param, const string 
    return 0;
 }
 
-
 void alignSimple(const bioseq &s1, const bioseq &s2,
-      const int seq1begin, const int seq2begin, ostream &ous) {
-   SimpleScoreMethod sm(10, -11, -40, -1);
+      const int seq1begin, const int seq2begin, ostream &ous, int gapo, int gape,
+      int match, int mismatch) 
+{
+   if (gapo > 0) gapo *= -1;
+   if (gape > 0) gape *= -1;
+   SimpleScoreMethod sm(match, mismatch, gapo, gape);
    Dynaln<SimpleScoreMethod> aln(s1, s2);
    aln.setMatrix(sm);
    aln.runlocal(seq1begin-1, seq2begin-1);
    aln.printAlign(ous);
    showAlignInfo<SimpleScoreMethod>(aln, cout);
+   if (aln.fixStagger()) {
+      aln.buildAlnInfo();
+      cerr << "after fixing staggered gap\n";
+      aln.printAlign(ous);
+   }
 }
 
 void alignProtein(const int gapOpen, const int gapExtend, 

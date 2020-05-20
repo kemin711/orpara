@@ -36,8 +36,6 @@ class DynalnTest : public testing::Test {
       Dynaln<NucleicScoreMethod> alnnsm;
 };
 
-
-
 TEST_F(DynalnTest, repeataln) {
    string sA1 = "ACCCGTGTGGCCAGTCGTACGTGTACACTGACGTACGATCAGTC";
    string sB1 = "ACGTGTCCAGTCCGTGCTGACGAATTGTGTGTTTTGGTTTC";
@@ -51,7 +49,8 @@ TEST_F(DynalnTest, repeataln) {
    cout << "seqB : " << sB1 << " -- " << sB2 << endl;
 
    Dynaln<SimpleScoreMethod> aln(sm);
-   double normalScore[maxLen + 1], score12, score11, score22;
+   //double normalScore[maxLen + 1], score12, score11, score22;
+   double score12, score11, score22;
 
    //for (int l = 1; l <= maxLen; l++) {
    //for (int l = 3; l <= maxLen; l++) {
@@ -59,7 +58,7 @@ TEST_F(DynalnTest, repeataln) {
       int x, y;
       x=max<int>(0, int(sA1.size())-l);
       y=max<int>(0, int(sB1.size()) - l);
-      if (x > sA1.size()-1 || y > sB1.size()) {
+      if (x > int(sA1.size()-1) || y > (int)sB1.size()) {
          throw runtime_error("x, y passed end of input string, cannot take substring beond end");
       }
       cout << string(2 * maxLen + 20, '=') << endl;
@@ -491,3 +490,15 @@ TEST_F(DynalnTest, nucmatrixN) {
    aligner.printAlign(cout);
    ASSERT_GT(aligner.getScore(), 0);
 }
+
+TEST_F(DynalnTest, simplematrixLongN) {
+   DNA seq1("goodseq", "GTACAAGGCACTGTGCTATATCTGGAACTACAAATATTAGTTAAATAGTCCAAGATTCAGTGGGTTCAGAGACTCTAAGTATTTGCCATTCCCTTTAGATGGAAACGTTCTTTGGTCCACCAAGCCCTATCGTTCTGCTCTTTGGAAATTCTCCCTCACTTTCTTCATAATGCCGTCCTTGACTAACTCTCCTCTAGCAATAC");
+   DNA nseq("seqwithN", "CAAATATTAGNTAANNNNTCCAAGATTNANTGNGNNNNNNNNNNNNNNNNNNNNNNNNNNNNNTTTAGATGGAAACGTTCTTTGGTCCACCANGCCCTATCGNNNTGCTCNTTGGNNATTCTNCCTCACNTTCTTCNTAATGC");
+   SimpleScoreMethodN ssm(10, -11, -40, -1);
+   Dynaln<SimpleScoreMethodN> aligner(ssm);
+   aligner.setseq(seq1, nseq);
+   aligner.runlocal();
+   aligner.printAlign(cout, 80);
+   ASSERT_TRUE(aligner.getIdentity() > 0.5);
+}
+

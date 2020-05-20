@@ -187,7 +187,7 @@ template<class T> double Kmean<T>::update() {
 }
 
 template<class T> void Kmean<T>::showCluster(ostream& ous) const {
-   for (int c=0; c<cluster.size(); ++c) {
+   for (int c=0; c < (int)cluster.size(); ++c) {
       ous << string(70, 'C') << endl;
       ous << "cluster: " << c << endl;
       for (T* p : cluster[c]) {

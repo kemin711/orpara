@@ -31,7 +31,7 @@ vector<tuple<T, double, double>> computeDerivative(const vector<pair<T, double>>
    T dx, d2x;
    d1=(input[1].second - input[0].second)/(input[1].first - input[0].first);
    res[0] = make_tuple(input[0].first, d1, 0.0f);
-   for (int i=1; i+1 < input.size(); ++i) {
+   for (int i=1; i+1 < (int)input.size(); ++i) {
       d2x=input[i+1].first - input[i-1].first;
       d1 = (input[i+1].second - input[i-1].second)/d2x;
       d2 = 4*(input[i+1].second - 2*input[i].second + input[i-1].second)/(d2x*d2x);
