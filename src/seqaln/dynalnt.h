@@ -55,6 +55,20 @@ enum ALNTYPE {GLOBAL, LOCAL};
 template<class T>
 class Dynaln {
    public:
+      typedef list<pair<int,int>>::iterator alniterator;
+      typedef list<pair<int,int>>::const_iterator const_alniterator;
+      alniterator begin() {
+         return alnidx.begin();
+      }
+      alniterator end() {
+         return alnidx.end();
+      }
+      const_alniterator cbegin() const {
+         return alnidx.cbegin();
+      }
+      const_alniterator cend() const {
+         return alnidx.cend();
+      }
       /**
        * Default constructor.
        * Gap parameters will be taken from the matrix.
@@ -359,10 +373,12 @@ class Dynaln {
        */
       const bioseq& getBottomSequence() const { return *seq2; }
       /**
+       * Will update the identical member value with the 
+       * corrected N. So this method is not const.
        * @return a string with N-corrected sequence according
        * to top sequence.
        */
-      string getNCorrectedBottomSequence() const; 
+      string getNCorrectedBottomSequence(); 
       /**
        * return the consensus sequence, and the number of residues
        * that are different.
@@ -543,63 +559,88 @@ class Dynaln {
       }
       /**
        * Helper function to Delete one gap
-       * @return true if numgaps1 or numgaps2 is zero;
+       * @return true if numgaps1 or numgaps2 is zero thus
+       *   no need for further fixing.
        */
-      bool removeOneGap() {
-         --gaplen1;
-         --gaplen2;
+      bool reduceGap(int cnt) {
+         gaplen1 -= cnt;
+         gaplen2 -= cnt;
          if (gaplen1 < 1) {
-            cerr << "gaplen1 is zero now\n";
+            //cerr << "gaplen1 is zero now\n";
             --numgaps1;
          }
          if (gaplen2 < 1) --numgaps2;
          if (numgaps1 < 1 || numgaps2 < 1) { // done
-            if (!topaln.empty()) { 
-               cerr << "topaln is empty rebuildAlinifo()\n";
-               //buildAlnInfo();
-            }
-            else {
-               cerr << "no need to rebuild align info\n";
-            }
             return true;
          }
          return false;
       }
+      /**
+       * Fix zig configured staggered gap
+       *         |itTop
+       * AGCTGCAA---ACT
+       * AGC----AGTTACT
+       *       |itBottom
+       * @return true if gap from least on sequence is zero
+       *   to indicate no more fixing is needed.
+       */
+      bool fixStaggerZig(alniterator& itTop, alniterator itBottom);
+      /**
+       * Fix zag configured staggered gap
+       *        |itTop
+       * ACG-----ATCGCCACTT
+       * ACGGGCACAT---CACTT
+       *           |itBottom
+       */
+      bool fixStaggerZag(alniterator& itTop, alniterator itBottom);
 
       /**
        * @return true if fixed at least one stagger gap
        */
       bool fixStagger() {
          if (numgaps1 < 1 || numgaps2 < 1) return false;
-         list<pair<int,int>>::iterator it, last;
+         //alniterator it, last, itLeft, itRight, itx;
+         alniterator it, last, itB;
          it = std::next(alnidx.begin());
          last = std::prev(alnidx.end());
          bool gapfixed=false;
          while (it != last) {
             if (it->first == -1) {
                if (prev(it)->second == -1) { // staggered gap
-                  // ACG--CGGT ==afterfix=> ACG-CGGT
-                  // TT-ACGTAC              TTACGTAC
-                  prev(it)->second = it->second;
-                  it = alnidx.erase(it);
-                  if (removeOneGap())  return true;
+                  // ACG--CGGT 
+                  // TT-ACGTAC
                   gapfixed=true;
+                  if (fixStaggerZig(it, prev(it))) break;
                }
                else if (next(it)->second == -1) {
                   // ACG--TACGGT ==afterfix=> ACG-TACGGT
                   // TCGAC-ACGTT              TCGACACGTT
-                  next(it)->second = it->second;
-                  it = alnidx.erase(it);
-                  if (removeOneGap()) return true;
                   gapfixed=true;
+                  //cerr << "zero zag " << it->second << " " << next(it)->first << endl;
+                  if (fixStaggerZag(it, next(it))) break;
                }
-            }
-            else {
-               if (it->second == -1) {
+               else if (prev(it, 2)->second == -1) {
+                  // ACTGA---CGGT 
+                  // TT--ACGTCGGT
+                  gapfixed=true;
+                  if (fixStaggerZig(it, prev(it,2))) break;
                }
+               else if (next(it,2)->second == -1) {
+                  //       | need to advance top
+                  // GGA-----CATGACC
+                  // GGACGGGG-----CC
+                  //         |
+                  itB=next(it,2);
+                  while (it->first == -1) ++it;
+                  --it;
+                  gapfixed=true;
+                  if (fixStaggerZag(it, itB)) break;
+               }
+               else ++it;
             }
-            ++it;
+            else ++it;
          }
+         if (gapfixed) buildAlnInfo();
          return gapfixed;
       }
 
@@ -635,6 +676,11 @@ class Dynaln {
        *   using seq2 as reference.
        */
       vector<pair<char,int>> getCigar2() const;
+      /**
+       * Return the MD string using sequence 1 as reference.
+       * Have not implemented the seq2 as reference version yet.
+       */
+      string getMDString1() const;
       vector<pair<int, int> > getAlnindexVector() const {
          return vector<pair<int,int> >(alnidx.begin(), alnidx.end());
       }
@@ -1824,6 +1870,7 @@ void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
    if (!topaln.empty()) topaln.clear();
    if (!bottomaln.empty()) bottomaln.clear();
    if (!middle.empty()) middle.clear();
+   idencnt=0;
 
    list<pair<int, int> >::const_iterator lit= alnidx.cbegin();
    int i,j,counter=0;
@@ -2308,7 +2355,7 @@ string Dynaln<T>::getBottomAlnByTopPosition(int tpos1, int tpos2) const {
 }
 
 // only apply to DNA or RNA sequence
-template<class T> string Dynaln<T>::getNCorrectedBottomSequence() const {
+template<class T> string Dynaln<T>::getNCorrectedBottomSequence() {
    static RandomBase& rb = RandomBase::getInstance();
    string tmp;
    tmp.reserve(getSeq2Length());
@@ -2320,19 +2367,23 @@ template<class T> string Dynaln<T>::getNCorrectedBottomSequence() const {
          }
       }
    }
+   int numCorrect=0;
    for (auto& p : alnidx) {
       if (p.second == -1) continue;
       if (C2[p.second] > 3) {
          if (p.first == -1) { // top gap get random base
+            tmp.push_back(rb());
          }
          else {
             tmp.push_back((*seq1)[p.first]); 
+            ++numCorrect;
          }
       }
       else {
          tmp.push_back((*seq2)[p.second]);
       }
    }
+   idencnt += numCorrect;
    if (alnidx.back().second < int(getSeq2Length()-1)) {
       string tail = seq2->substring(alnidx.back().second+1);
       for (string::size_type i=0; i<tail.size(); ++i) {
@@ -2343,6 +2394,129 @@ template<class T> string Dynaln<T>::getNCorrectedBottomSequence() const {
       tmp += tail;
    }
    return tmp;
+}
+
+template<class T>
+bool Dynaln<T>::fixStaggerZig(alniterator& itTop, alniterator itBottom) {
+   //         |top
+   // ACGCTGCA----CGGT 
+   // AC-----ACGCTAC  
+   //       | bottom
+   alniterator last = prev(end());
+   alniterator itRight = next(itTop);
+   alniterator itLeft = prev(itBottom);
+   while (itRight != last && itLeft != begin() && 
+         itLeft->second == -1 && itRight->first == -1) 
+   {
+      ++itRight;
+      --itLeft;
+   }
+   auto diff = distance(itTop, itRight);
+   ++itLeft;
+   alniterator itx = itTop;
+   while (itx != itRight) { // copy from [it, itRight) to [itLeft, it)
+      itLeft->second = itx->second;
+      ++itLeft; ++itx;
+   }
+   itTop = alnidx.erase(itTop, itRight);
+   if (reduceGap(diff)) return true;
+   return false;
+}
+
+template<class T> 
+bool Dynaln<T>::fixStaggerZag(alniterator& itTop, alniterator itBottom) {
+   //      |itTop
+   // ACG---TACGGTGTT 
+   // ACGACATA--ACGTT
+   //         |itBottom
+   alniterator itLeft = itTop;
+   alniterator itRight = itBottom;
+   //cerr << "itLeft " << itLeft->second << " " << (*seq2)[itLeft->second] << " itRight "
+   //   << itRight->first << " " << (*seq1)[itRight->first] << endl;
+   alniterator last = prev(end());
+   while (itLeft != begin() && itRight != last &&
+         itLeft->first == -1 && itRight->second == -1)
+   {
+      ++itRight;
+      --itLeft;
+   }
+   //cerr << "stopped at " << itLeft->second << " " << (*seq2)[itLeft->second] 
+   //   << " " << itRight->first << " " << (*seq1)[itRight->first] << endl;
+   auto diff = distance(itBottom, itRight);
+   //cerr << "diff=" << diff << endl;
+   ++itLeft;
+   alniterator itx = itBottom;
+   while (itx != itRight) {
+      //cerr << "moving " << itx->first << " " << (*seq1)[itx->first] << endl;
+      itLeft->first = itx->first;
+      ++itLeft; ++itx;
+   }
+   itTop = alnidx.erase(itBottom, itRight);
+   if (reduceGap(diff)) return true;
+   return false;
+}
+
+// md string using sequence 1 as reference MD:2G3T9AT1A19T10T11A5A3A4
+// 72                  89        99        109       119       129       139
+// +         +         +         +         +         +         +         +
+// GAGGGATGG--GGA-GGACATGACCCCCCGAGCCACCTTCCCTGCCGGGCCTTTCCAGCCGTCCCAGAGCCAGTCACGGC
+// || ||| ||  ||| ||||  | ||||||||||||||||||| |||||||||| ||||||||||| ||||| ||| ||||
+// GACGGACGGACGGACGGACGGGGCCCCCCGAGCCACCTTCCCCGCCGGGCCTTCCCAGCCGTCCCGGAGCCGGTCGCGGC
+// 2 G 3 T 2 + 3 + 4=9AT1A 19                T 10       T  11       A  5  A 3 A 4
+template<class T> string Dynaln<T>::getMDString1() const {
+   ostringstream ost;
+   const_alniterator it=cbegin();
+   char lastState='b'; // start state
+   int identicalSeg=0;
+   while (it != cend()) {
+      if (it->first != -1 && it->second != -1) {
+         if (C1[it->first] == C2[it->second]) { 
+            while (it != cend() && it->first != -1 && it->second != -1 && C1[it->first] == C2[it->second]) {
+               //cerr << "Match " << (*seq1)[it->first] << (*seq2)[it->second] 
+               //   << "C1: " << C1[it->first] << " C2: " << C2[it->second] 
+               //   << " idx1: " << it->first << " idx2: " << it->second << endl;
+               ++identicalSeg; ++it;
+            }
+            lastState='n'; // number
+            //cerr << "N state identicalSeg=" << identicalSeg << endl;
+         }
+         else { // different base
+            ost << identicalSeg;
+            identicalSeg=0;
+            while (it != cend() && it->first != -1 && it->second != -1 && C1[it->first] != C2[it->second]) {
+               //cerr << "Mismatch " << (*seq1)[it->first] << (*seq2)[it->second] << endl;
+               ost << (*seq1)[it->first];
+               ++it;
+            }
+            //cerr << "M state identicalSeg=" << identicalSeg << endl;
+            lastState='m'; // mismatch
+         }
+      }
+      else if (it->first == -1 && it->second > -1) { // seq2 got insertion
+         while (it != cend() && it->first == -1 && it->second > -1) {
+            // ignore query insertion
+            ++it;
+         }
+         //cerr << "I state identicalSeg=" << identicalSeg << endl;
+         //lastState='i'; // query insert state ignored
+      }
+      else if (it->first > -1 && it->second == -1) { 
+         // seq 2 has deletion need to report
+         if (lastState == 'n') ost << identicalSeg;
+         identicalSeg = 0;
+         ost << '^';
+         while (it != cend() && it->first > -1 && it->second == -1) {
+            ost << (*seq1)[it->first];
+            ++it;
+         }
+         lastState='d';
+      }
+      else {
+         throw runtime_error("alignment prohits bot as deletions");
+      }
+   }
+   if (lastState == 'n') ost << identicalSeg;
+   return ost.str();
 }
 
 ////////////////// Linear Space Algorithms ///////////////////////////////
