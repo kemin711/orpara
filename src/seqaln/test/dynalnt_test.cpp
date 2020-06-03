@@ -36,6 +36,16 @@ class DynalnTest : public testing::Test {
       Dynaln<NucleicScoreMethod> alnnsm;
 };
 
+TEST_F(DynalnTest, printaln) {
+   SimpleScoreMethod sm(10, -11, -40, -1);
+   DNA seq1("sq1", "GTCCCCTCACAGTTCTGAGGTCTGAAATCAAGGTGTCTGCAGAGCTGGTTCCTGTTGAGGGTTGCAAAGGAGAATCTCTTCCAGCCTCTCTCCTAGCTTTGGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTATACATGTAGATATATGTGTGCATGTGCATATATGTGCTCACATGTGTACATGC");
+   DNA seq2("sq2", "GTCCCCTCACAGTTCTGAGGTCTGAAATCAAGGTGTCTGCAGAGCTGGTTCCTGTTGAGGGTTGCAAAGCAGAATCTCTTCCAGCCTCTCTCCTAGCTTTGGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTAAACATGTAGATATATGTGT");
+   Dynaln<SimpleScoreMethod> aligner(sm);
+   aligner.setseq(seq1, seq2);
+   aligner.runlocal();
+   aligner.printAlign(cout);
+}
+
 TEST_F(DynalnTest, repeataln) {
    string sA1 = "ACCCGTGTGGCCAGTCGTACGTGTACACTGACGTACGATCAGTC";
    string sB1 = "ACGTGTCCAGTCCGTGCTGACGAATTGTGTGTTTTGGTTTC";
@@ -515,6 +525,18 @@ TEST_F(DynalnTest, simplematrixLongN) {
    cout << "N-corrected\n" << nonseq << endl
       << "original:\n" << nseq << endl;
    ASSERT_TRUE(nonseq.size() == nseq.length());
+
+   cout << "Another test make sure no N left in the sequence\n";
+   // test N still left or not
+   seq1.setSequence("aatcatctaatggaatggaatggaataatccatggactcgaatgcaatcatcatcgaatggaatcgaatggaatcatcgaatggactcgaatggaataatcattgaacggaatcgaatggaatcatcatcggatggaaatgaatggaatcatcatcgaatggaatcgaatagaattatgga"); // lower case
+   nseq.setSequence("AATGGAATGGAAAAGAATGGACTGTNANTCAANAATCATCGAANGGAATNGANTGGAATCNTCGAATGGACTCGAATGGAATAATCATTGAACGGAATCGAATGGAATCATCATCGGATGGAAATGAATGGAATCATCATCGAATGGAATN");
+   aligner.setseq(seq1, nseq);
+   aligner.runlocal();
+   aligner.printAlign(cout, 80);
+   nonseq = aligner.getNCorrectedBottomSequence();
+   cout << "N-corrected\n" << nonseq << endl
+      << "original:\n" << nseq << endl;
+   ASSERT_TRUE(nonseq.find('N') == string::npos);
 }
 
 TEST_F(DynalnTest, fixstagger) {
@@ -571,4 +593,82 @@ TEST_F(DynalnTest, fixstagger) {
    cout << aligner.getMDString1() << endl;
 }
 
+TEST_F(DynalnTest, trimLeft) {
+   DNA seq1("refseq", "TGTTAGCTTCATATTAAAGCTGTTTTGTTTCATGGTCAAAAGATAGATGCCAATGGTGGCAATGGATGCCTAGCAGGACAGAGACTCACTACACACACAAACACACACACACACACACACACACACACACACACACACACACAAAGTAGAT");
+   DNA seq2("query", "TTTTTTATATATATTTATTATCTTTTTTTTCTTTTTTTCAAAATAGATATCACCCTTGTGTCTCTATTTCTCGCTCTAGAGAGAGAGACACTAAACACACACACACACACACACACACACACACACACACACACACACACACACCCTTTTC");
+   /*
+ref x S41733017  10-147/148 | 10-150/151
+Score=576 gap length: 5 2 num gaps: 3 1 idencnt=106 simcnt=0 alnlen=143 identity=0.74126 similarity=0.74126
+11        21        31        39        49        59        69        77
++         +         +         +         +         +         +         +
+ATATTAAAGCTGTTTTGTTTCATGGT--CAAAAGATAGATGCCAATGGTGGCAATGGATGCCTAG--CAGGACAGAGACT
+||||| |   | |||| |||| |  |  ||||| | | ||  |  | ||| |  |  ||  || |  |  || |||||
+ATATTTATTATCTTTTTTTTCTTTTTTTCAAAATAGATATCACCCTTGTGTC--TCTATTTCTCGCTCTAGAGAGAGAGA
++         +         +         +         +         +         +         +
+11        21        31        41        51        61        69        79
 
+87        97        107       117       127       136       146
++         +         +         +         +         +         +         +
+CACTACACACACAAACACACACACACACACACACACACACACACACAC-CACACACCCTTTTC
+||||| ||||||| |||||||||||||||||||||||||||||||||| ||||||||||||||
+CACTAAACACACACACACACACACACACACACACACACACACACACACACACACACCCTTTTC
++         +         +         +         +         +         +         +
+89        99        109       119       129       139       149
+*/
+   SimpleScoreMethod ssm(10, -11, -40, -1);
+   Dynaln<SimpleScoreMethod> aligner(ssm);
+   aligner.setseq(seq1, seq2);
+   aligner.runlocal();
+   cout << "Before trimming\n";
+   aligner.printAlign(cout, 80);
+   cout << "nogap identity=" << aligner.getNogapIdentity() << endl;
+   aligner.trimLeft(0.85);
+   cout << "after left trimming. gaplen2=" << aligner.getGaplen2() << "\n";
+   aligner.printAlign(cout, 80);
+   //cout << "after print  gaplen2=" << aligner.getGaplen2() << "\n";
+   ASSERT_TRUE(aligner.getAlnlen() == 56);
+   // another more difficult case
+   seq1.setSequence("ACCACAGTGGAATTAAATTAGAATTACTCACCAAAAGTTAACTAGGGGAAACACAAACACACACACACACACACACACACACACACACAGAGCGACACAGACAAGATAGCGCGAGCGCACGGGTCAGCTCGCCTCTCTCGGCTGGAGCTCG");
+   seq2.setSequence("TATACTTTGGGTATAACTCTTTTTCTACACTCCGCTCTCTAGATATCTCACAGAGTGTTTATATATTATATTATCTCAAAAAATTATATCTCGGTTACACACACACACACACACACACACACACACACACACACAGAGAGCCACATACACA");
+   aligner.setseq(seq1, seq2);
+   aligner.runlocal();
+   cout << "Before trimming\n";
+   aligner.printAlign(cout, 80);
+   cout << "nogap identity=" << aligner.getNogapIdentity() << endl;
+   aligner.trimLeft(0.85);
+   cout << "after left trimming. gaplen2=" << aligner.getGaplen2() << "\n";
+   aligner.printAlign(cout, 80);
+}
+
+TEST_F(DynalnTest, trimRight) {
+   DNA seq1("refseq", "TCATGACTGACAAGGGGAGGGGAAGTAACACTTTTTAAGTTCACCCTGGGAAAGTAACCACTATCTACACACACACCAGTACATACACACACACACACACACACACACACACACCAGTACACACACACACACACACACACACACACACACACCAGTACA");
+   DNA seq2("query", "TCATGACTGACAAGGGGAGGGGAAGTAACACTTTTTAAGTTCACCCTGGGAAAGTAACCACTATCTACACACACACCAGTACATACACACACACACACACACAATAACAACAGCAAAACACAAAACACAACAAACAAGGACAGATCTAGTG");
+/*
+1         11        21        31        41        51        61        71
++         +         +         +         +         +         +         +
+TCATGACTGACAAGGGGAGGGGAAGTAACACTTTTTAAGTTCACCCTGGGAAAGTAACCACTATCTACACACACACCAGT
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+TCATGACTGACAAGGGGAGGGGAAGTAACACTTTTTAAGTTCACCCTGGGAAAGTAACCACTATCTACACACACACCAGT
++         +         +         +         +         +         +         +
+1         11        21        31        41        51        61        71
+
+81        91        101       111       121       130       140       150
++         +         +         +         +         +         +         +
+ACATACACACACACACACACACACACACACACACCAGTACACACACA-CACACACACACACACACACACACACCAGTACA
+|||||||||||||||||||||||            | || ||| ||| || | ||||| | ||||| ||| || || |||
+ACATACACACACACACACACACA------------A-TA-ACA-ACAGCA-AAACACAAA-ACACA-ACAAACAAGGACA
++         +         +         +         +         +         +         +
+81        91        101                 107                           133
+*/
+   SimpleScoreMethod ssm(10, -11, -40, -1);
+   Dynaln<SimpleScoreMethod> aligner(ssm);
+   aligner.setseq(seq1, seq2);
+   aligner.runlocal();
+   cout << "Before trimming\n";
+   aligner.printAlign(cout, 80);
+   cout << "nogap identity=" << aligner.getNogapIdentity() << endl;
+   aligner.trimRight(0.85);
+   cout << "after right trimming\n";
+   aligner.printAlign(cout, 80);
+   ASSERT_TRUE(aligner.getAlnlen() == 103);
+}
