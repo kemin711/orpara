@@ -121,7 +121,7 @@ template <int K> class KmerBase {
          }
          for (i=0; i < seq.length()-K+1; ++i) { // rolling update
             v<<=2;
-            v |= base2int(seq[i+K]);
+            v |= base2int(seq[i+K-1]);
             v &= mask;
             res[i]=v;
          }
