@@ -6,6 +6,7 @@
 
 using namespace std;
 
+namespace orpara {
 /**
  * This class should be used as base for other kmer.
  * Only minimal behavior will be defined in this class.
@@ -188,6 +189,6 @@ const uint64_t KmerBase<K>::mask = ((~uint64_t(0))<<(64-2*K))>>(64-2*K);
 template<int K> const uint64_t KmerBase<K>::maskL=KmerBase<K>::mask << 2;
 template<int K> const uint64_t KmerBase<K>::maskR=KmerBase<K>::mask >> 2;
 template<int K> const char KmerBase<K>::int2base[4]={'A', 'C', 'G', 'T'};
-
+}
 
 #endif

@@ -27,6 +27,13 @@ namespace orpara {
  */
 class Interval {
    public:
+      /**
+       * Default constructor.
+       * The region is a single point (-1,-1)
+       * which is most unlikely number. Could consider
+       * min(int) smallerst number.
+       * isNull() will test against this value.
+       */
       Interval() : b(-1), e(-1) { }
       /**
        * Constructor from two numbers.

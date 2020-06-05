@@ -45,7 +45,7 @@ TEST_F(KmerTest, common) {
       cout << std::dec << kint[i] << " ";
    }
    cout << endl;
-   delete kint;
+   delete[] kint;
 
    ASSERT_TRUE(msk == 63);
 }
