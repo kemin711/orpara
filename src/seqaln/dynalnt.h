@@ -1903,12 +1903,22 @@ void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
          x=itos(topmark[i]);
          if (i + x.size() < topruler.size()) {
             topruler.replace(i, x.length(), x);
+            for (int k=0; k<3; ++k) {
+               if (topruler[i+x.size()+k] != ' ') {
+                  topruler[i+x.size()+k] = ' ';
+               }
+            }
          }
       }
       if (bottommark[i] > -1) {
          x=itos(bottommark[i]);
          if (i + x.size() < bottomruler.size()) {
             bottomruler.replace(i, x.length(), x);
+            for (int k=0; k<3; ++k) {
+               if (bottomruler[i+x.size()+k] != ' ') {
+                  bottomruler[i+x.size()+k] = ' ';
+               }
+            }
          }
       }
    }
