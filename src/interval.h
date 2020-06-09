@@ -143,6 +143,11 @@ class Interval {
        * Less operator.
        */
       bool operator<(const Interval &iv) const { return less(iv); }
+      bool operator>(const Interval &iv) const { 
+         if (b>iv.b) return true;
+         if (b<iv.b) return false;
+         return e > iv.e;
+      }
       /**
        * Equal operator.
        */
