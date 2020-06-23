@@ -24,7 +24,8 @@ using namespace std;
 namespace orpara {
 /**
  * Templae version of kmer.  Kmer length
- * is a parameter in this class.
+ * is a parameter in this class. K should be 
+ * less than 16.
  *
  * This class is for individual sequences.
  * This will be dedicated to DNA 4 bases
@@ -58,6 +59,8 @@ class Kmert : public KmerBase<K> {
        * Vector store the 0 or more location of the kmer's 
        * first base's 0-based index in seq. Empty vector
        * signifies the lack of kmer in the entire sequence.
+       * Each index from 0 to loc.size() is the hash value of
+       * each possible kmer.
        */
       vector<vector<unsigned int> > loc;
       /**
@@ -202,7 +205,7 @@ void Kmert<K>::kmer2int() {
    }
    for (i=0; i<seq.length()-K+1; ++i) {
       v<<=2;
-      v |= base2int(seq[i+K]);
+      v |= base2int(seq[i+K-1]);
       v &= mask;
       hashval[i]=v;
    }
