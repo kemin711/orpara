@@ -2675,18 +2675,19 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    //   << it->first << "," << it->second << " ginw=" << ginw 
    //   << " ngp1=" << ngp1 << " ngp2=" << ngp2 << endl;
    while (itB != it && (itB->first == -1 || itB->second == -1)) { // skip gaps
-      cerr << "itB landed in gap: " << itB->first << ',' << itB->second << endl;
+      //cerr << "itB landed in gap: " << itB->first << ',' << itB->second << endl;
       //untrimGapInfo(itB, mstate, gplen1, gplen2, ngp1, ngp2);
       ++itB;
    }
    while (itB != it && itB->first != -1 && itB->second != -1 && C1[itB->first] != C2[itB->second]) { 
-      cerr << "itB landed in mismatch: " << itB->first << ',' << itB->second << endl;
+      //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG itB landed in mismatch: " << itB->first << ',' << itB->second << endl;
       ++itB;
    }
    //cout << itB->first << "," << itB->second << " gaplen2=" << gaplen2
    //   << " gplen2=" << gplen2 << endl;
-
    alnidx.erase(begin(), itB);
+   seq1begin=alnidx.begin()->first;
+   seq2begin=alnidx.begin()->second;
    //cout << "after update ngp2=" << ngp2 << endl;
    numgaps1 += ngp1; numgaps2 += ngp2;
    gaplen1 += gplen1; gaplen2 += gplen2;
@@ -2775,6 +2776,8 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
    ++itB;
    //cerr << "Window right at time of trimming " << itB->first << " " << itB->second << endl;
    alnidx.erase(itB, end());
+   seq1end=alnidx.back().first;
+   seq2end=alnidx.back().second;
    numgaps1 += ngp1; numgaps2 += ngp2;
    gaplen1 += gplen1; gaplen2 += gplen2;
    buildAlnInfo();
@@ -3330,8 +3333,7 @@ void LSDynaln<T>::buildResult(const int delta1, const int delta2) {
 /* use two rows of array to memorize the coordinate
  * of the alignment starting point
  */
-template<class T>
-int LSDynaln<T>::local() {
+template<class T> int LSDynaln<T>::local() {
    this->alntype=LOCAL;
    allocmem();
    const int col=this->seq2->length()+1; // column of matrix
