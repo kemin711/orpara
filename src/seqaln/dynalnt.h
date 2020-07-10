@@ -2640,7 +2640,7 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
       ++it;
    }
    if (samecnt >= cutcnt) {
-      cerr << __FILE__ << ":" << __LINE__ << ":DEBUG no need to trim\n";
+      //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG no need to trim\n";
       return false;
    }
    //cerr << "first 20 same count: " << samecnt << " gplen1=" << gplen1 
@@ -2763,13 +2763,13 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
    else {
       while (itB != it && (itB->first == -1 || itB->second == -1)) { // skip gaps
          //trimGapInfo(it, mstate);
-         cerr << "trim right landed in gap: " << itB->first << ',' << itB->second << "\n";
+         //cerr << "trim right landed in gap: " << itB->first << ',' << itB->second << "\n";
          //untrimGapInfo(itB, mstate, gplen1, gplen2, ngp1, ngp2);
          --itB;
       }
       while (itB != it && itB->first != -1 && itB->second != -1 && C1[itB->first] != C2[itB->second]) 
       { 
-         cerr << "trim right landed in mismatch: " << itB->first << ',' << itB->second << "\n";
+         //cerr << "trim right landed in mismatch: " << itB->first << ',' << itB->second << "\n";
          --itB;
       }
    }
