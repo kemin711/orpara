@@ -23,7 +23,7 @@ using namespace std;
 
 namespace orpara {
 /**
- * Templae version of kmer.  Kmer length
+ * Template version of kmer.  Kmer length
  * is a parameter in this class. K should be 
  * less than 16.
  *

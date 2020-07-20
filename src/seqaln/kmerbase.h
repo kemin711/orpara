@@ -3,6 +3,7 @@
 
 #include <string>
 #include <cstdint>
+#include <numeric_limits>
 
 using namespace std;
 
@@ -35,7 +36,7 @@ template <int K> class KmerBase {
             case 't':
                return 3;
             default:
-               return -1;
+               return numeric_limits<unsigned int>::max();
          }
       }
       static const char int2base[4];
@@ -57,7 +58,7 @@ template <int K> class KmerBase {
             case 't':
                return 3;
             default:
-               return -1;
+               return numeric_limits<unsigned int>::max();
          }
       }
       static const char int2baseC[4];
@@ -80,7 +81,7 @@ template <int K> class KmerBase {
             case 't':
                return 3;
             default:
-               return -1;
+               return numeric_limits<unsigned int>::max();
          }
       }
       static const char int2baseG[4];
@@ -102,7 +103,7 @@ template <int K> class KmerBase {
             case 't':
                return 0;
             default:
-               return -1;
+               return numeric_limits<unsigned int>::max();
          }
       }
       static const char int2baseT[4];
