@@ -1,5 +1,5 @@
-TESTS = testall testmatrix testkmerset testkmer
-check_PROGRAMS = testall testmatrix testkmerset testkmer
+TESTS = testall testmatrix testkmerset testkmer testminhash
+check_PROGRAMS = testall testmatrix testkmerset testkmer testminhash
 testall_SOURCES = main_testall.cpp dynalnt_test.cpp 
 testall_CXXFLAGS = -I.. -I../.. $(gtest_CXXFLAGS)
 testall_LDFLAGS = $(gtest_LDFLAGS)
@@ -19,4 +19,9 @@ testkmer_SOURCES = kmer_test.cpp
 testkmer_CXXFLAGS = -I.. -I../.. $(gtest_CXXFLAGS)
 testkmer_LDFLAGS = $(gtest_LDFLAGS)
 testkmer_LDADD = $(gtest_LIBS) ../../libkemin.la
+
+testminhash_SOURCES = minhash_test.cpp
+testminhash_CXXFLAGS = -I.. -I../.. $(gtest_CXXFLAGS)
+testminhash_LDFLAGS = $(gtest_LDFLAGS)
+testminhash_LDADD = $(gtest_LIBS) ../../libkemin.la
 

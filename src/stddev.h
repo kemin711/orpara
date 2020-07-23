@@ -199,8 +199,7 @@ class stddev {
 /**
  * Useful for working with multiple numbers.
  */
-template<size_t N>
-class Stddev {
+template<size_t N> class Stddev {
 	private:
 		double var[N];
 		double avg[N];

@@ -8,7 +8,8 @@
 AUTOMAKE_OPTIONS = subdir-objects
 only_headers = stddev.h seqaln/dynalnt.h seqaln/kmert.h seqaln/kmerbase.h seqaln/kmerset.h \
 				  	gentree.h evolution/evolution.h quicksortorder.h threadsafequeue.h \
-					derivative.h kmean.h insertsortlist.h cluster/hatrees.h randombase.h
+					derivative.h kmean.h insertsortlist.h cluster/hatrees.h randombase.h \
+					seqaln/minhash.h
 header_forlibs = strformat.h range.h interval.h bioseq.h codon.h Model.h FPGModel.h \
 					  GModel.h fastq.h seqaln/scorematrix.h seqaln/alninfo.h seqaln/alnexaminer.h \
 					  seqaln/kmer.h seqaln/kmerhelper.h ncbitaxonomy.h 
