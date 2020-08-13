@@ -268,6 +268,7 @@ template<class T> class Hatrees
        * @return vector of cluster as sets
        */
       vector<set<T>> getClusterAsSet() const;
+      vector<list<T>> getClusterAsList() const;
 
 #ifdef USE_HASH_MAP
       typedef typename unordered_map<T, HNode<T>* >::iterator niterator;
@@ -432,6 +433,15 @@ vector<set<T>> Hatrees<T>::getClusterAsSet() const {
    vector<set<T>> res;
    for (auto& r : result) {
 		res.push_back(set<T>(r.second.begin(), r.second.end()));
+	}
+   return res;
+}
+
+template<class T> vector<list<T>> Hatrees<T>::getClusterAsList() const {
+	if (result.empty()) transform();
+   vector<list<T>> res;
+   for (auto& r : result) {
+		res.push_back(list<T>(r.second.begin(), r.second.end()));
 	}
    return res;
 }
