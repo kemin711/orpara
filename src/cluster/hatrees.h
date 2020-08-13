@@ -6,6 +6,9 @@
 
 #include <string>
 #include <map>
+#ifdef USE_HASH_MAP
+#include <unordered_map>
+#endif
 //#include <hash_map.h>
 //#include <multimap.h> included by <map>
 #include <utility>   // contains pair.h
@@ -66,9 +69,10 @@ template<class T> struct HNode
    }
 
    /**
-    * The look up key
+    * The look up key.
+	 * stored in the map<key, value>
     */
-	T key;   // stored in the map<key, value>
+	T key;  
    /**
     * Pointer to parent
     */
@@ -111,6 +115,7 @@ template<class T> void join(HNode<T>* x, HNode<T>* y) {
 /* for hash_map of string as key, hash is not working
  * should be implemented later */
 /*
+ * Std provides string hash function
 template<> struct hash<string> {
 	size_t operator()(const string &key) const {
 		size_t res=0;
@@ -131,9 +136,9 @@ template<> struct hash<string> {
 ///////////////////////////////////////////////////////
 //   Hatrees class definition /////////////////////////
 /** 
- * this class provides simple file output methods.
+ * This class provides simple file output methods.
  * No database table output is defined in this class
- * bedause it will require different database drivers.
+ * because it will require different database drivers.
  * The getCluster() method will produce a relational table.
  * The template type T must have the output operator<<
  * implemented to use the display functions.
@@ -143,7 +148,8 @@ template<class T> class Hatrees
 {
 	public:
       /**
-       * Default constructor
+       * Default constructor build an empty object.
+       * Must call readFromMap() method to get input.
        */
 		Hatrees() : nodes(), result() { }
       /** 
@@ -165,6 +171,8 @@ template<class T> class Hatrees
 		void readFromMap(const std::multimap<T, T> &m);
       /**
        * Directly read from file for convenience.
+       * File must have two columns and each row is
+       * a relationship of two objects of the type T.
        */
 		void readFromFile(const string &file);
       /* only gecods.cpp needs this function
@@ -189,6 +197,8 @@ template<class T> class Hatrees
 		int getNodeCount() const { return nodes.size(); }
 		/** 
        * in a table format: (cluster_id(representative), members) 
+       * @param os output stream with two columns: clid TAB Member
+       * @param revere if true then will be member TAB clid
        * */
 		void showCluster(ostream &os, bool reverse= true);
 		/** 
@@ -208,7 +218,7 @@ template<class T> class Hatrees
       /** 
        * @return all the keys as a set<T> it is all the 
        *   members in the input. Useful for finding singleton
-       *   clusters. 
+       *   clusters by comparing with external inputs. 
        */
 		set<T> keyset() const;
 		vector<T> keyarray() const;
@@ -222,12 +232,13 @@ template<class T> class Hatrees
 		void clusterArray(vector<set<T> > &vecset);
 
       /** 
+       * Only clusters with more than one members are returned.
+       * Singletons are not in the output.
        * @return a relational table
        *   with two columns: | representative | member |
        *   Use this method to load into database tables.
        *   Singletons are not included in the output.
        */
-		//std::multimap<T,T>& getCluster() { 
 		vector<pair<T,T>> getCluster() const { 
          if (result.empty()) transform();
          vector<T,T> res;
@@ -249,12 +260,18 @@ template<class T> class Hatrees
          if (result.empty()) transform();
          return result.size();
       }
+      /**
+       * @return vector of cluster as vectors
+       */
       vector<vector<T>> getClusterAsVector() const;
+      /**
+       * @return vector of cluster as sets
+       */
       vector<set<T>> getClusterAsSet() const;
 
 #ifdef USE_HASH_MAP
-      typedef typename hash_map<T, HNode<T>* >::iterator niterator;
-      typedef typename hash_map<T, HNode<T>* >::const_iterator const_niterator;
+      typedef typename unordered_map<T, HNode<T>* >::iterator niterator;
+      typedef typename unordered_map<T, HNode<T>* >::const_iterator const_niterator;
 #else
       typedef typename map<T, HNode<T>* >::iterator niterator;
       typedef typename map<T, HNode<T>* >::const_iterator const_niterator;
@@ -262,7 +279,7 @@ template<class T> class Hatrees
 
 	private:
 #ifdef USE_HASH_MAP 
-		hash_map<T, HNode<T>* > nodes;
+		unordered_map<T, HNode<T>* > nodes;
 #else
 		map<T, HNode<T>* > nodes;
 #endif
@@ -271,8 +288,10 @@ template<class T> class Hatrees
        * representative->members 
        * Should have another method to return a reversed result.
        * Essentially the same as nodes, but more easy to work with.
+       * Note: the member size > 1. The minimal cluster size
+       * should be 2 since the input contain relationship between
+       * 2 objects.  
        */
-		//mutable map<T, vector<T>> result;
 		mutable map<HNode<T>*, vector<T>> result;
 
 		/** 
@@ -351,7 +370,10 @@ template<class T> void Hatrees<T>::showStore(ostream &os) const {
 	cerr << "Total number of unique keys is " << nodes.size() << endl;
 }
 
-/* return the key as a set<T> */
+/* 
+ * return all the key as a set<T>
+ * usful for computing the singletons
+ */
 template<class T> set<T> Hatrees<T>::keyset() const {
 	set<T> tmpset;
 	const_niterator it = nodes.begin();
