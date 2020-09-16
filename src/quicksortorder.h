@@ -259,8 +259,10 @@ class FindMedian {
          }
          */
          if (data.empty()) {
+#ifdef DEBUGLOG
             cerr << __FILE__ << ":" << __LINE__ << ":" << __func__ 
-               << ":WARN data is empty, please check your logic\n";
+               << ":WARN medianval=" << medianVal << " although data is empty, please check your logic\n";
+#endif
             return medianVal;
          }
          else if (data.size() == 1) {
