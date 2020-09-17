@@ -340,8 +340,11 @@ class FindMedian {
 
       int getUniqueCount() const {
          if (data.empty()) {
+            if (numuniq != -1) return numuniq;
+#ifdef DEBUGLOG
             cerr << __FILE__ << ":" << __LINE__ << ":" << __func__
                << ":WARN empty data, check logic\n";
+#endif
             return -1;
          }
          //if (numuniq == -1) {
