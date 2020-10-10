@@ -163,6 +163,9 @@ class stddev {
       void reduceCount(int c) {
          j -= c; if (c < 0) c=0;
       }
+      void addCount(int c) {
+         j += c;
+      }
       double getTotal() const { return j*getMean(); }
 		// postgres retuns the sample standard deviation
 		pair<double, double> result() const { return make_pair(avg, sqrt(SS)); }
@@ -367,6 +370,7 @@ template<size_t N> class Stddev {
       void reduceCount(int c) {
          j -= c; if (c < 0) c=0;
       }
+      void addCount(int c) { j += c; }
 		// postgres retuns the sample standard deviation
 		pair<array<double,N>, array<double,N> > result() const { 
          return make_pair(getAverage(), getStd()); 
