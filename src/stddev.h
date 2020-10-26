@@ -54,6 +54,7 @@ class stddev {
        * Constructor from one element.
        */
 		stddev(double val) : var(0), avg(val), j(1), SS(0) {}
+		stddev(double val, int n) : var(0), avg(val), j(n), SS(0) {}
       /**
        * copy constructor. 
        * Since all types are primitive, no need for 
@@ -223,11 +224,21 @@ template<size_t N> class Stddev {
       {
          for (size_t i=0; i<N; ++i) avg[i] = val[i]; 
       }
+		Stddev(const double val[], int n) 
+         : var{0}, avg{0}, j(n), SS{0} 
+      {
+         for (size_t i=0; i<N; ++i) avg[i] = val[i]; 
+      }
       /**
        * Constructor from a std::array type.
        */
 		Stddev(const array<double,N> val) 
          : var{0}, avg{0}, j(1), SS{0} 
+      {
+         for (size_t i=0; i<N; ++i) avg[i] = val[i]; 
+      }
+		Stddev(const array<double,N> val, int n) 
+         : var{0}, avg{0}, j(n), SS{0} 
       {
          for (size_t i=0; i<N; ++i) avg[i] = val[i]; 
       }
@@ -307,6 +318,11 @@ template<size_t N> class Stddev {
             }
 			}
 		}
+		void operator()(const double x[], int n) {
+         for (int i=0; i<n; ++i) {
+            operator()(x);
+         }
+		}
 
 		void operator()(const array<double,N>& x) {
 			++j;
@@ -326,6 +342,11 @@ template<size_t N> class Stddev {
             }
 			}
 		}
+		void operator()(const array<double,N>& x, int n) {
+         for (int i=0; i<n; ++i) {
+            operator()(x);
+         }
+      }
 
       /**
        * Get mean value for the member with index i
