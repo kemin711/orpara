@@ -140,8 +140,10 @@ void rmsp(const char a[], char b[]);
 void rmsp(string& str);
 /**
  * Same as rmsp, different implementation, not tested.
+ * Remove spaces only.
  */
 void removeWhiteChar(string& str);
+void removeHiddenChar(string& str);
 //removes extra white-char (space, \t, and \n) from the string, so 
 //that only one space is left to separate words
 void singleSpace(string &str);

@@ -253,6 +253,22 @@ void removeWhiteChar(string& str) {
    if (i < str.size()-1) str.resize(i);
 }
 
+void removeHiddenChar(string& str) {
+   string::size_type i=0, j=0;
+   while (j < str.size()) {
+      if (isprint(str[j])) {
+         ++i; ++j;
+      }
+      else {
+         ++j;
+      }
+      if (i != j) {
+         str[i] = str[j];
+      }
+   }
+   if (j>i) str.resize(i);
+}
+
 /**
  * @return a new string with all c deleted in str
  */

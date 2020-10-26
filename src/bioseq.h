@@ -504,12 +504,20 @@ class bioseq {
          return entropy(seq.substr(b,e-b+1)); }
 
       /** 
+       * @param seq input string can be anything other than DNA, but only
+       *    meaningful for DNA or RNA sequences.
        * @return the single letter and double letter
        *    entrpy of the sequence string.
        *
        * This is not a member function for convenient application on string.
+       * This is mainly used for judging whether input sequence is 
+       * simple repeat. For more accurate method a separate method should
+       * be used.
        */
       static pair<double,double> entropy(const string &seq);
+      /**
+       * @return the length of the underlying sequence.
+       */
       size_t length() const { return seq.length(); }
 
       /**

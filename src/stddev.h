@@ -24,7 +24,7 @@ using namespace std;
  */
 namespace orpara {
 /**
- * Simple statistics for numbers
+ * Simple statistics for numbers.
  */
 class stddev {
 	private:
@@ -154,6 +154,7 @@ class stddev {
        * Number of data points
        */
       int getCount() const { return j; }
+      void setCount(int c) { j = c; }
       /**
        * This is not a truely authentic operation.
        * We only use it for special situations for
@@ -163,6 +164,10 @@ class stddev {
       void reduceCount(int c) {
          j -= c; if (c < 0) c=0;
       }
+      /**
+       * For special situations. you may change the
+       * count.
+       */
       void addCount(int c) {
          j += c;
       }
