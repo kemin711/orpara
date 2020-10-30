@@ -349,13 +349,15 @@ class FindMedian {
 
       int getUniqueCount() const {
          if (data.empty()) {
-            if (numuniq != -1) return numuniq;
+            return numuniq;
+            //if (numuniq != -1) return numuniq;
 #ifdef DEBUGLOG
             cerr << __FILE__ << ":" << __LINE__ << ":" << __func__
                << ":WARN empty data, check logic\n";
 #endif
-            return -1;
+            //return -1;
          }
+         if (numuniq != -1) return numuniq;
          //if (numuniq == -1) {
             set<T> tmp(data.begin(), data.end());
             numuniq=tmp.size();
@@ -396,6 +398,24 @@ class FindMedian {
        *    then clear the data member to save storage.
        */
       pair<T, int> getMedianUniqueAndClear() {
+         computeMedian();
+         computeUniqueCount();
+         data.clear();
+         return make_pair(medianVal, numuniq);
+      }
+
+      /**
+       * Will do sample if data.size() > 10000
+       * then will sample 10000 from the original data
+       */
+      pair<T, int> getMedianUniqueAndClearQuick() {
+         if (data.size() > 10000) {
+            vector<T> tmp;
+            tmp.reserve(10000);
+            std::sample(data.begin(), data.end(), back_inserter(tmp),
+                  10000, std::mt19937{std::random_device{}()});
+            data = std::move(tmp);
+         }
          computeMedian();
          computeUniqueCount();
          data.clear();
