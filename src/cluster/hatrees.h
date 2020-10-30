@@ -20,6 +20,7 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
+#include <algorithm>
 
 //#include <istream.h>
 //
@@ -221,8 +222,10 @@ template<class T> class Hatrees
        *   clusters by comparing with external inputs. 
        */
 		set<T> keyset() const;
+      /**
+       * @return vector form of the keys
+       */
 		vector<T> keyarray() const;
-
 		/** 
        * produce an array of clusters, used call by reference
 		 * to avoid creating tmp and copying.
@@ -230,7 +233,6 @@ template<class T> class Hatrees
        * This is one of the output methods.
        * */
 		void clusterArray(vector<set<T> > &vecset);
-
       /** 
        * Only clusters with more than one members are returned.
        * Singletons are not in the output.
@@ -261,7 +263,8 @@ template<class T> class Hatrees
          return result.size();
       }
       /**
-       * @return vector of cluster as vectors
+       * You need to do a set operation to obtain the singletons.
+       * @return vector of cluster as vectors excluding singletons
        */
       vector<vector<T>> getClusterAsVector() const;
       /**
@@ -269,6 +272,14 @@ template<class T> class Hatrees
        */
       vector<set<T>> getClusterAsSet() const;
       vector<list<T>> getClusterAsList() const;
+      /*
+       * There is no singleton, since all members
+       * will have at least one relation with another
+       * So singleton operation must be done from 
+       * the caller who knows more than the clustered members.
+       * @return a set of singletons
+       */
+      //set<T> getSingleton() const;
 
 #ifdef USE_HASH_MAP
       typedef typename unordered_map<T, HNode<T>* >::iterator niterator;
@@ -436,6 +447,21 @@ vector<set<T>> Hatrees<T>::getClusterAsSet() const {
 	}
    return res;
 }
+
+/*
+template<class T>
+set<T> Hatrees<T>::getSingleton() const {
+   set<T> all = keyset();
+   set<T> clustered;
+   for (auto& r : result) {
+      clustered.insert(r.second.begin(), r.second.end());
+   }
+   set<T> single;
+   set_difference(all.begin(), all.end(), clustered.begin(), 
+         clustered.end(), inserter(single, single.end()));
+   return single;
+}
+*/
 
 template<class T> vector<list<T>> Hatrees<T>::getClusterAsList() const {
 	if (result.empty()) transform();

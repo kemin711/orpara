@@ -208,6 +208,12 @@ class FindMedian {
          : data(1,d), medianVal(numeric_limits<T>::max()), numuniq(-1) 
       { }
       /**
+       * @param n number of the same value d
+       */
+      FindMedian(const T& d, int n)
+         : data(n,d), medianVal(numeric_limits<T>::max()), numuniq(-1) 
+      { }
+      /**
        * Constructor from a vector as input.
        */
       FindMedian(const vector<T>& arr) 
@@ -225,6 +231,9 @@ class FindMedian {
        */
       void operator()(T val) {
          data.push_back(val);
+      }
+      void operator()(T val, int n) {
+         data.insert(data.cend(), n, val);
       }
 
       FindMedian& operator=(const FindMedian& other) {

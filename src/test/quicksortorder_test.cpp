@@ -4,8 +4,11 @@
 #include <iterator>
 #include <functional>
 #include <algorithm>
+#include <chrono>
+#include <random>
 
 using namespace orpara;
+using namespace std;
 
 TEST(QuicksortorderTest, RandomNumberGenerator) {
    default_random_engine generator;
@@ -340,3 +343,23 @@ TEST(QuicksortorderTest, FindMedianBig) {
    cout << "Median value (" << medianVal << ") should be 9 " << endl;
    ASSERT_EQ(medianVal, 9);
 }
+
+TEST(QuicksortorderTest, FindMedianSpeed) {
+   // test to see it is linear or n*log(n)
+   random_device r;
+   default_random_engine el(r());
+   uniform_int_distribution<int> uniform_dist(1, 150);
+   for (int n=100; n<10000000; n *= 2) {
+      vector<int> data(n, 0);
+      for (int i=0; i<n; ++i) {
+         data[i] = uniform_dist(el);
+      }
+      chrono::time_point<chrono::steady_clock> t0 = chrono::steady_clock::now();
+      FindMedian<int> fm(data);
+      int medianV = fm.getMedian();
+      chrono::steady_clock::duration tlen = chrono::steady_clock::now() - t0;
+      cerr << "median " << medianV << " from " << n << " numbers took "
+         << chrono::duration_cast<chrono::milliseconds>(tlen).count() << " milliseconds\n";
+   }
+}
+      
