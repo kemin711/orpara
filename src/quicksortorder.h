@@ -409,14 +409,17 @@ class FindMedian {
        * then will sample 10000 from the original data
        */
       pair<T, int> getMedianUniqueAndClearQuick() {
-         if (data.size() > 10000) {
+         if (data.size() > 13001) {
+            //cerr << "down-sampling to 10001 from " << data.size() << "\n";
             vector<T> tmp;
-            tmp.reserve(10000);
+            tmp.reserve(10001);
             std::sample(data.begin(), data.end(), back_inserter(tmp),
-                  10000, std::mt19937{std::random_device{}()});
+                  10001, std::mt19937{std::random_device{}()});
             data = std::move(tmp);
          }
-         computeMedian();
+         //computeMedian();
+         std::nth_element(data.begin(), data.begin() + data.size()/2, data.end());
+         medianVal = data[data.size()/2];
          computeUniqueCount();
          data.clear();
          return make_pair(medianVal, numuniq);
