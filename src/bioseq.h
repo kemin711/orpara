@@ -551,6 +551,10 @@ class bioseq {
        */
       char operator[](const int i) const { return seq[i]; }
       /**
+       * @return a reference to the ith residue
+       */
+      char& operator[](const int i) { return seq[i]; }
+      /**
        * Assignment operator.
        * Will not copy code incase you are construcing a different
        * object.
