@@ -299,6 +299,7 @@ void alignSimple(const bioseq &s1, const bioseq &s2,
       cerr << "after fixing staggered gap\n";
       aln.printAlign(ous);
    }
+   cerr << __func__ << " done\n";
 }
 
 void alignProtein(const int gapOpen, const int gapExtend, 

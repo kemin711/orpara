@@ -21,7 +21,7 @@ AC_PROG_SED
 AC_LANG([C], [C++])
 # Checks for libraries.
 AC_LANG_PUSH([C++])
-AX_CXX_COMPILE_STDCXX(14, [ext], [mandatory])
+AX_CXX_COMPILE_STDCXX(17, [ext], [mandatory])
 AC_LANG_POP([C++])
 
 if test "$prefix" = "NONE"; then

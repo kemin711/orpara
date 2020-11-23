@@ -638,6 +638,19 @@ CACTAAACACACACACACACACACACACACACACACACACACACACACACACACACCCTTTTC
    aligner.trimLeft(0.85);
    cout << "after left trimming. gaplen2=" << aligner.getGaplen2() << "\n";
    aligner.printAlign(cout, 80);
+   // TTTGAATACTAGAGTGTTATCGTTTTTTTTTTATTTTTTTTTAATTTTTTTTTTTTT
+   // ||| |||| || | | || |   ||||||||||||||||||||||||||||||||||
+   // TTTTAATATTA-A-TATTTTTT-TTTTTTTTTATTTTTTTTTAATTTTTTTTTTTTT
+   seq1.setSequence("TTTGAATACTAGAGTGTTATCGTTTTTTTTTTATTTTTTTTTAATTTTTTTTTTTTT");
+   seq2.setSequence("TTAGTTTTTGGTAGGGATCAATTTTAATATTAATATTTTTTTTTTTTTTTATTTTTTTTTAATTTTTTTTTTTTTATCAATTTTTATTTTTTTAATAATATATTAATTACTATAAAATAATGTTAATTAAATACTAAATCTTTTTATAAAA");
+   aligner.setseq(seq1, seq2);
+   aligner.runlocal();
+   cout << "Before trimming\n";
+   aligner.printAlign(cout, 80);
+   cout << "nogap identity=" << aligner.getNogapIdentity() << endl;
+   aligner.trimLeft(0.85);
+   cout << "after left trimming. gaplen2=" << aligner.getGaplen2() << "\n";
+   aligner.printAlign(cout, 80);
 }
 
 TEST_F(DynalnTest, trimRight) {

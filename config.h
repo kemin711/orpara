@@ -1,8 +1,8 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* define if the compiler supports basic C++14 syntax */
-#define HAVE_CXX14 1
+/* define if the compiler supports basic C++17 syntax */
+#define HAVE_CXX17 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1

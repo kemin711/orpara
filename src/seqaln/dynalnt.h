@@ -606,13 +606,28 @@ class Dynaln {
        * @return true if fixed at least one stagger gap
        */
       bool fixStagger();
+      /** 
+      * This function will subtract one gap when transitioning from 
+      * b or m state into g state if it happen to fall on a gap align
+      * state.  The gap length will also be reduced regardless of the transition.
+      * @param it is the iterator to alnidx. "it" should be on the trailing
+      *    side of the moving window.
+      * @param ms is match state: g for gap, m for match, b for begin
+      * @param gpl1 top seq gap length
+      * @param gpl2 bottom seq gap length
+      * @param ng1 number of gaps for the top sequence within window
+      * @param ng2 number of gaps for the bottom sequence within window
+      */
       static void trimGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int& ng1, int& ng2);
-      static void untrimGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int& ng1, int& ng2);
+      //static void addGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int& ng1, int& ng2);
       /**
        * This method will update gap values but
        * will leave identical member unchanged.
        * The buildAlnInfo() thethod should be called
        * to update alignment and the identical member.
+       * Uses addGapInfo method to count gap length and number of gaps
+       *  Passed the trailing end of the moving window. These should be then
+       *  subtracted from the total.
        */
       bool trimLeft(float ngidentitycut);
       bool trimRight(float ngidentitycut);
@@ -2563,11 +2578,11 @@ template<class T> string Dynaln<T>::getMDString1() const {
    return ost.str();
 }
 
-// remove one gap
+/*
 template<class T>
-void Dynaln<T>::trimGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int& ng1, int& ng2) {
+void Dynaln<T>::subtractGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int& ng1, int& ng2) {
    if (ms == 'b' || ms == 'm') {
-      if (it->first == -1) { // gap 1
+      if (it->first == -1) { // enter into gap state gap 1
          --ng1; --gpl1;
          ms='g'; // gap state first or second seq
       }
@@ -2581,9 +2596,10 @@ void Dynaln<T>::trimGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int&
       else if (it->second == -1) { --gpl2; }
    }
 }
+*/
 
 template<class T>
-void Dynaln<T>::untrimGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int& ng1, int& ng2) {
+void Dynaln<T>::trimGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int& ng1, int& ng2) {
    if (ms == 'b' || ms == 'm') {
       if (it->first == -1) { // gap 1
          ++ng1; ++gpl1;
@@ -2621,76 +2637,113 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
       return false;
    }
    // there is no need to update identical value.
-   //static const int window=20;
+   if (getNogapIdentity() < ngidentitycut) ngidentitycut=getNogapIdentity();
    int cutcnt = int(ceil(20*ngidentitycut));
    int samecnt=0;
    int ginw=0; // gap in window
    alniterator it = begin();
-   char mstate='b'; // start state
+   char mstate='b'; // start state for trailing end
+   //char mstateLead='b';
+   //char mstateFollow='b';
+   // ----[__window__]============
+   //     | trim point
+   // gplen1, gplen2 is the gap length before the window
+   // ngp1 and ngp2 is the number of gaps before the window
+   // Should be positive value
    int gplen1=0, gplen2=0, ngp1=0, ngp2=0;
    for (size_t i=0; i < 20; ++i) {
       while (it != end() && (it->first == -1 || it->second == -1)) {
-         trimGapInfo(it, mstate, gplen1, gplen2, ngp1, ngp2);
          ++ginw; ++it;
       }
-      mstate = 'm';
       if (C1[it->first] == C2[it->second]) { // identical
          ++samecnt;
       }
       ++it;
    }
    if (samecnt >= cutcnt) {
-      //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG no need to trim\n";
-      return false;
+      alniterator b = begin();
+      // skip indel or mismatch make sure b land in a match
+      while (b != it) {
+         if (b->first == -1 || b->second == -1) {
+            trimGapInfo(b, mstate, gplen1, gplen2, ngp1, ngp2);
+            ++b;
+         }
+         else if (C1[it->first] != C2[it->second]) {
+            ++b;
+         }
+         else break;
+      }
+      if (b == begin()) {
+         //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG no need to trim\n";
+         return false;
+      }
+      alnidx.erase(begin(), b);
+      seq1begin=alnidx.begin()->first;
+      seq2begin=alnidx.begin()->second;
+      numgaps1 -= ngp1; numgaps2 -= ngp2;
+      gaplen1 -= gplen1; gaplen2 -= gplen2;
+      buildAlnInfo();
+      return true;
    }
-   //cerr << "first 20 same count: " << samecnt << " gplen1=" << gplen1 
-   //   << " gplen2=" << gplen2 << endl;
+#ifdef DEBUG
+   cerr << "first 20 same count: " << samecnt << " gplen1=" << gplen1 
+      << " gplen2=" << gplen2 << endl;
+#endif
    alniterator itB=begin();
    // itB     it
    // |-------|
    // ---W----
-   while (it != end() && (samecnt <= cutcnt || ginw > 0) && (samecnt < 19 || ginw > 1)) {
+   while (it != end() && (samecnt < cutcnt || ginw > 0) && (samecnt < 19 || ginw > 1)) {
       //cerr << samecnt << " less than " << cutcnt << endl;
+      bool itmoved=false;
       while (it != end() && (it->first == -1 || it->second == -1)) {
-         trimGapInfo(it, mstate, gplen1, gplen2, ngp1, ngp2);
          ++ginw; ++it;
+         itmoved=true;
       }
-      //while (it != end() && itB->first == -1 || itB->second == -1) {
-      while (itB->first == -1 || itB->second == -1) {
+      bool itbmoved=false;
+      while (itB->first == -1 || itB->second == -1) { // there should be at least one match
+         trimGapInfo(itB, mstate, gplen1, gplen2, ngp1, ngp2);
          --ginw; ++itB;
+         itbmoved=true;
       }
       mstate = 'm';
       //cerr << "Window left " << (*seq1)[itB->first] << "/" << (*seq2)[itB->second]
       //      << " right  " << (*seq1)[it->first] << "/" << (*seq2)[it->second] << endl;
       if (C1[itB->first] == C2[itB->second]) --samecnt;
-      if (C1[it->first] == C2[it->second]) {
-         ++samecnt;
-      }
-      ++itB; ++it;
+      if (C1[it->first] == C2[it->second]) { ++samecnt; }
+      if (!itmoved) ++it;
+      if (!itbmoved) ++itB; 
+   }
+   if (it == end()) { // never reached cutoff
+      printAlign(cerr, 80);
+      cerr << __FILE__ << ":" << __LINE__ << ":WARN whole sequence trimmed away out\n";
+      //throw runtime_error("matched count never reached cutoff within window");
+      return false;
    }
    //assert(itB->first != -1 && itB->second != -1 && C1[itB->first] == C2[itB->second]);
    // itB should always land at a match
-   //cout << samecnt << " above cutoff " << cutcnt << " itB at "
-   //   << itB->first << "," << itB->second << " it at " 
-   //   << it->first << "," << it->second << " ginw=" << ginw 
-   //   << " ngp1=" << ngp1 << " ngp2=" << ngp2 << endl;
-   while (itB != it && (itB->first == -1 || itB->second == -1)) { // skip gaps
-      //cerr << "itB landed in gap: " << itB->first << ',' << itB->second << endl;
-      //untrimGapInfo(itB, mstate, gplen1, gplen2, ngp1, ngp2);
-      ++itB;
+#ifdef DEBUG
+   cout << __LINE__ << ": " << samecnt << " above cutoff " << cutcnt << " itB at "
+      << itB->first << "," << itB->second << " it at " 
+      << it->first << "," << it->second << " ginw=" << ginw 
+      << " ngp1=" << ngp1 << " ngp2=" << ngp2 << endl;
+#endif
+   while (itB != it) { // skip gap or mismatch
+      if (itB->first == -1 || itB->second == -1) {
+         trimGapInfo(itB, mstate, gplen1, gplen2, ngp1, ngp2);
+         ++itB;
+      }
+      else if (C1[itB->first] != C2[itB->second]) { 
+         ++itB;
+      }
+      else break;
    }
-   while (itB != it && itB->first != -1 && itB->second != -1 && C1[itB->first] != C2[itB->second]) { 
-      //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG itB landed in mismatch: " << itB->first << ',' << itB->second << endl;
-      ++itB;
-   }
-   //cout << itB->first << "," << itB->second << " gaplen2=" << gaplen2
-   //   << " gplen2=" << gplen2 << endl;
    alnidx.erase(begin(), itB);
    seq1begin=alnidx.begin()->first;
    seq2begin=alnidx.begin()->second;
    //cout << "after update ngp2=" << ngp2 << endl;
-   numgaps1 += ngp1; numgaps2 += ngp2;
-   gaplen1 += gplen1; gaplen2 += gplen2;
+   numgaps1 -= ngp1; numgaps2 -= ngp2;
+   gaplen1 -= gplen1; gaplen2 -= gplen2;
    //cout << "after update gaplen2=" << gaplen2 << endl;
    buildAlnInfo();
    //cout << "after buildAlnInfo() ngp2=" << ngp2 << endl;
@@ -2703,83 +2756,111 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
       cerr << __FILE__ << ":" << __LINE__ << ":DEBUG Alignment too short for trimming\n";
       return false;
    }
+   if (getNogapIdentity() < ngidentitycut) {
+      ngidentitycut = getNogapIdentity();
+   }
+   //cerr << "nogap identity cut=" << ngidentitycut << endl;
    int cutcnt = int(ceil(20*ngidentitycut));
    int samecnt=0;
-   int gapinwindow=0;
+   int gapinwindow=0; // total gap align (top or bottom) in window
    alniterator it = prev(end());
-   char mstate='b'; // start state
-   int gplen1=0, gplen2=0, ngp1=0, ngp2=0;
+   char mstate='b';
+   int gplen1=0, gplen2=0, ngp1=0, ngp2=0; // gap info inside window
+   // initialize window
    for (size_t i=0; i < 20; ++i) {
       while (it != begin() && (it->first == -1 || it->second == -1)) {
-         trimGapInfo(it, mstate, gplen1, gplen2, ngp1, ngp2);
-         ++gapinwindow;
-         --it;
+         ++gapinwindow; --it;
       }
-      mstate = 'm';
       if (C1[it->first] == C2[it->second]) { // identical
          ++samecnt;
       }
       --it;
    }
-   if (samecnt >= cutcnt) {
-      //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG no need to trim\n";
-      return false;
+   if (samecnt >= cutcnt) { // skip initial gap or mismatch
+      alniterator b = std::prev(end());
+      while (b != it) {
+         if (b->first == -1 || b->second == -1) {
+            trimGapInfo(b, mstate, gplen1, gplen2, ngp1, ngp2);
+            --b;
+         }
+         else if (C1[b->first] != C2[b->second]) {
+            --b;
+         }
+         else break;
+      }
+      if (b == std::prev(end())) {
+         //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG no need to trim\n";
+         return false;
+      }
+      ++b;
+      alnidx.erase(b, end());
+      seq1end=alnidx.back().first;
+      seq2end=alnidx.back().second;
+      numgaps1 -= ngp1; numgaps2 -= ngp2;
+      gaplen1 -= gplen1; gaplen2 -= gplen2;
+      buildAlnInfo();
+      return true;
    }
    //cerr << "same count: " << samecnt << endl;
    //cerr << "first 20 same count: " << samecnt << " gplen1=" << gplen1 
    //   << " gplen2=" << gplen2 << endl;
    alniterator itB=prev(end());
    // it      itB
-   // |-------|
+   // |-------| ignoring gap
    // ---W----
-   while (it != begin() && (samecnt <= cutcnt || gapinwindow > 0) && (samecnt < 19 || gapinwindow > 1)) 
+   while (it != begin() && (samecnt < cutcnt || gapinwindow > 0) && (samecnt < 19 || gapinwindow > 1)) 
    {
-      //cerr << samecnt << " less than " << cutcnt << " gap in window: " << gapinwindow << endl;
-      while (it != begin() && (it->first == -1 || it->second == -1)) {
-         trimGapInfo(it, mstate, gplen1, gplen2, ngp1, ngp2);
-         ++gapinwindow;
-         --it;
+      cerr << samecnt << " less than " << cutcnt << " or gaps in window: " << gapinwindow << endl;
+      bool itmoved=false;
+      while (it != begin() && (it->first == -1 || it->second == -1)) { 
+         ++gapinwindow; --it;
+         itmoved=true;
       }
+      bool itbmoved=false;
       while (itB->first == -1 || itB->second == -1) {
-         --gapinwindow;
-         --itB;
+         trimGapInfo(itB, mstate, gplen1, gplen2, ngp1, ngp2);
+         --gapinwindow; --itB;
+         itbmoved=true;
       }
       mstate = 'm';
-      //cerr << "Window right " << itB->first << " " << itB->second 
+      //cerr << "Window Follow-End " << itB->first << " " << itB->second 
       //  << " " << (*seq1)[itB->first] << "/" << (*seq2)[itB->second]
-      //      << " left  " << (*seq1)[it->first] << "/" << (*seq2)[it->second] << endl;
+      //      << " Lead  " << (*seq1)[it->first] << "/" << (*seq2)[it->second] << endl;
       if (C1[itB->first] == C2[itB->second]) --samecnt;
-      if (C1[it->first] == C2[it->second]) {
-         ++samecnt;
-      }
-      --itB; --it;
+      if (C1[it->first] == C2[it->second]) { ++samecnt; }
+      if (!itmoved) --it;
+      if (!itbmoved) --itB;
    }
-   ++itB;
-   //cout << samecnt << " above cutoff=" << cutcnt << " gapinwindow=" << gapinwindow << endl;
-   if (itB->first != -1 && itB->second != -1 && C1[itB->first] == C2[itB->second]) {
-      //cerr << itB->first << "," << itB->second << " itB at matched base\n";
-      // itB should be the next mismatch
+   //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG Window Follow-End " << itB->first << " " << itB->second 
+   //  << " " << (*seq1)[itB->first] << "/" << (*seq2)[itB->second]
+   //      << " Lead  " << (*seq1)[it->first] << "/" << (*seq2)[it->second] << endl;
+   if (it == begin()) {
+      cerr << __FILE__ << ":" << __LINE__ << ":WARN samecnt=" << samecnt
+         << " never above cutoff=" << cutcnt << " whole align is trimmed!\n";
+      return false;
+      //throw runtime_error("samecnt never above cutoff");
    }
-   else {
-      while (itB != it && (itB->first == -1 || itB->second == -1)) { // skip gaps
-         //trimGapInfo(it, mstate);
-         //cerr << "trim right landed in gap: " << itB->first << ',' << itB->second << "\n";
-         //untrimGapInfo(itB, mstate, gplen1, gplen2, ngp1, ngp2);
+   // skip over mismatch or gap
+   cout << samecnt << " above cutoff=" << cutcnt << " gapinwindow=" << gapinwindow << endl;
+   while (itB != it) {
+      if (itB->first == -1 || itB->second == -1) {
+         trimGapInfo(itB, mstate, gplen1, gplen2, ngp1, ngp2);
          --itB;
       }
-      while (itB != it && itB->first != -1 && itB->second != -1 && C1[itB->first] != C2[itB->second]) 
-      { 
-         //cerr << "trim right landed in mismatch: " << itB->first << ',' << itB->second << "\n";
+      else if (C1[itB->first] != C2[itB->second]) {
          --itB;
       }
+      else break;
    }
+   // itB is now at a match
    ++itB;
-   //cerr << "Window right at time of trimming " << itB->first << " " << itB->second << endl;
+   //cerr << "Window right at time of trimming " << itB->first << " " << itB->second 
+   //   << " seq2 base=" << C2[itB->second] << endl;
    alnidx.erase(itB, end());
    seq1end=alnidx.back().first;
    seq2end=alnidx.back().second;
-   numgaps1 += ngp1; numgaps2 += ngp2;
-   gaplen1 += gplen1; gaplen2 += gplen2;
+   numgaps1 -= ngp1; numgaps2 -= ngp2;
+   gaplen1 -= gplen1; gaplen2 -= gplen2;
    buildAlnInfo();
    return true;
 }
