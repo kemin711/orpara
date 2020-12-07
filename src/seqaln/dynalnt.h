@@ -570,11 +570,11 @@ class Dynaln {
       bool reduceGap(int cnt) {
          gaplen1 -= cnt;
          gaplen2 -= cnt;
-         if (gaplen1 < 1) {
+         if (gaplen1 < 1 && numgaps1 > 0) {
             //cerr << "gaplen1 is zero now\n";
-            --numgaps1;
+            numgaps1 = 0;
          }
-         if (gaplen2 < 1) --numgaps2;
+         if (gaplen2 < 1 && numgaps2 > 0) numgaps2 = 0;
          if (numgaps1 < 1 || numgaps2 < 1) { // done
             return true;
          }
@@ -586,18 +586,26 @@ class Dynaln {
        * AGCTGCAA---ACT
        * AGC----AGTTACT
        *       |itBottom
-       * @return true if gap from least on sequence is zero
-       *   to indicate no more fixing is needed.
+       * @param itTop will be updated to the one at the shorter
+       *    of the top or bottom gap length after itTop
+       * @return true if gap from least one sequence is zero
+       *   to indicate no more fixing is needed otherwise 
+       *   need more potential staggers to fix.
        */
-      bool fixStaggerZig(alniterator& itTop, alniterator itBottom);
+      //bool fixStaggerZig(alniterator& itTop, alniterator itBottom);
+      bool fixStaggerZig(alniterator& itTop, int d);
       /**
        * Fix zag configured staggered gap
-       *        |itTop
+       *        |itTop  
        * ACG-----ATCGCCACTT
        * ACGGGCACAT---CACTT
        *           |itBottom
+       * @param itTop is the top iterator for the last gap
+       * @param d id the distance between itBottom and itTop
+       *    The example d=2
        */
-      bool fixStaggerZag(alniterator& itTop, alniterator itBottom);
+      //bool fixStaggerZag(alniterator& itTop, alniterator itBottom);
+      bool fixStaggerZag(alniterator& itTop, int d);
 
       /**
        * Not sure we need to update tracing algorithm to eliminate
@@ -607,18 +615,22 @@ class Dynaln {
        */
       bool fixStagger();
       /** 
+       * |--window--|  front
+       * | it
       * This function will subtract one gap when transitioning from 
       * b or m state into g state if it happen to fall on a gap align
       * state.  The gap length will also be reduced regardless of the transition.
       * @param it is the iterator to alnidx. "it" should be on the trailing
       *    side of the moving window.
       * @param ms is match state: g for gap, m for match, b for begin
+      *    ms will be updated if it points to a different state
       * @param gpl1 top seq gap length
       * @param gpl2 bottom seq gap length
       * @param ng1 number of gaps for the top sequence within window
       * @param ng2 number of gaps for the bottom sequence within window
       */
       static void trimGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int& ng1, int& ng2);
+      // the following removed
       //static void addGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int& ng1, int& ng2);
       /**
        * This method will update gap values but
@@ -901,6 +913,12 @@ class Dynaln {
        * Show gap parameters and scoring matrix
        */
       void showParameters() const;
+      void showAlnidx() const {
+         for (auto& ij : alnidx) {
+            cerr << ij.first << "," << ij.second << " ";
+         }
+         cerr << endl;
+      }
 
    protected:
       /** 
@@ -1212,7 +1230,6 @@ class LSDynaln : public Dynaln<T> {
 };
 
 //////////// class definition ///////////////////////////
-
 
 //#define DEBUG
 
@@ -1861,36 +1878,22 @@ void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
    idencnt=0;
 
    list<pair<int, int> >::const_iterator lit= alnidx.cbegin();
-   int i,j,counter=0;
+   int i, j, counter=0;
    char topchar, bottomchar;
    vector<int> topmark(alnidx.size(),-1);
    vector<int> bottommark(alnidx.size(),-1);
-
    while (lit != alnidx.cend()) {
       i=lit->first; // top sequence index
       j=lit->second; // bottom sequence index
       if (counter % markevery == 0) {
-         if (i>-1) { 
-            topmark[counter]=i+1+delta1;
-         }
-         if (j>-1) {
-            bottommark[counter]=j+1+delta2;
-         }
+         if (i>-1) { topmark[counter]=i+1+delta1; }
+         if (j>-1) { bottommark[counter]=j+1+delta2; }
       }
-      if (i>=0) {
-         topchar=toupper((*seq1)[i]); 
-      }
-      else {
-         topchar=gapchar;
-      }
+      if (i>=0) { topchar=toupper((*seq1)[i]); }
+      else { topchar=gapchar; }
       topaln += topchar;
-
-      if (j>=0) {
-         bottomchar = toupper((*seq2)[j]);
-      }
-      else {
-         bottomchar = gapchar;
-      }
+      if (j>=0) { bottomchar = toupper((*seq2)[j]); }
+      else { bottomchar = gapchar; }
       bottomaln += bottomchar;
 
       if (topchar != gapchar && bottomchar != gapchar) {
@@ -1899,8 +1902,8 @@ void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
             ++idencnt;
          }
          else if (ST.lookup(C1[i],C2[j]) >= simcut) {
-            ++simcnt;
             middle += simchar;
+            ++simcnt;
          }
          else middle += ' ';
       }
@@ -1911,6 +1914,10 @@ void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
    }
    topruler.resize(alnidx.size()+8, ' ');
    bottomruler.resize(alnidx.size()+8, ' ');
+   //for (size_t i=0; i<alnidx.size(); ++i) {
+   //   if (topruler[i] != ' ') topruler[i] = ' ';
+   //   if (bottomruler[i] != ' ') bottomruler[i] = ' ';
+   //}
    string x;
 
    for (i=0; i<int(alnidx.size()); i++) {
@@ -2408,23 +2415,53 @@ template<class T> string Dynaln<T>::getNCorrectedBottomSequence() {
 }
 
 template<class T>
-bool Dynaln<T>::fixStaggerZig(alniterator& itTop, alniterator itBottom) {
-   //         |top
+//bool Dynaln<T>::fixStaggerZig(alniterator& itTop, alniterator itBottom) {
+/* 
+ * Regard less left gap long or right gap longer, the algorithm
+ * is the same
+ * Case left longer
+ *  1 stagger                0 stagger
+ *  ACGCTGCA----CGGT   ACGTAA---TTCAT
+ *  AC-----ACGCTACGT   AC----ACGTTCAT
+ * Case right longer
+ *  1 stagger                0 stagger
+ *  ACGCTGC----ACGGT   ACGTAA----TCAT
+ *  ACG---ACGCTACGT    ACG---ACGTTCAT
+*/
+bool Dynaln<T>::fixStaggerZig(alniterator& itTop, int d) {
+   // d is the distance before itTop in bottom d = 2 case as follows
+   //         |itTop
    // ACGCTGCA----CGGT 
-   // AC-----ACGCTAC  
-   //       | bottom
+   // AC-----ACGCTACGT
+   //       | itBottom
    alniterator last = prev(end());
-   alniterator itRight = next(itTop);
-   alniterator itLeft = prev(itBottom);
+   alniterator itRight = itTop;
+   alniterator itLeft = prev(itTop, d);
    while (itRight != last && itLeft != begin() && 
          itLeft->second == -1 && itRight->first == -1) 
    {
-      ++itRight;
-      --itLeft;
+      ++itRight; --itLeft;
    }
+   //cerr << "right gap " << itRight->first << "," << itRight->second << endl;
+   //cerr << "left gap " << itLeft->first << "," << itLeft->second << endl;
+   //cerr << "Zig Before adjustment numgaps1=" << numgaps1 << " numgaps2=" << numgaps2 << endl;
+   if (itRight->first != -1 && itLeft->second != -1) {
+      // top numgap reduction by one
+      --numgaps1; --numgaps2;
+   }
+   else if (itRight->first != -1) {
+      // bottom numgap reduce by one
+      --numgaps1;
+   }
+   else { --numgaps2; }
+   //cerr << "Zig After adjustment numgaps1=" << numgaps1 << " numgaps2=" << numgaps2 << endl;
+   // case 1 top gap length shorter than bottom gap length
    auto diff = distance(itTop, itRight);
+   //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG gaps removed=" << diff << endl;
+   alniterator itx;
+   if (d > 1) { itx = std::prev(itTop, d-1); }
+   else itx = itTop;
    ++itLeft;
-   alniterator itx = itTop;
    while (itx != itRight) { // copy from [it, itRight) to [itLeft, it)
       itLeft->second = itx->second;
       ++itLeft; ++itx;
@@ -2435,28 +2472,47 @@ bool Dynaln<T>::fixStaggerZig(alniterator& itTop, alniterator itBottom) {
 }
 
 template<class T> 
-bool Dynaln<T>::fixStaggerZag(alniterator& itTop, alniterator itBottom) {
-   //      |itTop
-   // ACG---TACGGTGTT 
-   // ACGACATA--ACGTT
-   //         |itBottom
+//bool Dynaln<T>::fixStaggerZag(alniterator& itTop, alniterator itBottom) {
+bool Dynaln<T>::fixStaggerZag(alniterator& itTop, int d) {
+   //      |itTop            |itLeft         after fix
+   // ACG---TACGGTGTT     ACG---TACGGTGTT   ACG-TACGGTGTT
+   // ACGACATA--ACGTT     ACGACATA--ACGTT   ACGACATAACGTT
+   //       3 |itBottom             |itRight
+   //       |itTop             |itLeft         after fix
+   // ACG----AACGGTGTT     ACG----ATACGGTGTT   ACG-TACGGTGTT
+   // ACGACATA--GGTGTT     ACGACATA--CGGTGTT   ACGACATAACGTT
+   //       2 |itBottom              |itRight
    alniterator itLeft = itTop;
-   alniterator itRight = itBottom;
+   alniterator itRight, itx;
+   itRight = std::next(itTop, d);
+   auto itBottom = itRight;
    //cerr << "itLeft " << itLeft->second << " " << (*seq2)[itLeft->second] << " itRight "
    //   << itRight->first << " " << (*seq1)[itRight->first] << endl;
    alniterator last = prev(end());
    while (itLeft != begin() && itRight != last &&
          itLeft->first == -1 && itRight->second == -1)
    {
-      ++itRight;
-      --itLeft;
+      ++itRight; --itLeft;
    }
+   //cerr << "itLeft " << itLeft->second << " " << (*seq2)[itLeft->second] << " itRight "
+   //   << itRight->first << " " << (*seq1)[itRight->first] << endl;
+   //cerr << "Zag Before adjustment numgaps1=" << numgaps1 << " numgaps2=" << numgaps2 << endl;
+   if (itLeft->first != -1 && itRight->second != -1) {
+      //cerr << "both top and bottom removed gaps\n";
+      --numgaps1; --numgaps2;
+   }
+   else if (itLeft->first != -1) {
+      --numgaps1;
+   }
+   else --numgaps2;
+   //cerr << "Zag After adjustment numgaps1=" << numgaps1 << " numgaps2=" << numgaps2 << endl;
+
    //cerr << "stopped at " << itLeft->second << " " << (*seq2)[itLeft->second] 
    //   << " " << itRight->first << " " << (*seq1)[itRight->first] << endl;
-   auto diff = distance(itBottom, itRight);
-   //cerr << "diff=" << diff << endl;
+   auto diff = distance(itLeft, itTop);
+   //cerr << "gaps removed=" << diff << endl;
    ++itLeft;
-   alniterator itx = itBottom;
+   itx = next(itTop);
    while (itx != itRight) {
       //cerr << "moving " << itx->first << " " << (*seq1)[itx->first] << endl;
       itLeft->first = itx->first;
@@ -2480,40 +2536,40 @@ template<class T> bool Dynaln<T>::fixStagger() {
             // ACG--CGGT 
             // TT-ACGTAC
             gapfixed=true;
-            if (fixStaggerZig(it, prev(it))) break;
+            if (fixStaggerZig(it, 1)) break;
          }
-         else if (next(it)->second == -1) {
+         else if (next(it)->second == -1 && it->second != -1 && next(it)->first != -1) {
             // ACG--TACGGT ==afterfix=> ACG-TACGGT
             // TCGAC-ACGTT              TCGACACGTT
             gapfixed=true;
             //cerr << "zero zag " << it->second << " " << next(it)->first << endl;
-            if (fixStaggerZag(it, next(it))) break;
+            if (fixStaggerZag(it, 1)) break;
          }
-         else if (prev(it, 2)->second == -1) {
+         else if (prev(it, 2)->second == -1 && prev(it)->second != -1) {
             // ACTGA---CGGT 
             // TT--ACGTCGGT
             gapfixed=true;
-            if (fixStaggerZig(it, prev(it,2))) break;
+            if (fixStaggerZig(it, 2)) break;
          }
-         else if (next(it,2)->second == -1) {
+         else if (next(it,2)->second == -1 && next(it)->first != -1 && next(it)->second != -1) {
             //       | need to advance top
-            // GGA-----CATGACC
+            // GGA----CATGACC
             // GGACGGGG-----CC
             //         |
-            itB=next(it,2);
-            while (it->first == -1) ++it;
-            --it;
             gapfixed=true;
-            if (fixStaggerZag(it, itB)) break;
+            //cerr << "one zag " << it->second << " " << next(it, 2)->first << endl;
+            if (fixStaggerZag(it, 2)) break;
          }
          else ++it;
       }
       else ++it;
    }
    if (gapfixed) buildAlnInfo();
+   //cerr << __FILE__ << ":" << __LINE__ << "alnidx after fixStagger\n";
+   //showAlnidx();
+   //printAlign(cout, 80);
    return gapfixed;
 }
-
 
 // md string using sequence 1 as reference MD:2G3T9AT1A19T10T11A5A3A4
 // 72                  89        99        109       119       129       139
@@ -2639,9 +2695,11 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    // there is no need to update identical value.
    if (getNogapIdentity() < ngidentitycut) ngidentitycut=getNogapIdentity();
    int cutcnt = int(ceil(20*ngidentitycut));
+   //cout << "cutoff for this operation cutcnt=" << cutcnt << endl;
    int samecnt=0;
    int ginw=0; // gap in window
    alniterator it = begin();
+   //cerr << "start index top=" << it->first << " bottom=" << it->second << endl;
    char mstate='b'; // start state for trailing end
    //char mstateLead='b';
    //char mstateFollow='b';
@@ -2649,7 +2707,8 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    //     | trim point
    // gplen1, gplen2 is the gap length before the window
    // ngp1 and ngp2 is the number of gaps before the window
-   // Should be positive value
+   // Should be positive value these values will be subtracted
+   // from the total gaps in the original alignment for only counted on the itB.
    int gplen1=0, gplen2=0, ngp1=0, ngp2=0;
    for (size_t i=0; i < 20; ++i) {
       while (it != end() && (it->first == -1 || it->second == -1)) {
@@ -2661,14 +2720,16 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
       ++it;
    }
    if (samecnt >= cutcnt) {
+      //cerr << "samecnt=" << samecnt << " above cutcnt=" << cutcnt << endl;
       alniterator b = begin();
       // skip indel or mismatch make sure b land in a match
       while (b != it) {
+         //cerr << b->first << "," << b->second << endl;
          if (b->first == -1 || b->second == -1) {
             trimGapInfo(b, mstate, gplen1, gplen2, ngp1, ngp2);
             ++b;
          }
-         else if (C1[it->first] != C2[it->second]) {
+         else if (C1[b->first] != C2[b->second]) {
             ++b;
          }
          else break;
@@ -2677,6 +2738,7 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
          //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG no need to trim\n";
          return false;
       }
+      //cerr << __LINE__ << ":DEBUG " << b->first << "," << b->second << " is the start now\n";
       alnidx.erase(begin(), b);
       seq1begin=alnidx.begin()->first;
       seq2begin=alnidx.begin()->second;
@@ -2687,10 +2749,11 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    }
 #ifdef DEBUG
    cerr << "first 20 same count: " << samecnt << " gplen1=" << gplen1 
-      << " gplen2=" << gplen2 << endl;
+      << " gplen2=" << gplen2 << " ginw=" << ginw << " window front: " 
+      << it->first << "," << it->second << endl;
 #endif
    alniterator itB=begin();
-   // itB     it
+   // itB     it (front)
    // |-------|
    // ---W----
    while (it != end() && (samecnt < cutcnt || ginw > 0) && (samecnt < 19 || ginw > 1)) {
@@ -2707,8 +2770,12 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
          itbmoved=true;
       }
       mstate = 'm';
-      //cerr << "Window left " << (*seq1)[itB->first] << "/" << (*seq2)[itB->second]
-      //      << " right  " << (*seq1)[it->first] << "/" << (*seq2)[it->second] << endl;
+#ifdef DEBUG
+      cerr << "Window left " << (*seq1)[itB->first] << "/" << (*seq2)[itB->second]
+            << " right  " << (*seq1)[it->first] << "/" << (*seq2)[it->second] 
+            << " ngp1=" << ngp1 << " ngp2=" << ngp2 
+            << " itB at " << itB->first << "," << itB->second << endl;
+#endif
       if (C1[itB->first] == C2[itB->second]) --samecnt;
       if (C1[it->first] == C2[it->second]) { ++samecnt; }
       if (!itmoved) ++it;
@@ -2726,21 +2793,31 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    cout << __LINE__ << ": " << samecnt << " above cutoff " << cutcnt << " itB at "
       << itB->first << "," << itB->second << " it at " 
       << it->first << "," << it->second << " ginw=" << ginw 
-      << " ngp1=" << ngp1 << " ngp2=" << ngp2 << endl;
+      << " ngp1=" << ngp1 << " ngp2=" << ngp2 
+      << " gplen1=" << gplen1 << " gplen2=" << gplen2 << endl;
 #endif
    while (itB != it) { // skip gap or mismatch
       if (itB->first == -1 || itB->second == -1) {
+         //cerr << "itB falls on gap " << itB->first << "," << itB->second << endl;
          trimGapInfo(itB, mstate, gplen1, gplen2, ngp1, ngp2);
          ++itB;
       }
       else if (C1[itB->first] != C2[itB->second]) { 
+         //cerr << "itB falls on mismatch " << itB->first << "," << itB->second 
+         //   << (*seq1)[itB->first] << "," << (*seq2)[itB->second] << endl;
          ++itB;
       }
-      else break;
+      else {
+         //cerr << "itB reached match state end " << itB->first << "," << itB->second 
+         //   << (*seq1)[itB->first] << "," << (*seq2)[itB->second] << endl;
+         break;
+      }
    }
+   //cerr << "After itB right walk itB: " << itB->first << "," << itB->second << endl;
    alnidx.erase(begin(), itB);
    seq1begin=alnidx.begin()->first;
    seq2begin=alnidx.begin()->second;
+   //cout << "seq1begin=" << seq1begin << " seq2begin=" << seq2begin << endl;
    //cout << "after update ngp2=" << ngp2 << endl;
    numgaps1 -= ngp1; numgaps2 -= ngp2;
    gaplen1 -= gplen1; gaplen2 -= gplen2;
@@ -2810,7 +2887,7 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
    // ---W----
    while (it != begin() && (samecnt < cutcnt || gapinwindow > 0) && (samecnt < 19 || gapinwindow > 1)) 
    {
-      cerr << samecnt << " less than " << cutcnt << " or gaps in window: " << gapinwindow << endl;
+      //cerr << samecnt << " less than " << cutcnt << " or gaps in window: " << gapinwindow << endl;
       bool itmoved=false;
       while (it != begin() && (it->first == -1 || it->second == -1)) { 
          ++gapinwindow; --it;
@@ -2841,7 +2918,7 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
       //throw runtime_error("samecnt never above cutoff");
    }
    // skip over mismatch or gap
-   cout << samecnt << " above cutoff=" << cutcnt << " gapinwindow=" << gapinwindow << endl;
+   //cout << samecnt << " above cutoff=" << cutcnt << " gapinwindow=" << gapinwindow << endl;
    while (itB != it) {
       if (itB->first == -1 || itB->second == -1) {
          trimGapInfo(itB, mstate, gplen1, gplen2, ngp1, ngp2);

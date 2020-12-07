@@ -626,7 +626,7 @@ CACTAAACACACACACACACACACACACACACACACACACACACACACACACACACCCTTTTC
    cout << "after left trimming. gaplen2=" << aligner.getGaplen2() << "\n";
    aligner.printAlign(cout, 80);
    //cout << "after print  gaplen2=" << aligner.getGaplen2() << "\n";
-   ASSERT_TRUE(aligner.getAlnlen() == 56);
+   ASSERT_TRUE(aligner.getAlnlen() == 66);
    // another more difficult case
    seq1.setSequence("ACCACAGTGGAATTAAATTAGAATTACTCACCAAAAGTTAACTAGGGGAAACACAAACACACACACACACACACACACACACACACACAGAGCGACACAGACAAGATAGCGCGAGCGCACGGGTCAGCTCGCCTCTCTCGGCTGGAGCTCG");
    seq2.setSequence("TATACTTTGGGTATAACTCTTTTTCTACACTCCGCTCTCTAGATATCTCACAGAGTGTTTATATATTATATTATCTCAAAAAATTATATCTCGGTTACACACACACACACACACACACACACACACACACACACAGAGAGCCACATACACA");
@@ -651,6 +651,72 @@ CACTAAACACACACACACACACACACACACACACACACACACACACACACACACACCCTTTTC
    aligner.trimLeft(0.85);
    cout << "after left trimming. gaplen2=" << aligner.getGaplen2() << "\n";
    aligner.printAlign(cout, 80);
+   //ref: AGCGGGAGGGGGCGGGCAGGGACACTTACACGCTCGCCAGGGGGTCCGGGCAGGCCAGTGGGTCCGGGTTCACCTCGAGCTCCTCGCTTTCCTTCCTCTCCAGCAGGGCCAGGGGGTCCTTGAACACCAACAGGGCC
+   //query: CCGATCTACCTCCCCAGGTTTGCCTGCTTCACCTGGAGGACCAGCAGGTCCAGGGAGACCCTGGAAGCCGGGGGAGCCAGCAGGGCCTTGTTCACCTCTCTCGCCAGCGGGACCAGCAGGGCCAGGGGGTCCCTGAACACCAACAGGGCCAGGCG
+   seq1.setSequence("AGCGGGAGGGGGCGGGCAGGGACACTTACACGCTCGCCAGGGGGTCCGGGCAGGCCAGTGGGTCCGGGTTCACCTCGAGCTCCTCGCTTTCCTTCCTCTCCAGCAGGGCCAGGGGGTCCTTGAACACCAACAGGGCC");
+   seq2.setSequence("CCGATCTACCTCCCCAGGTTTGCCTGCTTCACCTGGAGGACCAGCAGGTCCAGGGAGACCCTGGAAGCCGGGGGAGCCAGCAGGGCCTTGTTCACCTCTCTCGCCAGCGGGACCAGCAGGGCCAGGGGGTCCCTGAACACCAACAGGGCCAGGCG");
+   aligner.setseq(seq1, seq2);
+   aligner.runlocal();
+   cout << "Before fixStagger\n";
+   aligner.printAlign(cout, 80);
+/* before fix stagger
+refseq x query  36-136/137 | 49-149/155
+Score=434 gap length: 18 18 num gaps: 3 4 idencnt=74 simcnt=0 alnlen=119 identity=0.62185 similarity=0.62185
+37        45        44        57        67        77        87        97
++         +         +         +         +         +         +         +
+CCAGGGGG--TCCGGGCAG--------GCCAGTGGGTCCGGGTTCACCTCGAGCTCCTCGCTTTCCTTCCTCTC------
+|||||| |   || || ||        |||||  || ||  |||||||||    | |||||            |
+CCAGGGAGAC-CCTGGAAGCCGGGGGAGCCAGCAGGGCCTTGTTCACCTC----T-CTCGC------------CAGCGGG
++         +         +         +         +         +         +         +
+50        52        69        79        89                  104
+
+          109       119       129
++         +         +         +         +         +         +         +
+--CAGCAGGGCCAGGGGGTCCTTGAACACCAACAGGGCC
+  ||||||||||||||||||| |||||||||||||||||
+ACCAGCAGGGCCAGGGGGTCCCTGAACACCAACAGGGCC
++         +         +         +         +         +         +         +
+112       122       132       142      
+*/
+   aligner.fixStagger();
+   cout << "Before trimming, after fixStagger\n";
+/*
+refseq x query  36-136/137 | 49-149/155
+Score=434 gap length: 9 9 num gaps: 2 3 idencnt=76 simcnt=0 alnlen=110 identity=0.69091 similarity=0.69091
+37        46        44        58        68        78        88        98
++         +         +         +         +         +         +         +
+CCAGGGGG-TCCGGGCAG--------GCCAGTGGGTCCGGGTTCACCTCGAGCTCCTCGCTTTCCTTCCTCTCCAGCAGG
+|||||| |  || || ||        |||||  || ||  |||||||||    | |||||    |  |    ||||||||
+CCAGGGAGACCCTGGAAGCCGGGGGAGCCAGCAGGGCCTTGTTCACCTC----T-CTCGC----CAGCGGGACCAGCAGG
++         +         +         +         +         +         +         +         
+50        60        70        80        90                  104       111
+
+108       118       128       129
++         +         +         +         +         +         +         +
+GCCAGGGGGTCCTTGAACACCAACAGGGCC
+|||||||||||| |||||||||||||||||
+GCCAGGGGGTCCCTGAACACCAACAGGGCC
++         +         +         +         +         +         +         +
+121       131       141       142
+*/
+   aligner.printAlign(cout, 80);
+   ASSERT_TRUE(aligner.getNumgaps1() == 2 && aligner.getNumgaps2() == 3);
+   cout << "nogap identity=" << aligner.getNogapIdentity() << endl;
+   aligner.trimLeft(0.85);
+   cout << "after left trimming. gaplen2=" << aligner.getGaplen2() << "\n";
+/*
+refseq x query  94-136/137 | 107-149/155
+Score=434 gap length: 0 0 num gaps: 0 0 idencnt=38 simcnt=0 alnlen=43 identity=0.88372 similarity=0.88372
+95        105       115       125       135       7
++         +         +         +         +         +         +         +
+CCTCTCCAGCAGGGCCAGGGGGTCCTTGAACACCAACAGGGCC
+|    |||||||||||||||||||| |||||||||||||||||
+CGGGACCAGCAGGGCCAGGGGGTCCCTGAACACCAACAGGGCC
++         +         +         +         +         +         +         +
+108       118       128       138       148
+*/
+   aligner.printAlign(cout, 80);
+   ASSERT_TRUE(aligner.getAlnlen() == 43);
 }
 
 TEST_F(DynalnTest, trimRight) {

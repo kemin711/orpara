@@ -626,7 +626,8 @@ std::array<float, 5> Fastq::baseFraction() const {
          case 'N' :
          case 'n' : ++res[4];
                     break;
-         default: cerr << "Wrong base: " << b << endl;
+         default: cerr << __FILE__ << ":" << __LINE__ << ":ERROR Wrong base: " << b << endl
+                     << "name=" << name << "\nseq=" << seq << endl;
                   throw runtime_error("Base not ACGTN");
       }
    }
