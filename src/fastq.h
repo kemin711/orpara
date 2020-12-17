@@ -336,7 +336,8 @@ class Fastq {
       void cutAt(const unsigned int pos, Fastq &tailq);
       /**
        * 0-based index, from idx (inclusive) and right removed.
-       * remove [idx, last_idx]
+       * remove [idx, last_idx], preserve original name
+       * @param idx from which to remove till end
        */
       void discardTail(const unsigned int idx);
       /**
@@ -348,9 +349,11 @@ class Fastq {
        * Return a sub-sequence of the total with zero-indexed coordinate.
        * e must be less than the length of the sequence. 
        * inclusive meaning of coordinates.
+       * @param rename to make a new name by OLDNAME_sub[b]_[e] where
+       *    b and e are the start and end indices.
        * @return Fastq object of the original [b,e] Interval
        */
-      Fastq sub(unsigned int b, unsigned int e) const;
+      Fastq sub(unsigned int b, unsigned int e, bool rename=false) const;
 
       unsigned int length() const { return seq.length(); }
       /**

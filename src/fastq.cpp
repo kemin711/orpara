@@ -346,7 +346,7 @@ void Fastq::discardHead(const unsigned int idx) {
    }
 }
 
-Fastq Fastq::sub(unsigned int b, unsigned int e) const {
+Fastq Fastq::sub(unsigned int b, unsigned int e, bool rename) const {
    if (e >= length()) {
       cerr << "range: " << b << " - " << e << " outside fastq sequence\n";
       throw range_error("sub operation out of range");
@@ -355,21 +355,24 @@ Fastq Fastq::sub(unsigned int b, unsigned int e) const {
       cerr << __FILE__ << ":" << __LINE__ << ":WARN taking subseq of entire sequence\n";
       return *this;
    }
+   string subseq_ = seq.substr(b, e-b+1);
    // b >0 e<length
-   ostringstream convert;
-   convert << name << "_sub" << b << "_" << e;
-   string subname = convert.str();
+   if (rename) {
+      ostringstream convert;
+      convert << name << "_sub" << b << "_" << e;
+      string subname = convert.str();
 
-   convert.str("");
-   convert.clear();
-   if (!desc.empty()) {
-      convert << desc << " ";
+      convert.str("");
+      convert.clear();
+      if (!desc.empty()) {
+         convert << desc << " ";
+      }
+      convert << "subsequence from " << b << " to " << e;
+      string subdescription = convert.str();
+
+      return Fastq(subname, subdescription, subseq_, qual+b);
    }
-   convert << "subsequence from " << b << " to " << e;
-   string subdescription = convert.str();
-   string subseq = seq.substr(b, e-b+1);
-
-   return Fastq(subname, subdescription, subseq, qual+b);
+   return Fastq(name, desc, subseq_, qual+b);
 }
 
 void Fastq::write(ostream &ous) const {
