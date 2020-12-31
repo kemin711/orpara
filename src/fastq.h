@@ -186,16 +186,17 @@ class Fastq {
       void write(ostream &ou) const;
       /**
        * Write the object to a string buffer large enough to hold
-       * this object.
+       * this object. Buffer must have charSize()+1(\n) space left.
        * @return 1 after the end position of this object in the string buffer
-       *   des----this object in string format --|1-after the end
+       *   des----this object in string format\n --|1-after the end
        *                                          ^
        */
       char* writeChar(char* des) const;
       /**
        * This method is intended to be used by the write method.
        * @return the length of the object if converted to
-       *   string.
+       *   string. Note: writeChar() will add '\n' to the end
+       *   so the length of writeChar is 1+ the result of this function.
        */
       size_t charSize() const;
       /**
