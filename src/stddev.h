@@ -139,10 +139,16 @@ class stddev {
          ous << avg << delim << getStd() << delim << j;
          return ous;
       }
+      /**
+       * output mean, std, count to ous
+       */
       ostream& print(ostream &ous, const char delim='\t') const {
          ous << avg << delim << getStd() << delim << j;
          return ous;
       }
+      /**
+       * @return tab-delimited avg,std,count
+       */
       string toString(const char delim='\t') const {
          string tmp(to_string(avg));
          tmp += delim;
@@ -434,6 +440,10 @@ template<size_t N> class Stddev {
          }
          return ous;
       }
+      /**
+       * @return tab-delimited string with columns:
+       *    count, [avg, std]... N pairs
+       */
       string toString(const char delim='\t') const {
          ostringstream ostr;
          array<double, N> sd=getStd();
