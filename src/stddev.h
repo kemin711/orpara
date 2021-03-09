@@ -403,6 +403,7 @@ template<size_t N> class Stddev {
          j -= c; if (c < 0) c=0;
       }
       void addCount(int c) { j += c; }
+      void setCount(int c) { j = c; }
 		// postgres retuns the sample standard deviation
 		pair<array<double,N>, array<double,N> > result() const { 
          return make_pair(getAverage(), getStd()); 
