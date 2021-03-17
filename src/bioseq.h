@@ -350,7 +350,8 @@ class bioseq {
        */
       void printFastaWithHeader(ostream &ous, unsigned int width=70) const;
       
-      /** only print the sequence, no id or title.
+      /** 
+       * only print the sequence, no id or title.
        * Use printFastaWithHeader method for file output.
        * It will print the last line terminator.
        * */
@@ -358,11 +359,13 @@ class bioseq {
       //void printFasta(ostream &ous, int width=70) {
       //   printFasta(ous, (unsigned)width); 
       //}
-      /** fasta format, 70 residues per line.
+      /** 
+       * fasta format, 70 residues per line.
        * If the sequence has name it will produce a full
        * fasta file, otherwise only the sequence.
        * Not virtual function, different derived class may not
        * be able to print more information.
+       * The end of the fasta sequence is Terminated.
        */
       friend ostream& operator<<(ostream &ous, const bioseq &s);
       /** this is used for polymorphic behavior of the 
