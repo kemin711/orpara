@@ -346,13 +346,13 @@ bool bioseq::read(istream &ins) {
    if (code != nullptr) {
       delete[] code; code = nullptr;
    }
-   getline(ins,seq);
+   getline(ins,seq); // this could be the whole aa-sequence
 #ifdef VERIFY_RESIDUE
    if (isNotBioseq(seq)) {
       throw bioseqexception("biosequence contains illegal char");
    }
 #endif
-   if (ins.eof()) { // no more input
+   if (ins.eof() || ins.peek() == '>') { // no more input, or seq shorter than one line
       return true;
    }
    string line;
