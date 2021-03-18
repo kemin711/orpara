@@ -1410,7 +1410,7 @@ bool DNA::read(istream &ins) {
    }
    //title=title.substr(1); // get rid of >
    if ((i=title.find(' ')) != string::npos) {
-      name=title.substr(1,i);
+      name=title.substr(1,i-1);
       title=title.substr(i+1);
       //if (title[0] == ' ') { title=title.substr(1); }
    }
