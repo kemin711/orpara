@@ -96,8 +96,8 @@ void alignProteinMany(const string& ref, const string& dbf, const string& outf);
  */
 int main(int argc, char *argv[]) {
    string reffile, dbfile, outfile;
-   reffile="chr3_178935841_178936341.fas";
-   dbfile="CF_HD786_Old_3_prey_R1F.fastq";
+   //reffile="chr3_178935841_178936341.fas";
+   //dbfile="CF_HD786_Old_3_prey_R1F.fastq";
    ProgParam param;
    int i=1;
    while (i < argc) {
@@ -132,7 +132,17 @@ int main(int argc, char *argv[]) {
       }
       ++i;
    }
-   if (outfile.empty() && !reffile.empty() && !dbfile.empty()) {
+   if (reffile.empty()) {
+      usage();
+      cerr << "reference file not provided\n";
+      return 1;
+   }
+   if (dbfile.empty()) {
+      usage();
+      cerr << "must provide a data file of one or more sequences in fasta or fastq format\n";
+      return 1;
+   }
+   if (outfile.empty()) {
       outfile=makeOutputFile(reffile, dbfile);
    }
    if (isDNA(reffile)) {
