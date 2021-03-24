@@ -38,7 +38,7 @@ class Fastq {
        * For Ion Torrent, the scheme is from 0-40
        * 0                                       40
        * !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHI
-       * 33                                      73   
+       * 33                                      73 ASCII val
        * For efficiency this is the ASCII value
        * 33 - 126
        * ASCII value
@@ -90,6 +90,11 @@ class Fastq {
       Fastq() : name(), desc(), seq(), qual(nullptr), qual_len(0) {  }
       /**
        * Constructor with integer quality array
+       * @param quality is an array of integer with 
+       *   allocated length of at least sequence.length.
+       *   This value will be converted to unsigned char
+       *   by adding 33 to it. Range of quality [0,93],
+       *   normally [0,40]
        */
       Fastq(const string &id, const string &description, const string &sequence, const int* quality)
          : name(id), desc(description), seq(sequence), 
@@ -97,10 +102,11 @@ class Fastq {
             qual_len(sequence.length())
       { 
          const int* ptr=quality;
-          for (unsigned int i = 0; i<qual_len; ++i) {
-             qual[i] = static_cast<unsigned char>(*ptr++);
-          }
-          if (!desc.empty() && desc[0] == '@') desc=desc.substr(1);
+         for (unsigned int i = 0; i<qual_len; ++i) {
+             qual[i] = static_cast<unsigned char>(*ptr+conv);
+             ++ptr;
+         }
+         if (!desc.empty() && desc[0] == '@') desc=desc.substr(1);
       }
       Fastq(const string &id, const string &description, const string &sequence, const unsigned char* quality)
          : name(id), desc(description), seq(sequence), 
@@ -200,7 +206,8 @@ class Fastq {
        */
       size_t charSize() const;
       /**
-       * Convinient stream output format
+       * Convinient stream output format.
+       * ENDL will will written to the output stream.
        */
       friend ostream& operator<<(ostream &ous, const Fastq &fq) {
          fq.write(ous); return ous; }

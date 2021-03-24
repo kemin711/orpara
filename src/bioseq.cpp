@@ -346,13 +346,13 @@ bool bioseq::read(istream &ins) {
    if (code != nullptr) {
       delete[] code; code = nullptr;
    }
-   getline(ins,seq);
+   getline(ins,seq); // this could be the whole aa-sequence
 #ifdef VERIFY_RESIDUE
    if (isNotBioseq(seq)) {
       throw bioseqexception("biosequence contains illegal char");
    }
 #endif
-   if (ins.eof()) { // no more input
+   if (ins.eof() || ins.peek() == '>') { // no more input, or seq shorter than one line
       return true;
    }
    string line;
@@ -1410,7 +1410,7 @@ bool DNA::read(istream &ins) {
    }
    //title=title.substr(1); // get rid of >
    if ((i=title.find(' ')) != string::npos) {
-      name=title.substr(1,i);
+      name=title.substr(1,i-1);
       title=title.substr(i+1);
       //if (title[0] == ' ') { title=title.substr(1); }
    }
