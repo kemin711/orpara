@@ -244,6 +244,7 @@ class Dynaln {
          global(); buildResult(delta1, delta2); return this->Smax; }
       /** 
        * Run the local algorithm
+       * @return the alignment score
        */
       int local();
 
@@ -254,6 +255,7 @@ class Dynaln {
        *     in the first input sequence. Starting position of the
        *     input sequence used for alignment.
        * @param delta2 mark position in the second sequence.
+       * @return Alignment score
        * You could have used a subsequence for the alignment,
        * then you want to label the positions in the original sequence.
        * In this case you add the delta to the labeling.

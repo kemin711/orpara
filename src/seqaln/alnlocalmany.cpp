@@ -18,13 +18,14 @@ class ProgParam {
       int alnlencut;
       /**
        * Reverse complement 1 for the reference. 
-       * 2 for database
+       * 2 for database, 3 for plus strand of database,
+       * and 0 for try both strand of query database.
        */
       int revcomp;
 
    public:
       ProgParam() 
-         : identitycut(0.8), alnlencut(45), revcomp(0) { }
+         : identitycut(0.75), alnlencut(30), revcomp(0) { }
       void setAlnlenCut(const int al) {
          alnlencut = al;
       }
@@ -52,6 +53,15 @@ class ProgParam {
       int useReverseComplement() const {
          return revcomp;
       }
+      bool useBothStrand() const {
+         return revcomp == 0;
+      }
+      bool usePlusStrand() const {
+         return revcom == 3;
+      }
+      void setPlusStrand() {
+         revcom = 3;
+      }
       int getRevcomp() const {
          return revcomp;
       }
@@ -69,12 +79,13 @@ void usage() {
       << "       and others will be treated as fasta files\n"
       << "   --identity-cut FLOAT a fraction number (0, 1] to filter\n"
       << "     alignments whose identity < this will be discarded\n"
-      << "   --alnlen-cut INTEGER a integer value to filter alignment\n"
-      << "     if alignment length < this value, then will be discarded\n"
+      << "   --alnlen-cut INTEGER a integer value (default 30) to filter\n"
+      << "     alignment. If alignment length < this value, then will be discarded\n"
       << "   --minus-reference flag to use negative strand of reference\n"
       << "   --minus-database flag to use negative strand of database\n"
       << "     this is a costly operation, every sequence in db will be\n"
       << "     reverse complemented before alignment\n"
+      << "   --plus-database use plus strand of data file. Default use both\n"
       << "   --help will print this message\n"
       << "Positional argument:\n"
       << "   the database file can be given as the only positional argument\n"
@@ -126,6 +137,9 @@ int main(int argc, char *argv[]) {
       }
       else if (!strcmp(argv[i], "--minus-database")) { 
          param.reverseComplementDatabase(); 
+      }
+      else if (!strcmp(argv[i], "--plus-database")) {
+         param.setPlusStrand();
       }
       else {
          dbfile = argv[i];
@@ -185,13 +199,14 @@ void alignDNAMany(const string& ref, const string& dbf, const string& outf, cons
 {
    // align ref to fasta file
    SimpleScoreMethod sm(10, -9, -29, -3);
-   Dynaln<SimpleScoreMethod> aligner(sm);
+   Dynaln<SimpleScoreMethod> aligner(sm), revaligner(sm);
    DNA dnaref;
    dnaref.read(ref);
    if (param.useReverseComplement() == 1) {
       dnaref.revcomp();
    }
    aligner.setSeq1(dnaref);
+   revaligner.setSeq1(dnaref);
    ifstream inf(dbf);
    if (inf.fail()) {
       throw runtime_error("failed to open dbfile " + dbf);
@@ -211,15 +226,39 @@ void alignDNAMany(const string& ref, const string& dbf, const string& outf, cons
    else {
       DNA dna; 
       while (dna.read(inf)) {
-         if (param.useReverseComplement() == 2) {
-            dna.revcomp();
+         if (param.useBothStrand()) { // == 0
+            aligner.setSeq2(dna);
+            DNA rcdna = dna.revcompCopy();
+            revaligner.setSeq2(rcdna);
+            int score1 = aligner.loca();
+            int score2 = revaligner.local();
+            if (score1 >= score2) {
+               if (aligner.getIdentity() > param.getIdentityCut() 
+                     && aligner.getAlnlen() > param.getAlnlenCut()) 
+               {
+                  aligner.buildResult(0,0);
+                  aligner.printSummary(ouf, "\t", false) << endl;
+               }
+            }
+            else {
+               if (revaligner.getIdentity() > param.getIdentityCut()
+                     && revaligner.getAlnlen() > param.getAlnlenCut()) {
+                  revaligner.buildResult(0,0);
+                  revaligner.printSummary(ouf, "\t", false) << endl;
+               }
+            }
          }
-         aligner.setSeq2(dna);
-         aligner.runlocal();
-         if (aligner.getIdentity() > param.getIdentityCut() 
-               && aligner.getAlnlen() > param.getAlnlenCut()) 
-         {
-            aligner.printSummary(ouf, "\t", false) << endl;
+         else { // puls or minus
+            if (param.useReverseComplement() == 2) {
+               dna.revcomp();
+            }
+            aligner.setSeq2(dna);
+            aligner.runlocal();
+            if (aligner.getIdentity() > param.getIdentityCut() 
+                  && aligner.getAlnlen() > param.getAlnlenCut()) 
+            {
+               aligner.printSummary(ouf, "\t", false) << endl;
+            }
          }
          ++numseq;
       }
