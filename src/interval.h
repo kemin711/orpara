@@ -152,6 +152,7 @@ class Interval {
        * Equal operator.
        */
       bool operator==(const Interval &iv) const { return b==iv.b && e==iv.e; }
+      bool operator!=(const Interval &iv) const { return b!=iv.b || e!=iv.e; }
       bool before(const Interval &iv) const { return e < iv.b; }
       bool after(const Interval &iv) const { return b > iv.e; }
       /**
