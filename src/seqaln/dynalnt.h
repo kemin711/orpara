@@ -301,7 +301,8 @@ class Dynaln {
        * Note: this method calls buildAlnInfo()
        */
       void buildResult(const int delta1=0, const int delta2=0);
-      /** This method will build the alignment information
+      /** 
+       * This method will build the alignment information
        * topaln, buttaln, and middle string will be filled.
        * Furthermore, the identical member will be correctly
        * recalculated by this function; but the gap values
@@ -331,6 +332,7 @@ class Dynaln {
 
       /**
        * output headers.
+       * @param wantEntropy print entropy or not
        */
       static ostream& printSummaryHeader(ostream &ous, const string &dl="\t",
             bool wantEntropy=false);

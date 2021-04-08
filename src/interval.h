@@ -174,7 +174,13 @@ class Interval {
       int getBegin() const { return b; }
       /** returns the start of the interval */
       int begin() const { return b; }
+      /**
+       * @return end of the interval
+       */
       int getEnd() const { return e; }
+      /**
+       * @return end of the interval
+       */
       int end() const { return e; }
 
       /** 
