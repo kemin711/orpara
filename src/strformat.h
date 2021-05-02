@@ -24,7 +24,7 @@ namespace orpara {
 int wc(const string &str);  // word cound
 /**
  * The whole string are maded of continuos stretch of digits
- * @return true of str represent a number.
+ * @return true if str represents a integer number.
  */
 bool isnumber(const string &str); // all digits
 /** 

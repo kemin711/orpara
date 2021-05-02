@@ -93,6 +93,12 @@ class Interval {
          return b <= other.b && e >= other.e;
       }
       /**
+       * @return true if this interval contains the point
+       */
+      bool contains(int point) const {
+         return point >= b && point <= e;
+      }
+      /**
        * the distance between the two ranges
        *    |Range1|      | Range 2 |
        *           |<-d-->|
