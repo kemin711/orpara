@@ -160,7 +160,7 @@ class Interval {
       bool operator<(int p) const {
          return e < p;
       }
-      friend bool operator<(const Interval& iv, int p) {
+      friend bool operator<(int p, const Interval& iv) {
          return p < iv.b;
       }
       /**

@@ -892,6 +892,7 @@ class DNA : public bioseq {
        */
       char getAminoAcid(int idx) const {
          return codontable[seq.substr(idx, 3)];
+      }
 
       static const codon& getCodonTable() { return codontable; }
       static void setCodonTable(const int ctid) { codontable.use(ctid); }
