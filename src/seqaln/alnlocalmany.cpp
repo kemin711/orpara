@@ -22,10 +22,16 @@ class ProgParam {
        * and 0 for try both strand of query database.
        */
       int revcomp;
+      /**
+       * Output format 0 for summary, 1 for detail
+       */
+      int format;
 
    public:
       ProgParam() 
-         : identitycut(0.75), alnlencut(30), revcomp(0) { }
+         : identitycut(0.75), alnlencut(30), revcomp(0),
+           format(0)
+      { }
       void setAlnlenCut(const int al) {
          alnlencut = al;
       }
@@ -57,13 +63,28 @@ class ProgParam {
          return revcomp == 0;
       }
       bool usePlusStrand() const {
-         return revcom == 3;
+         return revcomp == 3;
       }
       void setPlusStrand() {
-         revcom = 3;
+         revcomp = 3;
       }
       int getRevcomp() const {
          return revcomp;
+      }
+      void setOutputDetail() {
+         format=1;
+      }
+      /**
+       * set detailed output: actual alignment
+       */
+      bool outputDetail() const {
+         return format == 1;
+      }
+      void setOutputFormat(char f) {
+         if (f == 'S' || f == 's') 
+            format = 0;
+         else if (f == 'D' || f == 'd')
+            format = 1;
       }
 };
 
@@ -73,6 +94,8 @@ void usage() {
       << "   -r reference sequence file only one sequence allowed\n"
       << "   -o output file name if not given this program will make\n"
       << "       one for you\n"
+      << "   -O format for the output. S for summary, D for detail\n"
+      << "       default summary.\n"
       << "   -d database file contain many sequences in fasta or fastq format\n"
       << "       The program will judge the type of sequence based on the \n"
       << "       file suffix. *.fastq files will be treated as fastq files\n"
@@ -124,6 +147,10 @@ int main(int argc, char *argv[]) {
       }
       else if (!strcmp(argv[i], "-o")) {
          outfile = argv[++i];
+      }
+      else if (!strcmp(argv[i], "-O")) {
+         ++i;
+         param.setOutputFormat(argv[i][0]);
       }
       //else if (!strcmp(argv[i], "-q")) { dbfile=argv[++i]; }
       else if (!strcmp(argv[i], "--identity-cut")) { 
@@ -230,21 +257,31 @@ void alignDNAMany(const string& ref, const string& dbf, const string& outf, cons
             aligner.setSeq2(dna);
             DNA rcdna = dna.revcompCopy();
             revaligner.setSeq2(rcdna);
-            int score1 = aligner.loca();
+            int score1 = aligner.local();
             int score2 = revaligner.local();
+            //cerr << score1 << " " << score2 << endl;
             if (score1 >= score2) {
+               aligner.buildResult(0,0);
                if (aligner.getIdentity() > param.getIdentityCut() 
                      && aligner.getAlnlen() > param.getAlnlenCut()) 
                {
-                  aligner.buildResult(0,0);
-                  aligner.printSummary(ouf, "\t", false) << endl;
+                  //cerr << "forward align better\n";
+                  if (param.outputDetail()) 
+                     aligner.printAlign(ouf);
+                  else 
+                     aligner.printSummary(ouf, "\t", false) << endl;
                }
             }
             else {
+               revaligner.buildResult(0,0);
+               //cerr << "reverse align better\n";
                if (revaligner.getIdentity() > param.getIdentityCut()
-                     && revaligner.getAlnlen() > param.getAlnlenCut()) {
-                  revaligner.buildResult(0,0);
-                  revaligner.printSummary(ouf, "\t", false) << endl;
+                     && revaligner.getAlnlen() > param.getAlnlenCut()) 
+               {
+                  if (param.outputDetail()) 
+                     revaligner.printAlign(ouf);
+                  else 
+                     revaligner.printSummary(ouf, "\t", false) << endl;
                }
             }
          }

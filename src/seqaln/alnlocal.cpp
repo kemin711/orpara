@@ -20,19 +20,22 @@ struct Progparam {
 void usage() {
    cout << "alnlocal seq1.file seq2.file -o outfile\n"
       << "Options:\n"
-      << "        -r [1,2]  reverse complement first or second sequence\n"
-      << "        -1 first sequence file\n"
-      << "        -2 second sequence file\n"
-      << "        -b1 1-based index of sequence1 begin\n"
-      << "        -e1 1-based index of sequence1 end\n"
-      << "        -b2 1-based index of sequence2 begin\n"
-      << "        -e2 1-based index of sequence2 end\n"
-      << "        --gap-open or -g  gap open cost, default min(matrix score)*2 \n"
-      << "        --gap-extend or -e  gap extend cost, default min(matrix score)\n"
-      << "        --self dna.fas file. Now only works for DNA sequences\n"
-      << "        -o output file\n"
-      << "        -m match score default 10\n"
-      << "        -x mismatch score default -20\n";
+      << "    -r [1,2]  reverse complement first or second sequence\n"
+      << "    -1 first sequence file\n"
+      << "    -2 second sequence file\n"
+      << "    -b1 1-based index of sequence1 begin\n"
+      << "    -e1 1-based index of sequence1 end\n"
+      << "    -b2 1-based index of sequence2 begin\n"
+      << "    -e2 1-based index of sequence2 end\n"
+      << "    --gap-open or -g  gap open cost, default min(matrix score)*2 \n"
+      << "    --gap-extend or -e  gap extend cost, default min(matrix score)\n"
+      << "    --self dna.fas file. Now only works for DNA sequences\n"
+      << "    -o output file. If not supplied this program will generate\n"
+      << "       one for you\n"
+      << "    -m match score default 10\n"
+      << "    -x mismatch score default -20. use -10 will have longer\n"
+      << "       alignment\n"
+      << "    --help will display this message\n";
 }
 
 /**
@@ -105,6 +108,9 @@ int main(int argc, char *argv[]) {
       else if (string(argv[i]) == "--self") { 
          SELF_ALIGN=true;
          file1=string(argv[++i]); 
+      }
+      else if (!strcmp(argv[i], "--help")) {
+         usage(); return 0;
       }
       else {
          file1 = argv[i];
@@ -299,7 +305,7 @@ void alignSimple(const bioseq &s1, const bioseq &s2,
       cerr << "after fixing staggered gap\n";
       aln.printAlign(ous);
    }
-   cerr << __func__ << " done\n";
+   //cerr << __func__ << " done\n";
 }
 
 void alignProtein(const int gapOpen, const int gapExtend, 
