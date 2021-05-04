@@ -879,9 +879,19 @@ class DNA : public bioseq {
       bool read(istream &ins);
       bool read(istream &ins, string &hd) {
          return bioseq::read(ins,hd); }
+      /**
+       * Read one sequence from input file
+       */
       void read(const string &file) { 
          bioseq::read(file); 
       }
+      /**
+       * @param pos is 0-based index into the DNA sequence.
+       * @return the amino acid encoded by nucleotides
+       *    [idx, idx+3)
+       */
+      char getAminoAcid(int idx) const {
+         return codontable[seq.substr(idx, 3)];
 
       static const codon& getCodonTable() { return codontable; }
       static void setCodonTable(const int ctid) { codontable.use(ctid); }

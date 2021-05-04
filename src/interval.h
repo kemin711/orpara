@@ -149,6 +149,15 @@ class Interval {
          return e > iv.e;
       }
       /**
+       * For comparison with single point
+       */
+      bool operator<(int p) const {
+         return e < p;
+      }
+      friend bool operator<(const Interval& iv, int p) {
+         return p < iv.b;
+      }
+      /**
        * Equal operator.
        */
       bool operator==(const Interval &iv) const { return b==iv.b && e==iv.e; }
