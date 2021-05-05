@@ -893,6 +893,25 @@ class DNA : public bioseq {
       char getAminoAcid(int idx) const {
          return codontable[seq.substr(idx, 3)];
       }
+      /**
+       * @param idx is the start of the codon
+       * @param len should be 3*n, if not will expand to 3*n
+       */
+      string getPeptide(int idx, int len) const {
+         if (len % 3 != 0) {
+            len += (3 - (len%3));
+         }
+         return subsequence(idx, len).translate().toString();
+      }
+      string getCodon(int idx) const {
+         return seq.substr(idx, 3);
+      }
+      string getCodingSegment(int idx, int len) const {
+         if (len % 3 != 0) {
+            len += (3 - (len%3));
+         }
+         return seq.substr(idx, len);
+      }
 
       static const codon& getCodonTable() { return codontable; }
       static void setCodonTable(const int ctid) { codontable.use(ctid); }
