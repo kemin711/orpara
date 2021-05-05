@@ -903,6 +903,9 @@ class DNA : public bioseq {
          }
          return subsequence(idx, len).translate().toString();
       }
+      /**
+       * @return the codon starting from idx
+       */
       string getCodon(int idx) const {
          return seq.substr(idx, 3);
       }
