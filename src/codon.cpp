@@ -333,3 +333,5 @@ void codon::fillReverseTable() {;
       revtab[x.second].push_back(x.first);
    }
 }
+
+} // end of name space
