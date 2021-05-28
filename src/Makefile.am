@@ -30,7 +30,7 @@ libkemin_la_LDFLAGS = -version-info 0:0:0
 #libkkemin_la_CPPFLAGS = -DMATRIXDIR=$(pkgdatadir)/matrix
 
 # this will work with all compiler operations
-AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\"" -D DATADIR=$(pkgdatadir)
+AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\"" -D DATADIR="\"$(pkgdatadir)\""
 LDADD = libkemin.la
 # binary either for testing or for usage
 bin_PROGRAMS = GrishinDistance maxdiff

@@ -11,7 +11,7 @@ const string codon::univcodon = "ttt F ttc F tta L ttg L tct S tcc S tca S tcg S
 char codon::unknownaa='X'; // this is the accepted letter 
 // the following needs more generic treatment for portability
 //char codon::codonfile[200]="/home/kzhou/etc/codontable.txt";
-char codon::codonfile(string(DATADIR) + "/codontable.txt");
+string codon::codonfile(string(DATADIR) + "/codontable.txt");
 
 vector<map<string,char> > codon::codontables=vector<map<string,char> >(28);
 vector<set<string> > codon::starts=vector<set<string> >(28);
@@ -126,7 +126,8 @@ void codon::showAllCodonTables(ostream &ous) {
 // given as a string of TTT F TTC F ....
 // this function will parse this string
 codon::codon(const std::string &def)
-   : majorStart(), altstart(), tab() {
+   : majorStart(), altstart(), tab(), nuc2aa(), revtab() 
+{
    strcpy(majorStart, "ATG");
    string::size_type i=0;
    while (i < def.size()) {
@@ -134,10 +135,12 @@ codon::codon(const std::string &def)
       i += 6;
    }
    convert();
+   fillReverseTable();
 }
 
 codon::codon() 
-   : majorStart(), altstart(), tab() {
+   : majorStart(), altstart(), tab(), nuc2aa(), revtab() 
+{
    //static const string dft = "ttt F ttc F tta L ttg L tct S tcc S tca S tcg S tat Y tac Y taa X tag X tgt C tgc C tga X tgg W ctt L ctc L cta L ctg L cct P ccc P cca P ccg P cat H cac H caa Q cag Q cgt R cgc R cga R cgg R att I atc I ata I atg M act T acc T aca T acg T aat N aac N aaa K aag K agt S agc S aga R agg R gtt V gtc V gta V gtg V gct A gcc A gca A gcg A gat D gac D gaa E gag E ggt G ggc G gga G ggg G taa * tga * tag *";
    strcpy(majorStart, "ATG");
    unsigned int i=0;
@@ -149,6 +152,7 @@ codon::codon()
    altstart.insert("ttg");
    altstart.insert("ctg");
    altstart.insert("atg");
+   fillReverseTable();
 }
 
 // encode base into 2 bits 
@@ -301,6 +305,7 @@ void codon::use(const int tabid) {
    }
    convert();
    altstart=starts[tabid];
+   fillReverseTable();
 }
 
 void codon::show(ostream &ous) const {
@@ -320,4 +325,11 @@ void codon::show(ostream &ous) const {
    ous << endl << endl;
 }
 
+void codon::fillReverseTable() {;
+   //map<string, char> tab; use tab to fill revtab
+   //map<char, vector<string>> revtab;
+   if (!revtab.empty()) revtab.clear();
+   for (auto& x : tab) {
+      revtab[x.second].push_back(x.first);
+   }
 }

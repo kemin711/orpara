@@ -72,6 +72,13 @@ class codon {
       char operator[](const char cc[3]);
 
       map<char,double> getAAUniformFrequency() const;
+      /**
+       * @param aa1 single letter code for amino acids
+       * @return codons associated with one amino acid
+       */
+      const vector<string>& getCodon(const char aa1) const {
+         return revtab.at(aa1);
+      }
       /** universal codon
        * It was initialized with lower case 3 letter codons followed by single
        * letter amino acids code.  Total 64 codons with star represents stop
@@ -106,6 +113,7 @@ class codon {
       static void showAllCodonTables(ostream &ous);
 
    private:
+      void fillReverseTable();
       char majorStart[4]; //"ATG";
       /** alternative starts */
       set<string> altstart;
@@ -132,10 +140,15 @@ class codon {
        * be determined by 2-nucleotides.
        */
       void convert();
+      /**
+       * Reverse look up table.
+       * AA single letter => codons look up table
+       */
+      map<char, vector<string>> revtab;
 
       /** 
-       * so far there are 23 with 7,8 removed
-       * actually 21 table. We will leave 7,8 empty.
+       * so far there are 33 with 7,8 removed
+       * actually 33 - 2 table. We will leave 7,8 empty.
        * I gave 28 for future growth.
        * To see this table is loaded, you need to test
        * the codon table at index 1.
