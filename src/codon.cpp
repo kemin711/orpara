@@ -5,20 +5,24 @@
 
 namespace orpara {
 
+// this is the universal codon table
 const string codon::univcodon = "ttt F ttc F tta L ttg L tct S tcc S tca S tcg S tat Y tac Y taa * tag * tgt C tgc C tga * tgg W ctt L ctc L cta L ctg L cct P ccc P cca P ccg P cat H cac H caa Q cag Q cgt R cgc R cga R cgg R att I atc I ata I atg M act T acc T aca T acg T aat N aac N aaa K aag K agt S agc S aga R agg R gtt V gtc V gta V gtg V gct A gcc A gca A gcg A gat D gac D gaa E gag E ggt G ggc G gga G ggg G";
 //char codon::unknownaa='?';
 char codon::unknownaa='X'; // this is the accepted letter 
 // the following needs more generic treatment for portability
 //char codon::codonfile[200]="/home/kzhou/etc/codontable.txt";
-char codon::codonfile[200]="/home/zhouke/etc/codontable.txt";
+char codon::codonfile(string(DATADIR) + "/codontable.txt");
 
 vector<map<string,char> > codon::codontables=vector<map<string,char> >(28);
 vector<set<string> > codon::starts=vector<set<string> >(28);
+
+// use a particular codong file
 void codon::setCodonFile(const char file[]) {
    if (strlen(file) > 199) {
       cerr << "input path too long, should be less than 200 char\n";
    }
-   strcpy(codonfile, file);
+   //strcpy(codonfile, file);
+   codonfile=file;
 }
 
 bool isCodonHeader(const string &line) {

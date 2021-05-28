@@ -44,9 +44,13 @@ class codon {
        *   acid code.
        * */
       codon(const std::string &def);
-      /** switch to a particular codon table.
+      /** 
+       * switch to a particular codon table.
        * for example useTable(12). This will switch to Candida yeast
-       * codon table. */
+       * codon table. 
+       * Default is using standard codong table when no using 
+       * a different one.
+       */
       void use(const int tabid);
 
       /** translate codon into one letter aa code
@@ -81,12 +85,22 @@ class codon {
       static char unknownaa;
       //static void readCodonTable(const string &file);
       static void readCodonTable();
+      /**
+       * Use a particular codon file
+       * @param file is the codong file name
+       */
       static void setCodonFile(const char file[]);
-      /** this is a global parameter it should be assigned to the system-wide
+      static void setCodonFile(const string cdnfile) {
+         codonfile = cdnfile;
+      }
+      /** 
+       * this is a global parameter it should be assigned to the system-wide
        * directory. Now default to user or programmer's home directory
        * $HOME/etc/codontable.txt
+       * TODO: bad design
        */
-      static char codonfile[200]; // $HOME/etc/codontable.txt
+      //static char codonfile[200]; // $HOME/etc/codontable.txt
+      static string codonfile; // DATADIR=pkgdatadir/codontable.txt
       /** for debug purpose */
       void show(ostream &ous) const;
       static void showAllCodonTables(ostream &ous);
