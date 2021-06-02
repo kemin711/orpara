@@ -909,6 +909,12 @@ class DNA : public bioseq {
       string getCodon(int idx) const {
          return seq.substr(idx, 3);
       }
+      /**
+       * @param idx is 0-based index
+       * @return the coding segment starting from idx for len
+       *    if len is not 3n, then will padd with extra based from 
+       *    this object to the 3' side
+       */
       string getCodingSegment(int idx, int len) const {
          if (len % 3 != 0) {
             len += (3 - (len%3));
