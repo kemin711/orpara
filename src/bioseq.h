@@ -791,7 +791,8 @@ class DNA : public bioseq {
        * NNN => ?, may be I should use X
        */
       Protein translate() const;
-      /** use 1-based index 
+      /** 
+       * use 1-based index 
        * This operation limits the operation to a subrange
        * of the DNA sequence.
        * This class use only one codon table that
