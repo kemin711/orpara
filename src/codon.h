@@ -44,9 +44,13 @@ class codon {
        *   acid code.
        * */
       codon(const std::string &def);
-      /** switch to a particular codon table.
+      /** 
+       * switch to a particular codon table.
        * for example useTable(12). This will switch to Candida yeast
-       * codon table. */
+       * codon table. 
+       * Default is using standard codong table when no using 
+       * a different one.
+       */
       void use(const int tabid);
 
       /** translate codon into one letter aa code
@@ -68,6 +72,13 @@ class codon {
       char operator[](const char cc[3]);
 
       map<char,double> getAAUniformFrequency() const;
+      /**
+       * @param aa1 single letter code for amino acids
+       * @return codons associated with one amino acid
+       */
+      const vector<string>& getCodon(const char aa1) const {
+         return revtab.at(aa1);
+      }
       /** universal codon
        * It was initialized with lower case 3 letter codons followed by single
        * letter amino acids code.  Total 64 codons with star represents stop
@@ -81,17 +92,28 @@ class codon {
       static char unknownaa;
       //static void readCodonTable(const string &file);
       static void readCodonTable();
+      /**
+       * Use a particular codon file
+       * @param file is the codong file name
+       */
       static void setCodonFile(const char file[]);
-      /** this is a global parameter it should be assigned to the system-wide
+      static void setCodonFile(const string cdnfile) {
+         codonfile = cdnfile;
+      }
+      /** 
+       * this is a global parameter it should be assigned to the system-wide
        * directory. Now default to user or programmer's home directory
        * $HOME/etc/codontable.txt
+       * TODO: bad design
        */
-      static char codonfile[200]; // $HOME/etc/codontable.txt
+      //static char codonfile[200]; // $HOME/etc/codontable.txt
+      static string codonfile; // DATADIR=pkgdatadir/codontable.txt
       /** for debug purpose */
       void show(ostream &ous) const;
       static void showAllCodonTables(ostream &ous);
 
    private:
+      void fillReverseTable();
       char majorStart[4]; //"ATG";
       /** alternative starts */
       set<string> altstart;
@@ -118,10 +140,15 @@ class codon {
        * be determined by 2-nucleotides.
        */
       void convert();
+      /**
+       * Reverse look up table.
+       * AA single letter => codons look up table
+       */
+      map<char, vector<string>> revtab;
 
       /** 
-       * so far there are 23 with 7,8 removed
-       * actually 21 table. We will leave 7,8 empty.
+       * so far there are 33 with 7,8 removed
+       * actually 33 - 2 table. We will leave 7,8 empty.
        * I gave 28 for future growth.
        * To see this table is loaded, you need to test
        * the codon table at index 1.

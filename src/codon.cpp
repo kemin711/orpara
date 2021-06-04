@@ -5,20 +5,25 @@
 
 namespace orpara {
 
-const string codon::univcodon = "ttt F ttc F tta L ttg L tct S tcc S tca S tcg S tat Y tac Y taa * tag * tgt C tgc C tga * tgg W ctt L ctc L cta L ctg L cct P ccc P cca P ccg P cat H cac H caa Q cag Q cgt R cgc R cga R cgg R att I atc I ata I atg M act T acc T aca T acg T aat N aac N aaa K aag K agt S agc S aga R agg R gtt V gtc V gta V gtg V gct A gcc A gca A gcg A gat D gac D gaa E gag E ggt G ggc G gga G ggg G";
+// this is the universal codon table
+// Use upper case BASE which is also upper case in codontable.txt
+const string codon::univcodon = "TTT F TTC F TTA L TTG L TCT S TCC S TCA S TCG S TAT Y TAC Y TAA * TAG * TGT C TGC C TGA * TGG W CTT L CTC L CTA L CTG L CCT P CCC P CCA P CCG P CAT H CAC H CAA Q CAG Q CGT R CGC R CGA R CGG R ATT I ATC I ATA I ATG M ACT T ACC T ACA T ACG T AAT N AAC N AAA K AAG K AGT S AGC S AGA R AGG R GTT V GTC V GTA V GTG V GCT A GCC A GCA A GCG A GAT D GAC D GAA E GAG E GGT G GGC G GGA G GGG G";
 //char codon::unknownaa='?';
 char codon::unknownaa='X'; // this is the accepted letter 
 // the following needs more generic treatment for portability
 //char codon::codonfile[200]="/home/kzhou/etc/codontable.txt";
-char codon::codonfile[200]="/home/zhouke/etc/codontable.txt";
+string codon::codonfile(string(DATADIR) + "/codontable.txt");
 
 vector<map<string,char> > codon::codontables=vector<map<string,char> >(28);
 vector<set<string> > codon::starts=vector<set<string> >(28);
+
+// use a particular codong file
 void codon::setCodonFile(const char file[]) {
    if (strlen(file) > 199) {
       cerr << "input path too long, should be less than 200 char\n";
    }
-   strcpy(codonfile, file);
+   //strcpy(codonfile, file);
+   codonfile=file;
 }
 
 bool isCodonHeader(const string &line) {
@@ -122,7 +127,8 @@ void codon::showAllCodonTables(ostream &ous) {
 // given as a string of TTT F TTC F ....
 // this function will parse this string
 codon::codon(const std::string &def)
-   : majorStart(), altstart(), tab() {
+   : majorStart(), altstart(), tab(), nuc2aa(), revtab() 
+{
    strcpy(majorStart, "ATG");
    string::size_type i=0;
    while (i < def.size()) {
@@ -130,11 +136,12 @@ codon::codon(const std::string &def)
       i += 6;
    }
    convert();
+   fillReverseTable();
 }
 
 codon::codon() 
-   : majorStart(), altstart(), tab() {
-   //static const string dft = "ttt F ttc F tta L ttg L tct S tcc S tca S tcg S tat Y tac Y taa X tag X tgt C tgc C tga X tgg W ctt L ctc L cta L ctg L cct P ccc P cca P ccg P cat H cac H caa Q cag Q cgt R cgc R cga R cgg R att I atc I ata I atg M act T acc T aca T acg T aat N aac N aaa K aag K agt S agc S aga R agg R gtt V gtc V gta V gtg V gct A gcc A gca A gcg A gat D gac D gaa E gag E ggt G ggc G gga G ggg G taa * tga * tag *";
+   : majorStart(), altstart{"TTG", "CTG", "ATG"}, tab(), nuc2aa(), revtab() 
+{
    strcpy(majorStart, "ATG");
    unsigned int i=0;
    while (i<univcodon.size()) {
@@ -142,9 +149,10 @@ codon::codon()
       i += 6;
    }
    convert();
-   altstart.insert("ttg");
-   altstart.insert("ctg");
-   altstart.insert("atg");
+   //altstart.insert("TTG");
+   //altstart.insert("CTG");
+   //altstart.insert("ATG");
+   fillReverseTable();
 }
 
 // encode base into 2 bits 
@@ -297,6 +305,7 @@ void codon::use(const int tabid) {
    }
    convert();
    altstart=starts[tabid];
+   fillReverseTable();
 }
 
 void codon::show(ostream &ous) const {
@@ -316,4 +325,13 @@ void codon::show(ostream &ous) const {
    ous << endl << endl;
 }
 
+void codon::fillReverseTable() {;
+   //map<string, char> tab; use tab to fill revtab
+   //map<char, vector<string>> revtab;
+   if (!revtab.empty()) revtab.clear();
+   for (auto& x : tab) {
+      revtab[x.second].push_back(x.first);
+   }
 }
+
+} // end of name space

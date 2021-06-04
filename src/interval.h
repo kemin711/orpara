@@ -93,10 +93,17 @@ class Interval {
          if (other.isNull()) return true;
          return b <= other.b && e >= other.e;
       }
+      bool contain(const Interval& other) const {
+         if (other.isNull()) return true;
+         return b <= other.b && e >= other.e;
+      }
       /**
        * @return true if this interval contains the point
        */
       bool contains(int point) const {
+         return point >= b && point <= e;
+      }
+      bool contain(int point) const {
          return point >= b && point <= e;
       }
       /**
@@ -161,7 +168,7 @@ class Interval {
       bool operator<(int p) const {
          return e < p;
       }
-      friend bool operator<(const Interval& iv, int p) {
+      friend bool operator<(int p, const Interval& iv) {
          return p < iv.b;
       }
       /**

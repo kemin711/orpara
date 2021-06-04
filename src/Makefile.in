@@ -16,6 +16,7 @@
 
 
 
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -99,14 +100,14 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx.m4 \
 	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-DIST_COMMON = $(srcdir)/Makefile.am $(pkginclude_HEADERS) \
-	$(am__DIST_COMMON)
+DIST_COMMON = $(srcdir)/Makefile.am $(dist_pkgdata_DATA) \
+	$(pkginclude_HEADERS) $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" \
-	"$(DESTDIR)$(pkgincludedir)"
+	"$(DESTDIR)$(pkgdatadir)" "$(DESTDIR)$(pkgincludedir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -238,6 +239,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+DATA = $(dist_pkgdata_DATA)
 HEADERS = $(pkginclude_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
@@ -446,13 +448,14 @@ cppfiles = strformat.cpp range.cpp interval.cpp codon.cpp bioseq.cpp Model.cpp \
 
 #alnrange.cpp ChainAvgrange.cpp
 pkginclude_HEADERS = $(only_headers) $(header_forlibs)
+dist_pkgdata_DATA = codontable.txt
 lib_LTLIBRARIES = libkemin.la
 libkemin_la_SOURCES = $(header_forlibs) $(cppfiles)
 libkemin_la_LDFLAGS = -version-info 0:0:0
 #libkkemin_la_CPPFLAGS = -DMATRIXDIR=$(pkgdatadir)/matrix
 
 # this will work with all compiler operations
-AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\"" 
+AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\"" -D DATADIR="\"$(pkgdatadir)\""
 LDADD = libkemin.la
 GrishinDistance_SOURCES = GrishinDistance.cpp evolution/evolution.h
 maxdiff_SOURCES = maxdiff.cpp
@@ -663,6 +666,27 @@ mostlyclean-libtool:
 clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf seqaln/.libs seqaln/_libs
+install-dist_pkgdataDATA: $(dist_pkgdata_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(dist_pkgdata_DATA)'; test -n "$(pkgdatadir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(pkgdatadir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(pkgdatadir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkgdatadir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkgdatadir)" || exit $$?; \
+	done
+
+uninstall-dist_pkgdataDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_pkgdata_DATA)'; test -n "$(pkgdatadir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(pkgdatadir)'; $(am__uninstall_files_from_dir)
 install-pkgincludeHEADERS: $(pkginclude_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(pkginclude_HEADERS)'; test -n "$(pkgincludedir)" || list=; \
@@ -844,12 +868,12 @@ distdir-am: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) $(HEADERS)
+all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) $(DATA) $(HEADERS)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgincludedir)"; do \
+	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgdatadir)" "$(DESTDIR)$(pkgincludedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -922,7 +946,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-pkgincludeHEADERS
+install-data-am: install-dist_pkgdataDATA install-pkgincludeHEADERS
 
 install-dvi: install-dvi-recursive
 
@@ -983,8 +1007,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
-	uninstall-pkgincludeHEADERS
+uninstall-am: uninstall-binPROGRAMS uninstall-dist_pkgdataDATA \
+	uninstall-libLTLIBRARIES uninstall-pkgincludeHEADERS
 
 .MAKE: $(am__recursive_targets) install-am install-strip
 
@@ -994,17 +1018,17 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	ctags ctags-am distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-pdf install-pdf-am \
+	install-data install-data-am install-dist_pkgdataDATA \
+	install-dvi install-dvi-am install-exec install-exec-am \
+	install-html install-html-am install-info install-info-am \
+	install-libLTLIBRARIES install-man install-pdf install-pdf-am \
 	install-pkgincludeHEADERS install-ps install-ps-am \
 	install-strip installcheck installcheck-am installdirs \
 	installdirs-am maintainer-clean maintainer-clean-generic \
 	mostlyclean mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
-	uninstall-pkgincludeHEADERS
+	uninstall-am uninstall-binPROGRAMS uninstall-dist_pkgdataDATA \
+	uninstall-libLTLIBRARIES uninstall-pkgincludeHEADERS
 
 .PRECIOUS: Makefile
 
