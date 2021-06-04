@@ -33,6 +33,7 @@ class Interval {
        * which is most unlikely number. Could consider
        * min(int) smallerst number.
        * isNull() will test against this value.
+       * Maybe should use -inf,-inf for NULL
        */
       Interval() : b(-1), e(-1) { }
       /**
