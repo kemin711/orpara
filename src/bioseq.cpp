@@ -411,14 +411,16 @@ bool bioseq::read(const string &file) {
    string line;
    getline(IN, line);
    while (!IN.eof() && line[0] != '>') {
-      if (!isprint(line.back())) {
-         line.resize(line.size()-1);
+      if (!line.empty()) { // dealing with empty line case
+         if (!isprint(line.back())) {
+            line.resize(line.size()-1);
+         }
+         if (isNotBioseq(line)){
+            cerr << line << " contain illegal sequence char\n";
+            return false;
+         }
+         seq += line;
       }
-      if (isNotBioseq(line)){
-         cerr << line << " contain illegal sequence char\n";
-         return false;
-      }
-      seq += line;
       getline(IN, line);
    }
    if (!IN.eof()) {
