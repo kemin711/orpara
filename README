@@ -1,5 +1,7 @@
-This is a subset of the libraries from orpara that are only used by the 16S pipeline.
-All source codes were created by orpara.com from 2002 to July 12, 2015.
+This is a subset of the libraries from orpara that are in reasonable usable state.
+Much of the code is not of general interest and not included here.
+
+All source codes were created by orpara.com from 2002 to present.
 
 It is free to use open source MIT license.
 

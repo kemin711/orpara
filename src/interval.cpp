@@ -347,4 +347,5 @@ int IntervalChain::getInnerLength() const {
 int IntervalChain::getOuterLength() const {
    return chain.back()->getEnd() - chain.front()->getBegin() + 1;
 }
-}
+
+} // orpara namespace ends

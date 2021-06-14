@@ -143,7 +143,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_2 = strformat.lo range.lo interval.lo codon.lo bioseq.lo \
 	Model.lo FPGModel.lo fastq.lo seqaln/scorematrix.lo \
 	seqaln/alninfo.lo seqaln/alnexaminer.lo seqaln/kmer.lo \
-	seqaln/kmerhelper.lo ncbitaxonomy.lo
+	seqaln/kmerhelper.lo ncbitaxonomy.lo genomicinterval.lo
 am_libkemin_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libkemin_la_OBJECTS = $(am_libkemin_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -179,11 +179,12 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/FPGModel.Plo \
 	./$(DEPDIR)/GrishinDistance.Po ./$(DEPDIR)/Model.Plo \
 	./$(DEPDIR)/bioseq.Plo ./$(DEPDIR)/codon.Plo \
-	./$(DEPDIR)/fastq.Plo ./$(DEPDIR)/interval.Plo \
-	./$(DEPDIR)/maxdiff.Po ./$(DEPDIR)/ncbitaxonomy.Plo \
-	./$(DEPDIR)/range.Plo ./$(DEPDIR)/strformat.Plo \
-	seqaln/$(DEPDIR)/alnexaminer.Plo seqaln/$(DEPDIR)/alninfo.Plo \
-	seqaln/$(DEPDIR)/kmer.Plo seqaln/$(DEPDIR)/kmerhelper.Plo \
+	./$(DEPDIR)/fastq.Plo ./$(DEPDIR)/genomicinterval.Plo \
+	./$(DEPDIR)/interval.Plo ./$(DEPDIR)/maxdiff.Po \
+	./$(DEPDIR)/ncbitaxonomy.Plo ./$(DEPDIR)/range.Plo \
+	./$(DEPDIR)/strformat.Plo seqaln/$(DEPDIR)/alnexaminer.Plo \
+	seqaln/$(DEPDIR)/alninfo.Plo seqaln/$(DEPDIR)/kmer.Plo \
+	seqaln/$(DEPDIR)/kmerhelper.Plo \
 	seqaln/$(DEPDIR)/scorematrix.Plo
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -434,17 +435,17 @@ AUTOMAKE_OPTIONS = subdir-objects
 only_headers = stddev.h seqaln/dynalnt.h seqaln/kmert.h seqaln/kmerbase.h seqaln/kmerset.h \
 				  	gentree.h evolution/evolution.h quicksortorder.h threadsafequeue.h \
 					derivative.h kmean.h insertsortlist.h cluster/hatrees.h randombase.h \
-					seqaln/minhash.h
+					seqaln/minhash.h 
 
 header_forlibs = strformat.h range.h interval.h bioseq.h codon.h Model.h FPGModel.h \
 					  GModel.h fastq.h seqaln/scorematrix.h seqaln/alninfo.h seqaln/alnexaminer.h \
-					  seqaln/kmer.h seqaln/kmerhelper.h ncbitaxonomy.h 
+					  seqaln/kmer.h seqaln/kmerhelper.h ncbitaxonomy.h genomicinterval.h
 
 #					  alnrange.h ChainAvgrange.h 
 cppfiles = strformat.cpp range.cpp interval.cpp codon.cpp bioseq.cpp Model.cpp \
 			  FPGModel.cpp fastq.cpp seqaln/scorematrix.cpp seqaln/alninfo.cpp \
 			  seqaln/alnexaminer.cpp seqaln/kmer.cpp seqaln/kmerhelper.cpp \
-			  ncbitaxonomy.cpp 
+			  ncbitaxonomy.cpp genomicinterval.cpp
 
 #alnrange.cpp ChainAvgrange.cpp
 pkginclude_HEADERS = $(only_headers) $(header_forlibs)
@@ -619,6 +620,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bioseq.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codon.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fastq.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/genomicinterval.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/maxdiff.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ncbitaxonomy.Plo@am__quote@ # am--include-marker
@@ -920,6 +922,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/bioseq.Plo
 	-rm -f ./$(DEPDIR)/codon.Plo
 	-rm -f ./$(DEPDIR)/fastq.Plo
+	-rm -f ./$(DEPDIR)/genomicinterval.Plo
 	-rm -f ./$(DEPDIR)/interval.Plo
 	-rm -f ./$(DEPDIR)/maxdiff.Po
 	-rm -f ./$(DEPDIR)/ncbitaxonomy.Plo
@@ -981,6 +984,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/bioseq.Plo
 	-rm -f ./$(DEPDIR)/codon.Plo
 	-rm -f ./$(DEPDIR)/fastq.Plo
+	-rm -f ./$(DEPDIR)/genomicinterval.Plo
 	-rm -f ./$(DEPDIR)/interval.Plo
 	-rm -f ./$(DEPDIR)/maxdiff.Po
 	-rm -f ./$(DEPDIR)/ncbitaxonomy.Plo
