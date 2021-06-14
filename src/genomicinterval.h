@@ -9,12 +9,16 @@ namespace orpara {
  * A simple representation of a region on one genomic DNA.
  */
 class GenomicInterval : public Interval {
-   GenomicInterval(int ri, int b, int e) 
-      : Interval(b,e), refid(ri)
-   {  }
-   bool operator<(const GenomicInterval& other) const;
-   bool operator>(const GenomicInterval& other) const;
-   bool operator==(const GenomicInterval& other) const;
+   public:
+      GenomicInterval(int ri, int b, int e) 
+         : Interval(b,e), refid(ri)
+      {  }
+      bool operator<(const GenomicInterval& other) const;
+      bool operator>(const GenomicInterval& other) const;
+      bool operator==(const GenomicInterval& other) const;
+      int getRefid() const {
+        return refid;
+      } 
 
    protected:
       /**
