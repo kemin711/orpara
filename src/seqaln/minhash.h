@@ -17,8 +17,11 @@ namespace orpara {
  * Template parameter 
  *   K is kmer length should be < 32
  *   S sketch size should be < input string length
+ *   BHF base to integer [0-4] hashing function default is
+ *   KmerBase<K>::base2int we can use a different hashing
+ *   function to get more accurate estimate of similarity.
  */
-template<int K, int S>
+template<int K, int S, BHF=KmerBase<K>::base2int>
 class Sketch {
    public:
       //Sketch(const string& dna) : hv{UINT64_MAX} {
@@ -42,7 +45,8 @@ class Sketch {
          uint64_t v=0;
          for (i=0; i<K-1; ++i) { // first kmer except the last base
             v <<= 2;
-            v |= KmerBase<K>::base2int(dna[i]);
+            //v |= KmerBase<K>::base2int(dna[i]);
+            v |= BHF(dna[i]);
          }
 #ifdef DEBUG
          cout << "i=" << i << " preparation ready\n";
@@ -55,7 +59,8 @@ class Sketch {
             //++kmercnt[dna.substr(i,K)];
             //++kmercnt[tmpk];
             v<<=2;
-            v |= KmerBase<K>::base2int(dna[i+K-1]);
+            //v |= KmerBase<K>::base2int(dna[i+K-1]);
+            v |= BHF(dna[i+K-1]);
             v &= KmerBase<K>::mask;
             //cout << tmpk << " i=" << i << " v=" << v << endl;
             if (v < hv[0]) {
@@ -86,7 +91,8 @@ class Sketch {
          //}
          //cout << string(50, '-') << endl;
       }
-      /**
+
+      /*
        * Use base2intC hash function
        * A special base2int function can be provided.
        * Typically you can use alternative to base2int function
@@ -95,7 +101,6 @@ class Sketch {
        * rates:
        *   KmerBase::base2intC(char ch), base2intG(), and base2intT()
        *
-       */
       Sketch(const string& dna, function<unsigned int(char)> hf) 
          : hv(new uint64_t[S]) 
       {
@@ -134,6 +139,8 @@ class Sketch {
             }
          }
       }
+       */
+
       Sketch(const Sketch<K,S>& sk) 
          : hv(new uint64_t[S]) 
       {
@@ -225,11 +232,47 @@ class Sketch {
          return ous;
       }
 
+      void add(const string& dna) {
+         assert(dna.size() > S && dna.size() > K);
+         int i;
+         uint64_t v=0;
+         for (i=0; i<K-1; ++i) { // first kmer except the last base
+            v <<= 2;
+            //v |= KmerBase<K>::base2int(dna[i]);
+            v |= BHF(dna[i]);
+         }
+         for (i=0; i < (int)dna.size()-K+1; ++i) { // rolling update
+            v<<=2;
+            //v |= KmerBase<K>::base2int(dna[i+K-1]);
+            v |= BHF(dna[i+K-1]);
+            v &= KmerBase<K>::mask;
+            if (v < hv[0]) {
+               memmove(hv+1, hv, (S-1)*sizeof(uint64_t));
+               hv[0]=v;
+            }
+            else if (v < hv[S-1]) { // put into sorted location
+               int x;
+               bool dupval=false;
+               for (x=S-1; x > -1; --x) {
+                  if (v > hv[x]) break;
+                  else if (v == hv[x]) { // ignore identical kmers
+                     dupval=true;
+                     break;
+                  }
+               }
+               if (!dupval) { // insert to this location
+                  ++x;
+                  memmove(hv+x+1, hv+x, (S-x-1)*sizeof(uint64_t));
+                  hv[x]=v;
+               }
+            }
+         }
+      }
+
    private:
       /**
        * array of hash values
        */
-      //array<uint64_t,S> hv;
       uint64_t* hv;
 };
 } 
