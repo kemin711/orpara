@@ -623,7 +623,6 @@ string bioseq::substring(const int b) const {
    return seq.substr(b);
 }
 
-
 // using human coordinates
 bioseq bioseq::subseq(int b, int e) const { 
    if (b<1) {

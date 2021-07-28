@@ -316,6 +316,8 @@ class bioseq {
        */
       bool read(istream &ins, string &header);
       /**
+       * Get one sequence with this call. Can do repeat call of 
+       * this function in a loop.
        * @return true if not reaching the end of file.
        *    fasle if reached the end of file. Will throw
        *    exception if bad fasta file encountered.
@@ -870,14 +872,18 @@ class DNA : public bioseq {
       Protein longestORF(int &b, int &e) const;
       void longestORF(Protein &p, int &b, int &e) const;
       /**
-       * read one sequence from the input stream ins.
+       * Read one sequence from the input stream ins.
        * The title of fasta sequences should not have TAB
        * but people just use it.  This function will
        * not change the TAB to space.
        * @return true if the read obtained one record
        *      false if no more sequence left in the input stream.
+       * Can be used to get all sequences from one file.
        */
       bool read(istream &ins);
+      /**
+       * Older version to get all sequences from one fasta file.
+       */
       bool read(istream &ins, string &hd) {
          return bioseq::read(ins,hd); }
       /**
