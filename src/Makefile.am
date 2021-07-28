@@ -6,18 +6,19 @@
 ## this file is used to generate the library for distribution
 
 AUTOMAKE_OPTIONS = subdir-objects
-only_headers = stddev.h seqaln/dynalnt.h seqaln/kmert.h seqaln/kmerbase.h seqaln/kmerset.h \
+only_headers = stddev.h seqaln/dynalnt.h seqaln/kmert.h seqaln/kmerset.h \
 				  	gentree.h evolution/evolution.h quicksortorder.h threadsafequeue.h \
-					derivative.h kmean.h insertsortlist.h cluster/hatrees.h randombase.h \
-					seqaln/minhash.h 
+					derivative.h kmean.h insertsortlist.h cluster/hatrees.h randombase.h 
 header_forlibs = strformat.h range.h interval.h bioseq.h codon.h Model.h FPGModel.h \
 					  GModel.h fastq.h seqaln/scorematrix.h seqaln/alninfo.h seqaln/alnexaminer.h \
-					  seqaln/kmer.h seqaln/kmerhelper.h ncbitaxonomy.h genomicinterval.h
+					  seqaln/kmer.h seqaln/kmerhelper.h ncbitaxonomy.h genomicinterval.h \
+					  seqaln/kmerbase.h seqaln/minhash.h 
 #					  alnrange.h ChainAvgrange.h 
 cppfiles = strformat.cpp range.cpp interval.cpp codon.cpp bioseq.cpp Model.cpp \
 			  FPGModel.cpp fastq.cpp seqaln/scorematrix.cpp seqaln/alninfo.cpp \
 			  seqaln/alnexaminer.cpp seqaln/kmer.cpp seqaln/kmerhelper.cpp \
-			  ncbitaxonomy.cpp genomicinterval.cpp
+			  ncbitaxonomy.cpp genomicinterval.cpp seqaln/kmerbase.cpp \
+			  seqaln/minhash.cpp
 #alnrange.cpp ChainAvgrange.cpp
 
 pkginclude_HEADERS = $(only_headers) $(header_forlibs)
@@ -31,6 +32,7 @@ libkemin_la_LDFLAGS = -version-info 0:0:0
 
 # this will work with all compiler operations
 AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\"" -D DATADIR="\"$(pkgdatadir)\""
+AM_CXXFLAGS = -Iseqaln
 LDADD = libkemin.la
 # binary either for testing or for usage
 bin_PROGRAMS = GrishinDistance maxdiff

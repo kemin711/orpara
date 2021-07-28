@@ -143,7 +143,8 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_2 = strformat.lo range.lo interval.lo codon.lo bioseq.lo \
 	Model.lo FPGModel.lo fastq.lo seqaln/scorematrix.lo \
 	seqaln/alninfo.lo seqaln/alnexaminer.lo seqaln/kmer.lo \
-	seqaln/kmerhelper.lo ncbitaxonomy.lo genomicinterval.lo
+	seqaln/kmerhelper.lo ncbitaxonomy.lo genomicinterval.lo \
+	seqaln/kmerbase.lo seqaln/minhash.lo
 am_libkemin_la_OBJECTS = $(am__objects_1) $(am__objects_2)
 libkemin_la_OBJECTS = $(am_libkemin_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -184,8 +185,8 @@ am__depfiles_remade = ./$(DEPDIR)/FPGModel.Plo \
 	./$(DEPDIR)/ncbitaxonomy.Plo ./$(DEPDIR)/range.Plo \
 	./$(DEPDIR)/strformat.Plo seqaln/$(DEPDIR)/alnexaminer.Plo \
 	seqaln/$(DEPDIR)/alninfo.Plo seqaln/$(DEPDIR)/kmer.Plo \
-	seqaln/$(DEPDIR)/kmerhelper.Plo \
-	seqaln/$(DEPDIR)/scorematrix.Plo
+	seqaln/$(DEPDIR)/kmerbase.Plo seqaln/$(DEPDIR)/kmerhelper.Plo \
+	seqaln/$(DEPDIR)/minhash.Plo seqaln/$(DEPDIR)/scorematrix.Plo
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -432,20 +433,21 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects
-only_headers = stddev.h seqaln/dynalnt.h seqaln/kmert.h seqaln/kmerbase.h seqaln/kmerset.h \
+only_headers = stddev.h seqaln/dynalnt.h seqaln/kmert.h seqaln/kmerset.h \
 				  	gentree.h evolution/evolution.h quicksortorder.h threadsafequeue.h \
-					derivative.h kmean.h insertsortlist.h cluster/hatrees.h randombase.h \
-					seqaln/minhash.h 
+					derivative.h kmean.h insertsortlist.h cluster/hatrees.h randombase.h 
 
 header_forlibs = strformat.h range.h interval.h bioseq.h codon.h Model.h FPGModel.h \
 					  GModel.h fastq.h seqaln/scorematrix.h seqaln/alninfo.h seqaln/alnexaminer.h \
-					  seqaln/kmer.h seqaln/kmerhelper.h ncbitaxonomy.h genomicinterval.h
+					  seqaln/kmer.h seqaln/kmerhelper.h ncbitaxonomy.h genomicinterval.h \
+					  seqaln/kmerbase.h seqaln/minhash.h 
 
 #					  alnrange.h ChainAvgrange.h 
 cppfiles = strformat.cpp range.cpp interval.cpp codon.cpp bioseq.cpp Model.cpp \
 			  FPGModel.cpp fastq.cpp seqaln/scorematrix.cpp seqaln/alninfo.cpp \
 			  seqaln/alnexaminer.cpp seqaln/kmer.cpp seqaln/kmerhelper.cpp \
-			  ncbitaxonomy.cpp genomicinterval.cpp
+			  ncbitaxonomy.cpp genomicinterval.cpp seqaln/kmerbase.cpp \
+			  seqaln/minhash.cpp
 
 #alnrange.cpp ChainAvgrange.cpp
 pkginclude_HEADERS = $(only_headers) $(header_forlibs)
@@ -457,6 +459,7 @@ libkemin_la_LDFLAGS = -version-info 0:0:0
 
 # this will work with all compiler operations
 AM_CPPFLAGS = -D MATRIXDIR="\"$(pkgdatadir)/matrix\"" -D DATADIR="\"$(pkgdatadir)\""
+AM_CXXFLAGS = -Iseqaln
 LDADD = libkemin.la
 GrishinDistance_SOURCES = GrishinDistance.cpp evolution/evolution.h
 maxdiff_SOURCES = maxdiff.cpp
@@ -594,6 +597,10 @@ seqaln/kmer.lo: seqaln/$(am__dirstamp) \
 	seqaln/$(DEPDIR)/$(am__dirstamp)
 seqaln/kmerhelper.lo: seqaln/$(am__dirstamp) \
 	seqaln/$(DEPDIR)/$(am__dirstamp)
+seqaln/kmerbase.lo: seqaln/$(am__dirstamp) \
+	seqaln/$(DEPDIR)/$(am__dirstamp)
+seqaln/minhash.lo: seqaln/$(am__dirstamp) \
+	seqaln/$(DEPDIR)/$(am__dirstamp)
 
 libkemin.la: $(libkemin_la_OBJECTS) $(libkemin_la_DEPENDENCIES) $(EXTRA_libkemin_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libkemin_la_LINK) -rpath $(libdir) $(libkemin_la_OBJECTS) $(libkemin_la_LIBADD) $(LIBS)
@@ -629,7 +636,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@seqaln/$(DEPDIR)/alnexaminer.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@seqaln/$(DEPDIR)/alninfo.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@seqaln/$(DEPDIR)/kmer.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@seqaln/$(DEPDIR)/kmerbase.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@seqaln/$(DEPDIR)/kmerhelper.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@seqaln/$(DEPDIR)/minhash.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@seqaln/$(DEPDIR)/scorematrix.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -931,7 +940,9 @@ distclean: distclean-recursive
 	-rm -f seqaln/$(DEPDIR)/alnexaminer.Plo
 	-rm -f seqaln/$(DEPDIR)/alninfo.Plo
 	-rm -f seqaln/$(DEPDIR)/kmer.Plo
+	-rm -f seqaln/$(DEPDIR)/kmerbase.Plo
 	-rm -f seqaln/$(DEPDIR)/kmerhelper.Plo
+	-rm -f seqaln/$(DEPDIR)/minhash.Plo
 	-rm -f seqaln/$(DEPDIR)/scorematrix.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -993,7 +1004,9 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f seqaln/$(DEPDIR)/alnexaminer.Plo
 	-rm -f seqaln/$(DEPDIR)/alninfo.Plo
 	-rm -f seqaln/$(DEPDIR)/kmer.Plo
+	-rm -f seqaln/$(DEPDIR)/kmerbase.Plo
 	-rm -f seqaln/$(DEPDIR)/kmerhelper.Plo
+	-rm -f seqaln/$(DEPDIR)/minhash.Plo
 	-rm -f seqaln/$(DEPDIR)/scorematrix.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic

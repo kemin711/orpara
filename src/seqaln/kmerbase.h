@@ -16,7 +16,7 @@ class Nucleotide {
        * and any other base to -1
        * This should be represented by 2-bits of information.
        */
-      static unsigned int base2int(char ch) {
+      static unsigned int base2int(const char ch) {
          switch (ch) {
             case 'A': 
             case 'a':
@@ -38,7 +38,7 @@ class Nucleotide {
       /**
        * C hash to 0, A 1, G hash to 2, T 3
        */
-      static unsigned int base2intC(char ch) {
+      static unsigned int base2intC(const char ch) {
          switch (ch) {
             case 'A': 
             case 'a':
@@ -60,7 +60,7 @@ class Nucleotide {
       /**
        * C hash to 2, G hash to 0, A 1, T 3
        */
-      static unsigned int base2intG(char ch) {
+      static unsigned int base2intG(const char ch) {
          switch (ch) {
             case 'A': 
             case 'a':
@@ -82,7 +82,7 @@ class Nucleotide {
       /**
        * C hash to 3, G hash to 1, A 2, T 0
        */
-      static unsigned int base2intT(char ch) {
+      static unsigned int base2intT(const char ch) {
          switch (ch) {
             case 'A': 
             case 'a':
@@ -103,106 +103,14 @@ class Nucleotide {
       static const char int2baseT[4];
 };
 
-
 /**
  * This class should be used as base for other kmer.
  * Only minimal behavior will be defined in this class.
  * For this class K can be up to 32
  */
-template <int K> class KmerBase::Nucleotide {
+template <int K> class KmerBase : public Nucleotide {
    public:
       KmerBase() { }
-      /*
-       * Helper method to convert A,C,G,T into 0-3
-       * and any other base to -1
-       * This should be represented by 2-bits of information.
-      static unsigned int base2int(char ch) {
-         switch (ch) {
-            case 'A': 
-            case 'a':
-               return 0;
-            case 'C':
-            case 'c':
-               return 1;
-            case 'G':
-            case 'g':
-               return 2;
-            case 'T':
-            case 't':
-               return 3;
-            default:
-               return numeric_limits<unsigned int>::max();
-         }
-      }
-      static const char int2base[4];
-       */
-      /*
-       * C hash to 0, A 1, G hash to 2, T 3
-      static unsigned int base2intC(char ch) {
-         switch (ch) {
-            case 'A': 
-            case 'a':
-               return 1;
-            case 'C':
-            case 'c':
-               return 0;
-            case 'G':
-            case 'g':
-               return 2;
-            case 'T':
-            case 't':
-               return 3;
-            default:
-               return numeric_limits<unsigned int>::max();
-         }
-      }
-      static const char int2baseC[4];
-       */
-      //template<int K> const char KmerBase<K>::int2base[4]={'C', 'A', 'G', 'T'};
-      /*
-       * C hash to 2, G hash to 0, A 1, T 3
-      static unsigned int base2intG(char ch) {
-         switch (ch) {
-            case 'A': 
-            case 'a':
-               return 1;
-            case 'C':
-            case 'c':
-               return 2;
-            case 'G':
-            case 'g':
-               return 0;
-            case 'T':
-            case 't':
-               return 3;
-            default:
-               return numeric_limits<unsigned int>::max();
-         }
-      }
-      static const char int2baseG[4];
-       */
-      /*
-       * C hash to 3, G hash to 1, A 2, T 0
-      static unsigned int base2intT(char ch) {
-         switch (ch) {
-            case 'A': 
-            case 'a':
-               return 1;
-            case 'C':
-            case 'c':
-               return 2;
-            case 'G':
-            case 'g':
-               return 3;
-            case 'T':
-            case 't':
-               return 0;
-            default:
-               return numeric_limits<unsigned int>::max();
-         }
-      }
-      static const char int2baseT[4];
-       */
       /**
        * For building the first kmer
        */

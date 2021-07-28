@@ -239,7 +239,7 @@ class Fastq {
          setName(prefix + to_string(id));
       }
       /**
-       * @return the underlying sequence as a reference.
+       * @return the underlying sequence as a string reference.
        */
       const string& getSequence() const { return seq; }
       void setSequence(const string& sq) { 
