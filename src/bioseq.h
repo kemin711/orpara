@@ -368,6 +368,7 @@ class bioseq {
        * Not virtual function, different derived class may not
        * be able to print more information.
        * The end of the fasta sequence is Terminated.
+       * Caller don't need to output ENDL.
        */
       friend ostream& operator<<(ostream &ous, const bioseq &s);
       /** this is used for polymorphic behavior of the 
