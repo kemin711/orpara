@@ -459,6 +459,7 @@ class Dynaln {
       int getAlnlen() const { return alnidx.size(); }
       /**
        * This is the part of first sequence that are aligned
+       * @return a fraction from 0 to 1.
        */
       float getCov1() const { return getSeq1AlignedLength()/(float)seq1->length(); }
       /**
@@ -1009,7 +1010,8 @@ class Dynaln {
        * Same as C1: code for the sequence.
        */
       const int* C2;
-      /** simulated 2-D array of integers
+      /** 
+       * simulated 2-D array of integers
        *  size (seq1.length()+1)*(seq2.length()+1)
        *  For internal use only.
        *  Will store the trace-back pointer.
