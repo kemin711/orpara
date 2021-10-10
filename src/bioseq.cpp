@@ -1402,18 +1402,18 @@ bool DNA::ambiguous() const {
 bool DNA::read(istream &ins) {
    if (ins.eof()) return false;
    string::size_type i;
-   //clear(); // make sure the sequence starts with empty
-   getline(ins,title);
+   string line; 
+   if (title.empty()) {
+      getline(ins,title); // if reading first record
+   }
    if (title[0] != '>' || title.length() < 2) {
       cerr << "not in proper fasta format, first line of DNA file: "
          << title << endl;
       throw bioseqexception("fasta format problem");
    }
-   //title=title.substr(1); // get rid of >
    if ((i=title.find(' ')) != string::npos) {
       name=title.substr(1,i-1);
       title=title.substr(i+1);
-      //if (title[0] == ' ') { title=title.substr(1); }
    }
    else {
       name=title;
@@ -1424,9 +1424,8 @@ bool DNA::read(istream &ins) {
       code=nullptr;
    }
    seq.clear();
-   string line; 
-   getline(ins,line);
-   while (!ins.eof()) {
+   getline(ins, line);
+   while (!ins.eof() && line[0] != '<') {
       if (line.empty()) {
          getline(ins,line);
          continue;
@@ -1440,20 +1439,22 @@ bool DNA::read(istream &ins) {
          throw bioseqexception("None nucleotide symbol in line: " + line + "|");
       }
 #endif
-      if (!line.empty() && 
-            (line.find('U') != string::npos || line.find('u') != string::npos)) {
+      if (line.find('U') != string::npos || line.find('u') != string::npos) {
          for (size_t j=0; j < line.size(); ++j) {
             if (line[j] == 'U') line[j] = 'T';
             else if (line[j] == 'u') line[j] = 't';
          }
       }
       seq += line;
-      if (ins.peek() == '>') return true;
+      //if (ins.peek() == '>') return true;
       getline(ins,line);
    }
    if (seq.empty()) {
       cerr << "Empty sequence something is wrong!\n";
       throw bioseqexception("empty sequence from sequence file");
+   }
+   if (!line.empty() && line[0] == '>') {
+      title = std::move(line);
    }
    if (!ins.eof())  {
       ins.peek();
