@@ -42,7 +42,7 @@ class Fastq {
        * For efficiency this is the ASCII value
        * 33 - 126
        * ASCII value
-       * Qualit score should use unsigned char* to save space
+       * Quality score should use unsigned char* to save space
        * One int use 4 bytes, char uses only one byte
        */
       unsigned char* qual;
@@ -176,6 +176,13 @@ class Fastq {
        * operation.
        */
       Fastq& operator=(Fastq &&other);
+      /**
+       * @param i is the zero-based index on fastq.
+       * @return the quality score at index i (0-based index)
+       */
+      unsigned char qat(size_t i) const {
+         return qual[i];
+      }
       /**
        * Use this for reading from a file.
        * @return true if loaded one object from the input stream
