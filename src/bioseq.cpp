@@ -1402,11 +1402,8 @@ bool DNA::ambiguous() const {
 bool DNA::read(istream &ins) {
    if (ins.eof()) return false;
    string::size_type i;
-   string line; 
-   if (title.empty()) {
-      getline(ins,title); // if reading first record
-   }
-   if (title[0] != '>' || title.length() < 2) {
+   getline(ins, title); 
+   if (title.empty() || title[0] != '>' || title.length() < 2) {
       cerr << "not in proper fasta format, first line of DNA file: "
          << title << endl;
       throw bioseqexception("fasta format problem");
@@ -1424,14 +1421,31 @@ bool DNA::read(istream &ins) {
       code=nullptr;
    }
    seq.clear();
+   string line; 
    getline(ins, line);
-   while (!ins.eof() && line[0] != '<') {
-      if (line.empty()) {
-         getline(ins,line);
-         continue;
+   while (!ins.eof()) {
+      if (line.empty()) { // remove empty line
+         if (ins.peek() == '>') {
+            if (seq.empty()) {
+               throw runtime_error(to_string(__LINE__) + ": empty sequence for fasta");
+            }
+            return true;
+         }
+         else if (ins.eof()) {
+            if (!seq.empty()) return true;
+            else return false;
+         }
+         else {
+            throw runtime_error("non fasta record after empty line");
+         }
       }
       while (!isprint(line.back())) { // remove invisible variable
+         // potential empty line with one or more non-printable char
+         //cerr << "potential empty line length=" << line.size() << endl;
          line.resize(line.length()-1);
+         if (line.empty()) {
+            return true;
+         }
       }
 #ifdef VERIFY_RESIDUE
       if (line.find_first_not_of("ACGTURYSWKMBDHVN-acgturyswkmbdhvn") != string::npos) 
@@ -1446,22 +1460,16 @@ bool DNA::read(istream &ins) {
          }
       }
       seq += line;
-      //if (ins.peek() == '>') return true;
-      getline(ins,line);
+      if (ins.peek() == '>') return true;
+      getline(ins, line);
    }
    if (seq.empty()) {
       cerr << "Empty sequence something is wrong!\n";
       throw bioseqexception("empty sequence from sequence file");
    }
-   if (!line.empty() && line[0] == '>') {
-      title = std::move(line);
-   }
-   if (!ins.eof())  {
-      ins.peek();
-   }
+   if (!ins.eof()) ins.peek();
    return true;
 }
-
 
 bool longestNoStartORFPlus(const string &rna, 
       pair<int,int> &nterm, string &npep, pair<int,int> &full, string &pep)
