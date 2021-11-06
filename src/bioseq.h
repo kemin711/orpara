@@ -843,7 +843,10 @@ class DNA : public bioseq {
        * At least one base is not ACGT
        */
       bool ambiguous() const;
-      //void revcomp() { seq=reverseComplement(seq); }
+      /**
+       * @return number of ambigous bases
+       */
+      int ambiguousCount() const;
       /** 
        * use the inplace global function more efficient
        * The sequence will be modified.

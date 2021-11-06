@@ -1388,6 +1388,7 @@ bool DNA::noAmbiguous() const {
    }
    return true;
 }
+
 bool DNA::ambiguous() const {
    for (size_t i=0; i<seq.size(); ++i) {
       if (toupper(seq[i]) != 'A'
@@ -1397,6 +1398,16 @@ bool DNA::ambiguous() const {
          return true;
    }
    return false;
+} 
+
+int DNA::ambiguousCount() const {
+   int amcnt=0;
+   for (size_t i=0; i<seq.size(); ++i) {
+      char b = toupper(seq[i]); 
+      if (b != 'A' && b != 'C' && b != 'G' && b != 'T')
+         ++amcnt;
+   }
+   return amcnt;
 } 
 
 bool DNA::read(istream &ins) {
