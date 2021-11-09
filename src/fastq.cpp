@@ -336,10 +336,16 @@ void Fastq::cutAt(const unsigned int pos, Fastq &newfasq) {
 }
 
 void Fastq::discardTail(const unsigned int idx) {
+	if (idx == length()) {
+		throw logic_error("idx same as length() discardTail has no effect");
+	}
    seq.resize(idx);
 }
 
 void Fastq::discardHead(const unsigned int idx) {
+	if (idx == 0) {
+		throw logic_error("discardHead idx=0 has no effect");
+	}
    seq = seq.substr(idx);
    for (unsigned int i=0; i+idx<seq.length(); ++i) {
       qual[i] = qual[i+idx];
