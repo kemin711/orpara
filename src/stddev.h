@@ -335,6 +335,25 @@ template<size_t N> class Stddev {
          }
 		}
 
+		void operator()(const array<int,N>& x) {
+			++j;
+			if (j==1) { 
+            for (size_t i=0; i<N; ++i) {
+               avg[i] = x[i];
+               var[i] = 0;
+               SS[i] = 0;
+            }
+         }
+			else { 
+            for (size_t i=0; i<N; ++i) {
+               double avgnew = avg[i] + (x[i]-avg[i])/j;
+               SS[i] = (1-static_cast<double>(1)/(j-1))*SS[i] + j*pow(avgnew-avg[i], 2);
+               var[i] = (j-1)*(var[i]/j + pow(avgnew-avg[i], 2));
+               avg[i] = avgnew; 
+            }
+			}
+      }
+
 		void operator()(const array<double,N>& x) {
 			++j;
 			if (j==1) { 
@@ -353,6 +372,11 @@ template<size_t N> class Stddev {
             }
 			}
 		}
+		void operator()(const array<int,N>& x, int n) {
+         for (int i=0; i<n; ++i) {
+            operator()(x);
+         }
+      }
 		void operator()(const array<double,N>& x, int n) {
          for (int i=0; i<n; ++i) {
             operator()(x);
