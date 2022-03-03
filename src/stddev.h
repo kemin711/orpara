@@ -365,7 +365,7 @@ template<size_t N> class Stddev {
        */
       double getMean(size_t i) const { return avg[i]; }
       /**
-       * @return the mean value.
+       * @return the mean value array.
        */
 		const double* getMean() const { return avg; }
       array<double, N> getAverage() const {
