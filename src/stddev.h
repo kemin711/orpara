@@ -127,8 +127,8 @@ class stddev {
          double a= static_cast<double>(j)/sumcnt;
          double b= static_cast<double>(other.j)/sumcnt;
          avg = avg*a + other.avg*b;
-         var = var*a + otehr.var*b;
-         SS = SS*a + otehr.SS*b;
+         var = var*a + other.var*b;
+         SS = SS*a + other.SS*b;
          j = sumcnt;
       }
 
@@ -409,8 +409,8 @@ template<size_t N> class Stddev {
             double a= static_cast<double>(j)/sumcnt;
             double b= static_cast<double>(other.j)/sumcnt;
             avg[i] = avg[i]*a + other.avg[i]*b;
-            var[i] = var[i]*a + otehr.var[i]*b;
-            SS[i] = SS[i]*a + otehr.SS[i]*b;
+            var[i] = var[i]*a + other.var[i]*b;
+            SS[i] = SS[i]*a + other.SS[i]*b;
          }
          j = sumcnt;
       }
