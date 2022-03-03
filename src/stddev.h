@@ -119,6 +119,18 @@ class stddev {
             operator()(x);
          }
       }
+      /**
+       * Combine other into this object.
+       */
+      void absorb(const stddev& other) {
+         int sumcnt = j + other.j;
+         double a= static_cast<double>(j)/sumcnt;
+         double b= static_cast<double>(other.j)/sumcnt;
+         avg = avg*a + other.avg*b;
+         var = var*a + otehr.var*b;
+         SS = SS*a + otehr.SS*b;
+         j = sumcnt;
+      }
 
       /**
        * @return the mean value.
@@ -216,10 +228,16 @@ class stddev {
  */
 template<size_t N> class Stddev {
 	private:
+      /**
+       * population variance
+       */
 		double var[N];
 		double avg[N];
       /** the n value */
 		int j;
+      /**
+       * Sample variant
+       */
 		double SS[N];
 
 	public:
@@ -381,6 +399,20 @@ template<size_t N> class Stddev {
          for (int i=0; i<n; ++i) {
             operator()(x);
          }
+      }
+      /**
+       * Combine other into this object.
+       */
+      void absorb(const Stddev<N>& other) {
+         int sumcnt = j + other.j;
+         for (size_t i=0; i < N; ++i) {
+            double a= static_cast<double>(j)/sumcnt;
+            double b= static_cast<double>(other.j)/sumcnt;
+            avg[i] = avg[i]*a + other.avg[i]*b;
+            var[i] = var[i]*a + otehr.var[i]*b;
+            SS[i] = SS[i]*a + otehr.SS[i]*b;
+         }
+         j = sumcnt;
       }
 
       /**
