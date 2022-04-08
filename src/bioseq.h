@@ -893,8 +893,8 @@ class DNA : public bioseq {
       /**
        * Read one sequence from input file
        */
-      void read(const string &file) { 
-         bioseq::read(file); 
+      bool read(const string &file) { 
+         return bioseq::read(file); 
       }
       /**
        * @param pos is 0-based index into the DNA sequence.
