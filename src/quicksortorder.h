@@ -233,7 +233,7 @@ class FindMedian {
          data.push_back(val);
       }
       void operator()(T val, int n) {
-         data.insert(data.cend(), n, val);
+         data.insert(data.end(), n, val);
       }
 
       FindMedian& operator=(const FindMedian& other) {
