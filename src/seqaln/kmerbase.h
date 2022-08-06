@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdint>
 #include <limits>
+#include <iostream>
 
 using namespace std;
 
@@ -18,6 +19,7 @@ class Nucleotide {
        * Helper method to convert A,C,G,T into 0-3
        * and any other base to 0 (A).
        * This should be represented by 2-bits of information.
+       * For speed, we remove the exception checking.
        */
       static unsigned int base2int(const char ch) {
          switch (ch) {
@@ -34,7 +36,10 @@ class Nucleotide {
             case 't':
                return 3;
             default:
-               cerr << __FILE__ << ":" << __LINE__ << ":WARN non ACGT base: " << ch << endl;
+               //cerr << __FILE__ << ":" << __LINE__ << ":WARN non ACGT base: " << ch << endl;
+               //if (!isalpha(ch)) {
+               //   throw logic_error("invisible Base error");
+               //}
                return 0;
                //return numeric_limits<unsigned int>::max();
          }
@@ -58,7 +63,7 @@ class Nucleotide {
             case 't':
                return 3;
             default:
-               cerr << "warn non ACGT base: " << ch << endl;
+               //cerr << "warn non ACGT base: " << ch << endl;
                return 0;
                //return numeric_limits<unsigned int>::max();
          }
@@ -82,7 +87,7 @@ class Nucleotide {
             case 't':
                return 3;
             default:
-               cerr << "warn non ACGT base: " << ch << endl;
+               //cerr << "warn non ACGT base: " << ch << endl;
                return 0;
                //return numeric_limits<unsigned int>::max();
          }
@@ -106,7 +111,7 @@ class Nucleotide {
             case 't':
                return 0;
             default:
-               cerr << "warn non ACGT base: " << ch << endl;
+               //cerr << "warn non ACGT base: " << ch << endl;
                return 0;
                //return numeric_limits<unsigned int>::max();
          }
