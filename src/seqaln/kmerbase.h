@@ -13,7 +13,7 @@ class Nucleotide {
    public:
       /**
        * Helper method to convert A,C,G,T into 0-3
-       * and any other base to -1
+       * and any other base to 0 (A).
        * This should be represented by 2-bits of information.
        */
       static unsigned int base2int(const char ch) {
@@ -31,7 +31,9 @@ class Nucleotide {
             case 't':
                return 3;
             default:
-               return numeric_limits<unsigned int>::max();
+               cerr << __FILE__ << ":" << __LINE__ << ":WARN non ACGT base: " << ch << endl;
+               return 0;
+               //return numeric_limits<unsigned int>::max();
          }
       }
       static const char int2base[4];
@@ -53,7 +55,9 @@ class Nucleotide {
             case 't':
                return 3;
             default:
-               return numeric_limits<unsigned int>::max();
+               cerr << "warn non ACGT base: " << ch << endl;
+               return 0;
+               //return numeric_limits<unsigned int>::max();
          }
       }
       static const char int2baseC[4];
@@ -75,7 +79,9 @@ class Nucleotide {
             case 't':
                return 3;
             default:
-               return numeric_limits<unsigned int>::max();
+               cerr << "warn non ACGT base: " << ch << endl;
+               return 0;
+               //return numeric_limits<unsigned int>::max();
          }
       }
       static const char int2baseG[4];
@@ -97,7 +103,9 @@ class Nucleotide {
             case 't':
                return 0;
             default:
-               return numeric_limits<unsigned int>::max();
+               cerr << "warn non ACGT base: " << ch << endl;
+               return 0;
+               //return numeric_limits<unsigned int>::max();
          }
       }
       static const char int2baseT[4];
@@ -131,7 +139,7 @@ template <int K> class KmerBase : public Nucleotide {
        * K mer to string
        */
       static string oneMer2String(uint64_t merval) {
-         string tmp(K, 'A');
+         string tmp(K, 'A'); // fill with A
          int i=K-1;
          while (i > -1) {
             unsigned int code = (merval & 3U);
