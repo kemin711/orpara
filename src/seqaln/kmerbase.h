@@ -9,6 +9,9 @@ using namespace std;
 
 namespace orpara {
 
+/**
+  * Basic operation with nucleotide bases.
+  */
 class Nucleotide {
    public:
       /**
@@ -106,13 +109,19 @@ class Nucleotide {
 /**
  * This class should be used as base for other kmer.
  * Only minimal behavior will be defined in this class.
- * For this class K can be up to 32
+ * For this class K can be up to 32. If K < 16, then
+ * can cast integer to uint32_t.
  */
 template <int K> class KmerBase : public Nucleotide {
    public:
       KmerBase() { }
       /**
-       * For building the first kmer
+       * Given a nucleotide string of length K, this
+       * function will convert it to a 64 bit integer.
+       * For building the first kmer and can also be used
+       * for hashing.
+       * @param kmerseq is a ACGT string of length K
+       * @return has value of input K-mer using base2int() function.
        */
       static uint64_t oneMer2int(const string& kmerseq) {
            // calculate kmer integer hash value for all kmers in the sequence
@@ -128,7 +137,8 @@ template <int K> class KmerBase : public Nucleotide {
       }
 
       /**
-       * K mer to string
+       * K mer to string.
+       * @param merval the integer value of a kmer.
        */
       static string oneMer2String(uint64_t merval) {
          string tmp(K, 'A');

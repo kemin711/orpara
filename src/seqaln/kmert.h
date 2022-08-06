@@ -33,6 +33,7 @@ namespace orpara {
  * This class emphasize the location information.
  * Kmercount class emphasizes the count without
  * storing the location information.
+ * TODO: K should be unsigned short to save some space.
  * @see KmerCount
  */
 template<unsigned int K> 

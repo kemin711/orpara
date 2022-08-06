@@ -14,9 +14,9 @@ using namespace std;
 namespace orpara {
 /**
  * This will be dedicated to DNA 4 bases
- * K should either be a templae parameter or 
+ * K should either be a template parameter or 
  * static variable to gain performance.
- * This version use static member. In most cases, all classes will use the same K
+ * This version use static member. In most cases, all classes will use the same K.
  */
 class Kmer {
    private:
