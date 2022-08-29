@@ -171,7 +171,13 @@ class Dynaln {
          if (!validInput()) throw AlnInputException("Matrix and Input sequence type mismatch");
       }
 
+      /**
+       * You cannot make a copy.
+       */
       Dynaln(const Dynaln &da)=delete;
+      /**
+       * You cannot do assignment.
+       */
       Dynaln& operator=(const Dynaln &da)=delete;
       /**
        * This should be used in very liminted numbers.

@@ -33,6 +33,7 @@ class ScoreMethod {
    public:
       /**
        * Default constructor.
+       * Match 10, mismatch -10.
        * default gap open -20, gap extend -1
        */
       ScoreMethod() : gapo(-20), gape(-1) { }
