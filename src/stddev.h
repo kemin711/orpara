@@ -40,35 +40,41 @@ class stddev {
        * The n value: number of data points.
        */
 		int j;
-      /**
+      /*
        * Sample variance
        */
-		double SS;  
+		//double SS;  
 
 	public:
       /**
        * Default constructor.
        */
-		stddev() : var(0), avg(0), j(0), SS(0) {}
+		//stddev() : var(0), avg(0), j(0), SS(0) {}
+		stddev() : var(0), avg(0), j(0) {}
       /**
        * Constructor from one element.
        */
-		stddev(double val) : var(0), avg(val), j(1), SS(0) {}
-		stddev(double val, int n) : var(0), avg(val), j(n), SS(0) {}
+		//stddev(double val) : var(0), avg(val), j(1), SS(0) {}
+		stddev(double val) : var(0), avg(val), j(1) {}
+		//stddev(double val, int n) : var(0), avg(val), j(n), SS(0) {}
+		stddev(double val, int n) : var(0), avg(val), j(n) {}
+		stddev(double meanv, double stdv, int n) 
+         : var(stdv*stdv), avg(meanv), j(n) {}
       /**
        * copy constructor. 
        * Since all types are primitive, no need for 
        * move constructor.  The default compiler generated
        * move constructor should work fine.
        */
-      stddev(const stddev &other) : var(other.var), avg(other.avg), j(other.j),
-         SS(other.SS) { }
+      stddev(const stddev &other) : var(other.var), avg(other.avg), j(other.j)
+         //SS(other.SS) { }
+          { }
       stddev& operator=(const stddev& other) {
          if (this != &other) {
             var=other.var;
             avg=other.avg;
             j=other.j;
-            SS=other.SS;
+            //SS=other.SS;
          }
          return *this;
       }
@@ -100,11 +106,12 @@ class stddev {
 		void operator()(double x) {
 			++j;
 			if (j==1) { 
-            avg = x; var = 0; SS=0; 
+            //avg = x; var = 0; SS=0; 
+            avg = x; var = 0; 
          }
 			else { 
             double avgnew = avg + (x-avg)/j;
-				SS = (1-static_cast<double>(1)/(j-1))*SS + j*pow(avgnew-avg, 2);
+				//SS = (1-static_cast<double>(1)/(j-1))*SS + j*pow(avgnew-avg, 2);
 				var = (j-1)*(var/j + pow(avgnew-avg, 2));
 				avg = avgnew; 
          }	
@@ -128,7 +135,7 @@ class stddev {
          double b= static_cast<double>(other.j)/sumcnt;
          avg = avg*a + other.avg*b;
          var = var*a + other.var*b;
-         SS = SS*a + other.SS*b;
+         //SS = SS*a + other.SS*b;
          j = sumcnt;
       }
 
@@ -140,7 +147,11 @@ class stddev {
        * @return the standard deviation.
        */
 		double getStd() const { return sqrt(var); }
-		double getSampleStd() const { return sqrt(SS); }
+      double getSampleVariance() const {
+         if (j == 1) return 0;
+         else return var*j/(j-1);
+      }
+		double getSampleStd() const { return sqrt(getSampleVariantce()); }
       /**
        * print avg,stddev,n to the output stream.
        * will not output endl for flexibility.
@@ -192,7 +203,7 @@ class stddev {
       }
       double getTotal() const { return j*getMean(); }
 		// postgres retuns the sample standard deviation
-		pair<double, double> result() const { return make_pair(avg, sqrt(SS)); }
+		pair<double, double> result() const { return make_pair(avg, getSampleStd()); }
       /**
        * For tabular output.
        */
@@ -219,7 +230,8 @@ class stddev {
        * Rest this object to be used as a new object.
        */
       void clear() {
-         j=0; SS=0; avg=0; var=0; 
+         //j=0; SS=0; avg=0; var=0; 
+         j=0; avg=0; var=0; 
       }
 };
 
@@ -235,26 +247,29 @@ template<size_t N> class Stddev {
 		double avg[N];
       /** the n value */
 		int j;
-      /**
+      /*
        * Sample variant
        */
-		double SS[N];
+		//double SS[N];
 
 	public:
       /**
        * Default constructor.
        */
-		Stddev() : var{0}, avg{0}, j(0), SS{0} {}
+		//Stddev() : var{0}, avg{0}, j(0), SS{0} {}
+		Stddev() : var{0}, avg{0}, j(0) {}
       /**
        * Constructor from one element.
        */
 		Stddev(const double val[]) 
-         : var{0}, avg{0}, j(1), SS{0} 
+         //: var{0}, avg{0}, j(1), SS{0} 
+         : var{0}, avg{0}, j(1)
       {
          for (size_t i=0; i<N; ++i) avg[i] = val[i]; 
       }
 		Stddev(const double val[], int n) 
-         : var{0}, avg{0}, j(n), SS{0} 
+         //: var{0}, avg{0}, j(n), SS{0} 
+         : var{0}, avg{0}, j(n)
       {
          for (size_t i=0; i<N; ++i) avg[i] = val[i]; 
       }
@@ -262,12 +277,14 @@ template<size_t N> class Stddev {
        * Constructor from a std::array type.
        */
 		Stddev(const array<double,N> val) 
-         : var{0}, avg{0}, j(1), SS{0} 
+         //: var{0}, avg{0}, j(1), SS{0} 
+         : var{0}, avg{0}, j(1)
       {
          for (size_t i=0; i<N; ++i) avg[i] = val[i]; 
       }
 		Stddev(const array<double,N> val, int n) 
-         : var{0}, avg{0}, j(n), SS{0} 
+         //: var{0}, avg{0}, j(n), SS{0} 
+         : var{0}, avg{0}, j(n)
       {
          for (size_t i=0; i<N; ++i) avg[i] = val[i]; 
       }
@@ -278,12 +295,13 @@ template<size_t N> class Stddev {
        * move constructor should work fine.
        */
       Stddev(const Stddev &other) 
-         : var{0}, avg{0}, j(other.j), SS{0} 
+         //: var{0}, avg{0}, j(other.j), SS{0} 
+         : var{0}, avg{0}, j(other.j)
       {
          for (size_t i=0; i<N; ++i) {
             var[i]=other.var[i];
             avg[i]=other.avg[i];
-            SS[i]=other.SS[i];
+            //SS[i]=other.SS[i];
          }
       }
 
@@ -302,7 +320,7 @@ template<size_t N> class Stddev {
             for (size_t i=0; i<N; ++i) {
                var[i]=other.var[i];
                avg[i]=other.avg[i];
-               SS[i]=other.SS[i];
+               //SS[i]=other.SS[i];
             }
             j = other.j;
          }
@@ -335,13 +353,13 @@ template<size_t N> class Stddev {
             for (size_t i=0; i<N; ++i) {
                avg[i] = x[i];
                var[i] = 0;
-               SS[i] = 0;
+               S//S[i] = 0;
             }
          }
 			else { 
             for (size_t i=0; i<N; ++i) {
                double avgnew = avg[i] + (x[i]-avg[i])/j;
-               SS[i] = (1-static_cast<double>(1)/(j-1))*SS[i] + j*pow(avgnew-avg[i], 2);
+               //SS[i] = (1-static_cast<double>(1)/(j-1))*SS[i] + j*pow(avgnew-avg[i], 2);
                var[i] = (j-1)*(var[i]/j + pow(avgnew-avg[i], 2));
                avg[i] = avgnew; 
             }
@@ -359,13 +377,13 @@ template<size_t N> class Stddev {
             for (size_t i=0; i<N; ++i) {
                avg[i] = x[i];
                var[i] = 0;
-               SS[i] = 0;
+               //SS[i] = 0;
             }
          }
 			else { 
             for (size_t i=0; i<N; ++i) {
                double avgnew = avg[i] + (x[i]-avg[i])/j;
-               SS[i] = (1-static_cast<double>(1)/(j-1))*SS[i] + j*pow(avgnew-avg[i], 2);
+               //SS[i] = (1-static_cast<double>(1)/(j-1))*SS[i] + j*pow(avgnew-avg[i], 2);
                var[i] = (j-1)*(var[i]/j + pow(avgnew-avg[i], 2));
                avg[i] = avgnew; 
             }
@@ -378,13 +396,13 @@ template<size_t N> class Stddev {
             for (size_t i=0; i<N; ++i) {
                avg[i] = x[i];
                var[i] = 0;
-               SS[i] = 0;
+               //SS[i] = 0;
             }
          }
 			else { 
             for (size_t i=0; i<N; ++i) {
                double avgnew = avg[i] + (x[i]-avg[i])/j;
-               SS[i] = (1-static_cast<double>(1)/(j-1))*SS[i] + j*pow(avgnew-avg[i], 2);
+               //SS[i] = (1-static_cast<double>(1)/(j-1))*SS[i] + j*pow(avgnew-avg[i], 2);
                var[i] = (j-1)*(var[i]/j + pow(avgnew-avg[i], 2));
                avg[i] = avgnew; 
             }
@@ -410,7 +428,7 @@ template<size_t N> class Stddev {
             double b= static_cast<double>(other.j)/sumcnt;
             avg[i] = avg[i]*a + other.avg[i]*b;
             var[i] = var[i]*a + other.var[i]*b;
-            SS[i] = SS[i]*a + other.SS[i]*b;
+            //SS[i] = SS[i]*a + other.SS[i]*b;
          }
          j = sumcnt;
       }
@@ -442,12 +460,18 @@ template<size_t N> class Stddev {
          }
          return tmp;
       }
+      double getSampleVariance(size_t i) const {
+         if (j == 1) return 0;
+         else return var*j/(j-1);
+      }
 
-      double getSampleStd(size_t i) const { return sqrt(SS[i]); }
+      //double getSampleStd(size_t i) const { return sqrt(SS[i]); }
+      double getSampleStd(size_t i) const { return sqrt(getSampleVariance(i)); }
 		array<double, N> getSampleStd() const { 
          array<double, N> tmp;
          for (size_t i=0; i<N; ++i) {
-            tmp[i] = sqrt(SS[i]);
+            //tmp[i] = sqrt(SS[i]);
+            tmp[i] = getSampleStd(i);
          }
          return tmp;
       }
@@ -521,7 +545,8 @@ template<size_t N> class Stddev {
       void clear() {
          j=0; 
          for (size_t i=0; i<N; ++i) {
-            SS[i]=0; avg[i]=0; var[i]=0; 
+            //SS[i]=0; avg[i]=0; var[i]=0; 
+            avg[i]=0; var[i]=0; 
          }
       }
 };
