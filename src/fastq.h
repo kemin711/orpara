@@ -262,11 +262,14 @@ class Fastq {
       void setSequenceQuality(string&& s, const string& q) {
          seq=std::move(s); encode(q);
       }
-
+      /**
+       * @param b is the 0-based start index in the underly sequence.
+       * @return a string object starting from b with length len
+       */
       string getSubSequence(int b, int len) const { return seq.substr(b,len); }
       /**
        * @param len length of the subsequence.
-       * @return string object starting at b (0-based index) to the end of sequence
+       * @return string object starting at b (0-based index) for length len
        */
       string getSubsequence(int b, int len) const { return seq.substr(b,len); }
       /**

@@ -151,7 +151,9 @@ class stddev {
          if (j == 1) return 0;
          else return var*j/(j-1);
       }
-		double getSampleStd() const { return sqrt(getSampleVariantce()); }
+		double getSampleStd() const { 
+         return sqrt(getSampleVariance()); 
+      }
       /**
        * print avg,stddev,n to the output stream.
        * will not output endl for flexibility.
@@ -353,7 +355,7 @@ template<size_t N> class Stddev {
             for (size_t i=0; i<N; ++i) {
                avg[i] = x[i];
                var[i] = 0;
-               S//S[i] = 0;
+               //SS[i] = 0;
             }
          }
 			else { 
