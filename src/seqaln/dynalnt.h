@@ -2627,9 +2627,10 @@ template<class T> string Dynaln<T>::getMDString1() const {
          //cerr << "I state identicalSeg=" << identicalSeg << endl;
          //lastState='i'; // query insert state ignored
       }
-      else if (it->first > -1 && it->second == -1) { 
+      else if (it->first > -1 && it->second == -1) { // seq2 del, seq1 ins
          // seq 2 has deletion need to report
          if (lastState == 'n') ost << identicalSeg;
+         else if (lastState == 'm') ost << 0; // previous is mismatch padd with 0
          identicalSeg = 0;
          ost << '^';
          while (it != cend() && it->first > -1 && it->second == -1) {

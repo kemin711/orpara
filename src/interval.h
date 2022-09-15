@@ -137,6 +137,13 @@ class Interval {
        *    Negative indicates that there is no overlap.
        */
       int extend(const Interval &i);
+      /**
+       * Expand the object by decreasing b by sz and
+       * increasing e by sz.
+       */
+      void expand(int sz) {
+         b -= sz; e += sz;
+      }
       virtual string toDelimitedString(const string &dl="\t") const;
       void clear() {
          b=-1; e=-1;
