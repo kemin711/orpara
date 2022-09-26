@@ -13,7 +13,7 @@ using namespace orpara;
  */
 class DynalnTest : public testing::Test {
    protected:
-      DynalnTest() : smbase(), ssm(20, -19),
+      DynalnTest() : smbase(), ssm(10, -11, -40, -1),
          psm(), nsm(), nsmN("NUC.4.4.N"),
          alnsmbase(smbase),
          alnssm(ssm),
@@ -23,6 +23,12 @@ class DynalnTest : public testing::Test {
 
       virtual void SetUp() { }
       virtual void TearDown() { }
+
+      void testlocal(const DNA& sq1, const DNA& sq2) {
+         alnssm.setSeq(sq1, sq2);
+         alnssm.runlocal();
+         alnssm.printAlign(cout, 80);
+      }
 
       ScoreMethod smbase;
       SimpleScoreMethod ssm;
@@ -626,7 +632,7 @@ CACTAAACACACACACACACACACACACACACACACACACACACACACACACACACCCTTTTC
    cout << "after left trimming. gaplen2=" << aligner.getGaplen2() << "\n";
    aligner.printAlign(cout, 80);
    //cout << "after print  gaplen2=" << aligner.getGaplen2() << "\n";
-   ASSERT_TRUE(aligner.getAlnlen() == 66);
+   ASSERT_TRUE(aligner.getAlnlen() == 56);
    // another more difficult case
    seq1.setSequence("ACCACAGTGGAATTAAATTAGAATTACTCACCAAAAGTTAACTAGGGGAAACACAAACACACACACACACACACACACACACACACACAGAGCGACACAGACAAGATAGCGCGAGCGCACGGGTCAGCTCGCCTCTCTCGGCTGGAGCTCG");
    seq2.setSequence("TATACTTTGGGTATAACTCTTTTTCTACACTCCGCTCTCTAGATATCTCACAGAGTGTTTATATATTATATTATCTCAAAAAATTATATCTCGGTTACACACACACACACACACACACACACACACACACACACAGAGAGCCACATACACA");
@@ -717,6 +723,31 @@ CGGGACCAGCAGGGCCAGGGGGTCCCTGAACACCAACAGGGCC
 */
    aligner.printAlign(cout, 80);
    ASSERT_TRUE(aligner.getAlnlen() == 43);
+   /*
+refseq x query  82-228/299 | 14-158/159
+Score=659 gap length: 2 4 num gaps: 1 2 idencnt=110 simcnt=0 alnlen=149 identity=0.73826 similarity=0.73826
+83        93        103       113       123       133       143       153
++         +         +         +         +         +         +         +
+CCCGAGAGGTGGAGGTTGCAGTGAGCCAAGATCACACCACTGCACTCTCGTCTAGGTGATAGAGCGAGACTCTGTCTC--
+|| | | || ||||  ||| |||||||  | |  | |||| || | |  | |  || |  |   | | || |     |
+CCGGGGGGGGGGAGCCTGCTGTGAGCCGCGGTGGCGCCACGGCGCCCCAGCC--GGGGCCA--CCCAAACCCCCAAACAA
++         +         +         +         +         +         +         +
+15        25        35        45        55        65        73        81
+
+161       171       181       191       201       211       221
++         +         +         +         +         +         +         +
+AAAAAAAAAAAAAAAAAAAAAAAAAGTAACTCCAAGGCTGGGCGTGGTGGCTCATGCCTGTAATCCCAG
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| | ||
+AAAAAAAAAAAAAAAAAAAAAAAAAGTAACTCCAAGGCTGGGCGTGGTGGCTCATGCCTGTAATACAAG
++         +         +         +         +         +         +         +
+91        101       111       121       131       141       151
+*/
+   seq1.setSequence("AAATACAAAAATTAGCTGGGGGTGGTGGCGGGTGCCTGTAGTCCCAGCTACTTGGGAGGCTGAGGGAGCAGAATCGCTTGAACCCGAGAGGTGGAGGTTGCAGTGAGCCAAGATCACACCACTGCACTCTCGTCTAGGTGATAGAGCGAGACTCTGTCTCAAAAAAAAAAAAAAAAAAAAAAAAAGTAACTCCAAGGCTGGGCGTGGTGGCTCATGCCTGTAATCCCAGCACATTAGGAGGCCGAAGTAGGCAGATTGCTTGAGGCCAGGAGTTCGAGACCAGCCTGGCCAACATAGTG");
+   seq2.setSequence("GCTCTTCCTATCCCCCGGGGGGGGGGAGCCTGCTGTGAGCCGCGGTGGCGCCACGGCGCCCCAGCCGGGGCCACCCAAACCCCCAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAGTAACTCCAAGGCTGGGCGTGGTGGCTCATGCCTGTAATACAAG");
+   testlocal(seq1, seq2);
+   alnssm.trimLeft(0.91);
+   cout << "after trim left at 0.91\n";
+   alnssm.printAlign(cout, 80);
 }
 
 TEST_F(DynalnTest, trimRight) {
@@ -750,4 +781,38 @@ ACATACACACACACACACACACA------------A-TA-ACA-ACAGCA-AAACACAAA-ACACA-ACAAACAAGGACA
    cout << "after right trimming\n";
    aligner.printAlign(cout, 80);
    ASSERT_TRUE(aligner.getAlnlen() == 103);
+   // another test
+   /*
+ref x S29252  70-240/299 | 0-147/159
+Score=674 gap length: 5 28 num gaps: 2 8 idencnt=122 simcnt=0 alnlen=176 identity=0.69318 similarity=0.69318
+71        81        91        101       111       121       131       141
++         +         +         +         +         +         +         +
+CGCCCGGGGCCGCTGCAGATGGCGGGGCGCGTTGGAGCGCCGGGCCGGCCCCGGGGCTGGAGGGAGGCCCGCGAGACCCC
+|||||||||||||||||||||||||||||||||||||||||||||||| ||||||    |  || |  || | |  ||||
+CGCCCGGGGCCGCTGCAGATGGCGGGGCGCGTTGGAGCGCCGGGCCGGGCCCGGG---CGCCGGCG--CCACCACGCCCC
++         +         +         +         +         +         +         +
+1         11        21        31        41        51        58        66
+
+151       169       166       176       186       196       206       216
++         +         +         +         +         +         +         +
+GGGCCGTC----CGCCC-CGCCGCCGCGCTCCGGCCCGCGGGGGCAGCTTGCGAGCCCCGACGCCCCGGGCCCAGGGCCG
+||| || |    ||    ||||||||      ||| ||| | |||     |  ||| |||     ||||||||     ||
+GGGGCGGCGGGGCGGGGGCGCCGCCG------GGCGCGCCGAGGC-----GG-AGCTCCG-----CCGGGCCC-----CG
++         +         +         +         +         +         +         +
+76        86        96        119       110       115                 129
+
+226       236
++         +         +         +         +         +         +         +
+CGCTCCGAAGCGCCGC
+||| |||  |||||||
+CGC-CCGGTGCGCCGC
++         +         +         +         +         +         +         +
+134       143
+*/
+   seq1.setSequence("CCTGCGGAGCTACGCCTCGGAGCGCCCGTCGGCGGCCCCGACCCGCAGTCCCCGGGCCTGGATGAGCCTGCGCCCGGGGCCGCTGCAGATGGCGGGGCGCGTTGGAGCGCCGGGCCGGCCCCGGGGCTGGAGGGAGGCCCGCGAGACCCCGGGCCGTCCGCCCCGCCGCCGCGCTCCGGCCCGCGGGGGCAGCTTGCGAGCCCCGACGCCCCGGGCCCAGGGCCGCGCTCCGAAGCGCCGCTTCCAGAACTCGACCCGTTGTTCTCCTGGACTGAGGAGCCCGAGGAGTGTGGCCCCGC");
+   seq2.setSequence("CGCCCGGGGCCGCTGCAGATGGCGGGGCGCGTTGGAGCGCCGGGCCGGGCCCGGGCGCCGGCGCCACCACGCCCCGGGGCGGCGGGGCGGGGGCGCCGCCGGGCGCGCCGAGGCGGAGCTCCGCCGGGCCCCGCGCCCGGTGCGCCGCCCCCCGCCCGG");
+   testlocal(seq1,seq2);
+   alnssm.trimRight(0.92);
+   cout << "After trim right at 0.92\n";
+   alnssm.printAlign(cout, 80);
 }

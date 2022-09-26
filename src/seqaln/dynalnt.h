@@ -653,6 +653,11 @@ class Dynaln {
        *  subtracted from the total.
        */
       bool trimLeft(float ngidentitycut);
+      /**
+       * trim gap and low-ientity regions then update alignment
+       * result information to be used again.
+       * @return try if trimming is successful.
+       */
       bool trimRight(float ngidentitycut);
 
       /**
@@ -1117,6 +1122,7 @@ class Dynaln {
        */
       string topruler, bottomruler;
       ALNTYPE alntype;
+      static int trimwidth;
 };
 
 /** Class LSDynaln
@@ -1247,6 +1253,7 @@ class LSDynaln : public Dynaln<T> {
 
 // need to define const members
 template<class T> const char Dynaln<T>::gapchar='-';
+template<class T> int Dynaln<T>::trimwidth=22;
 
 template<class T>
 Dynaln<T>::~Dynaln<T>() {
@@ -2701,13 +2708,15 @@ void Dynaln<T>::trimGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int&
 // +         +         +         +         +         +         +         +
 // 89        99        109       119       129       139       149
 template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
-   if (getAlnlen() < 25) {
-      cerr << "Alignment too short for trimming\n";
+   if (getAlnlen() < 25 || getAlnlen() < trimwidth) {
+      //cerr << __FILE__ << ":" << __LINE__ << ": Alignment alnlen=" << getAlnlen() << " too short for trimming\n";
       return false;
    }
    // there is no need to update identical value.
-   if (getNogapIdentity() < ngidentitycut) ngidentitycut=getNogapIdentity();
-   int cutcnt = int(ceil(20*ngidentitycut));
+   //if (getNogapIdentity() < ngidentitycut) 
+   //   ngidentitycut=getNogapIdentity();
+   if (ngidentitycut >= 1) ngidentitycut=0.99;
+   int cutcnt = int(ceil(trimwidth*ngidentitycut));
    //cout << "cutoff for this operation cutcnt=" << cutcnt << endl;
    int samecnt=0;
    int ginw=0; // gap in window
@@ -2723,7 +2732,7 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    // Should be positive value these values will be subtracted
    // from the total gaps in the original alignment for only counted on the itB.
    int gplen1=0, gplen2=0, ngp1=0, ngp2=0;
-   for (size_t i=0; i < 20; ++i) {
+   for (int i=0; i < trimwidth; ++i) {
       while (it != end() && (it->first == -1 || it->second == -1)) {
          ++ginw; ++it;
       }
@@ -2761,7 +2770,7 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
       return true;
    }
 #ifdef DEBUG
-   cerr << "first 20 same count: " << samecnt << " gplen1=" << gplen1 
+   cerr << "first " << trimwidth << " same count: " << samecnt << " gplen1=" << gplen1 
       << " gplen2=" << gplen2 << " ginw=" << ginw << " window front: " 
       << it->first << "," << it->second << endl;
 #endif
@@ -2795,8 +2804,8 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
       if (!itbmoved) ++itB; 
    }
    if (it == end()) { // never reached cutoff
-      printAlign(cerr, 80);
-      cerr << __FILE__ << ":" << __LINE__ << ":WARN whole sequence trimmed away out\n";
+      //printAlign(cerr, 80);
+      //cerr << __FILE__ << ":" << __LINE__ << ":WARN whole sequence trimmed away out\n";
       //throw runtime_error("matched count never reached cutoff within window");
       return false;
    }
@@ -2842,22 +2851,24 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
 }
 
 template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
-   if (getAlnlen() < 25) {
-      cerr << __FILE__ << ":" << __LINE__ << ":DEBUG Alignment too short for trimming\n";
+   if (getAlnlen() < 25 || getAlnlen() < trimwidth) {
+      //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG Alignment too short for trimming\n";
       return false;
    }
-   if (getNogapIdentity() < ngidentitycut) {
-      ngidentitycut = getNogapIdentity();
-   }
-   //cerr << "nogap identity cut=" << ngidentitycut << endl;
-   int cutcnt = int(ceil(20*ngidentitycut));
+   // lower cutoff such that the whole alignment will not be trimmed out?
+   //if (getNogapIdentity() < ngidentitycut) {
+   //   ngidentitycut = getNogapIdentity();
+   //}
+   //cerr << "nogap identity cut=" << ngidentitycut << " noidentity=" << getNogapIdentity() << endl;
+   if (ngidentitycut >=1) ngidentitycut=0.99; // upper limit
+   int cutcnt = int(ceil(trimwidth*ngidentitycut));
    int samecnt=0;
    int gapinwindow=0; // total gap align (top or bottom) in window
    alniterator it = prev(end());
    char mstate='b';
    int gplen1=0, gplen2=0, ngp1=0, ngp2=0; // gap info inside window
-   // initialize window
-   for (size_t i=0; i < 20; ++i) {
+   // initialize window, one gap counts as one event
+   for (int i=0; i < trimwidth; ++i) {
       while (it != begin() && (it->first == -1 || it->second == -1)) {
          ++gapinwindow; --it;
       }
@@ -2925,8 +2936,8 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
    //  << " " << (*seq1)[itB->first] << "/" << (*seq2)[itB->second]
    //      << " Lead  " << (*seq1)[it->first] << "/" << (*seq2)[it->second] << endl;
    if (it == begin()) {
-      cerr << __FILE__ << ":" << __LINE__ << ":WARN samecnt=" << samecnt
-         << " never above cutoff=" << cutcnt << " whole align is trimmed!\n";
+      //cerr << __FILE__ << ":" << __LINE__ << ":WARN samecnt=" << samecnt
+      //   << " never above cutoff=" << cutcnt << " whole align is trimmed!\n";
       return false;
       //throw runtime_error("samecnt never above cutoff");
    }
