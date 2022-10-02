@@ -625,6 +625,29 @@ class Dynaln {
        * @return true if fixed at least one stagger gap
        */
       bool fixStagger();
+      // 151       161       171       181                 
+      // +         +         +         +         +         +         +         +         
+      // ATTTATTTTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTT-A
+      // |||||||    ||||||||||||||||||||||||||    |
+      // ATTTATT----GTGTGTGTGTGTGTGTGTGTGTGTGTACAGA
+      // +         +         +         +         +         +         +         +         
+      // 79                  95        105       115       
+      bool hasEndGap() const {
+         auto it = std::prev(alnidx.cend());
+         --it;
+         if (it->first == -1 || it->second == -1)
+            return true;
+         --it;
+         if (it->first == -1 || it->second == -1)
+            return true;
+         it = std::next(alnidx.cbegin());
+         if (it->first == -1 || it->second == -1)
+            return true;
+         ++it;
+         if (it->first == -1 || it->second == -1)
+            return true;
+         return false;
+      }
       /** 
        * |--window--|  front
        * | it
@@ -2542,6 +2565,7 @@ bool Dynaln<T>::fixStaggerZag(alniterator& itTop, int d) {
    return false;
 }
 
+
 template<class T> bool Dynaln<T>::fixStagger() {
    if (numgaps1 < 1 || numgaps2 < 1) return false;
    //alniterator it, last, itLeft, itRight, itx;
@@ -2778,7 +2802,8 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    // itB     it (front)
    // |-------|
    // ---W----
-   while (it != end() && (samecnt < cutcnt || ginw > 0) && (samecnt < 19 || ginw > 1)) {
+   //while (it != end() && (samecnt < cutcnt || ginw > 0) && (samecnt < 19 || ginw > 1)) {
+   while (it != end() && (samecnt < cutcnt || ginw > 0)) {
       //cerr << samecnt << " less than " << cutcnt << endl;
       bool itmoved=false;
       while (it != end() && (it->first == -1 || it->second == -1)) {
@@ -2850,6 +2875,7 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    return true;
 }
 
+// window only count matched position
 template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
    if (getAlnlen() < 25 || getAlnlen() < trimwidth) {
       //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG Alignment too short for trimming\n";
@@ -2877,6 +2903,7 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
       }
       --it;
    }
+   //cerr << "samecnt=" << samecnt << " cutcnt=" << cutcnt << endl;
    if (samecnt >= cutcnt) { // skip initial gap or mismatch
       alniterator b = std::prev(end());
       while (b != it) {
@@ -2902,16 +2929,18 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
       buildAlnInfo();
       return true;
    }
-   //cerr << "same count: " << samecnt << endl;
-   //cerr << "first 20 same count: " << samecnt << " gplen1=" << gplen1 
+   //cerr << __LINE__ << ": same count: " << samecnt << endl;
+   //cerr << "first " << trimwidth << " same count: " << samecnt << " gplen1=" << gplen1 
    //   << " gplen2=" << gplen2 << endl;
    alniterator itB=prev(end());
    // it      itB
    // |-------| ignoring gap
    // ---W----
-   while (it != begin() && (samecnt < cutcnt || gapinwindow > 0) && (samecnt < 19 || gapinwindow > 1)) 
+   //while (it != begin() && (samecnt < cutcnt || gapinwindow > 0) && (samecnt < 19 || gapinwindow > 1)) 
+   while (it != begin() && (samecnt < cutcnt || gapinwindow > 0)) 
    {
-      //cerr << samecnt << " less than " << cutcnt << " or gaps in window: " << gapinwindow << endl;
+      //cerr << __LINE__ << ": samecnt=" << samecnt << " less than cutcnt=" << cutcnt 
+      //   << " or " << gapinwindow << " gapinwindow\n";
       bool itmoved=false;
       while (it != begin() && (it->first == -1 || it->second == -1)) { 
          ++gapinwindow; --it;

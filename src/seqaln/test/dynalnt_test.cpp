@@ -815,4 +815,65 @@ CGC-CCGGTGCGCCGC
    alnssm.trimRight(0.92);
    cout << "After trim right at 0.92\n";
    alnssm.printAlign(cout, 80);
+   /*
+    * >ref
+GGTGAACCTCAGCACGTCATTGACGTCGGTGGAGGACACGGCGCTCCACCCTGGTGGCCGAGGGTGGGCTGCCTCCCCTC
+CTGTGATCAGCAGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTCTCATTCAGCAAATATTTATTTATTTATTTTG
+TGTGTGTGTGTGTGTGTGTGTGTGTGTGTTATTGTTTATTTTTTATTTCTCCAAACCTCTTTTTTTTTTTATTGATCATT
+CTTGGGTGTTTCTCACAGAGGGGGATTTGGCAGGGTCATAGGACAATAGTGGAG
+
+>S11232167
+GCCTCCCCTCCTGTGATCAGCAGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTCTCATTCAGCAAATATTTATTTAT
+TTATTGTGTGTGTGTGTGTGTGTGTGTGTGTACAGACAGAATTTTTTTTCACTGTTTTTTTATATGTATCGA
+ref x S11232167  70-236/294 | 0-149/152
+Score=1075 gap length: 2 19 num gaps: 2 5 idencnt=135 simcnt=0 alnlen=169 identity=0.79882 similarity=0.79882
+71        81        91        101       111       121       131       141
++         +         +         +         +         +         +         +
+GCCTCCCCTCCTGTGATCAGCAGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTCTCATTCAGCAAATATTTATTT
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||  ||||||||||||||||||||||
+GCCTCCCCTCCTGTGATCAGCAGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT--CTCATTCAGCAAATATTTATTT
++         +         +         +         +         +         +         +
+1         11        21        31        41        51        59        69
+
+151       161       171       181                 200       209       219
++         +         +         +         +         +         +         +
+ATTTATTTTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTT-ATTGTTTATTTT-TTATTTCTCCAAACCTCTTTTTTTTT
+|||||||    ||||||||||||||||||||||||||    |  |         || ||| |      | || |||||||
+ATTTATT----GTGTGTGTGTGTGTGTGTGTGTGTGTACAGACAG-------AATTTTTT-TT-----CACTGTTTTTTT
++         +         +         +         +         +         +         +
+79                  95        105       115                           132
+
+229
++         +         +         +         +         +         +         +
+TTATTGATC
+ |||  |||
+ATATGTATC
++         +         +         +         +         +         +         +
+142
+
+Trim is bad: 
+ref x S11232167  70-190/294 | 0-115/152
+Score=1075 gap length: 1 6 num gaps: 1 2 idencnt=112 simcnt=0 alnlen=122 identity=0.91803 similarity=0.91803
+71        81        91        101       111       121       131       141
++         +         +         +         +         +         +         +
+GCCTCCCCTCCTGTGATCAGCAGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTCTCATTCAGCAAATATTTATTT
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||  ||||||||||||||||||||||
+GCCTCCCCTCCTGTGATCAGCAGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT--CTCATTCAGCAAATATTTATTT
++         +         +         +         +         +         +         +
+1         11        21        31        41        51        59        69
+
+151       161       171       181
++         +         +         +         +         +         +         +
+ATTTATTTTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTT-A
+|||||||    ||||||||||||||||||||||||||    |
+ATTTATT----GTGTGTGTGTGTGTGTGTGTGTGTGTACAGA
++         +         +         +         +         +         +         +
+79                  95        105       115
+*/
+   seq1.setSequence("GGTGAACCTCAGCACGTCATTGACGTCGGTGGAGGACACGGCGCTCCACCCTGGTGGCCGAGGGTGGGCTGCCTCCCCTCCTGTGATCAGCAGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTCTCATTCAGCAAATATTTATTTATTTATTTTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTTATTGTTTATTTTTTATTTCTCCAAACCTCTTTTTTTTTTTATTGATCATTCTTGGGTGTTTCTCACAGAGGGGGATTTGGCAGGGTCATAGGACAATAGTGGAG");
+   seq2.setSequence("GCCTCCCCTCCTGTGATCAGCAGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTCTCATTCAGCAAATATTTATTTATTTATTGTGTGTGTGTGTGTGTGTGTGTGTGTACAGACAGAATTTTTTTTCACTGTTTTTTTATATGTATCGA");
+   testlocal(seq1,seq2);
+   alnssm.trimRight(0.8);
+   cout << "After trim right at 0.8\n";
+   alnssm.printAlign(cout, 80);
 }
