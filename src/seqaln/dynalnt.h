@@ -312,7 +312,8 @@ class Dynaln {
        * topaln, buttaln, and middle string will be filled.
        * Furthermore, the identical member will be correctly
        * recalculated by this function; but the gap values
-       * will not be updated.
+       * will not be updated. Usually when fixStagger() and fix1M()
+       * are used, then need to rebuild the alignment.
        *
        * This method more generic, derived class don't have
        * to implement this. The linear space version use this 
@@ -554,7 +555,13 @@ class Dynaln {
        * @return number of gaps in the second sequence.
        */
       int getNumgaps2() const { return numgaps2; }
+      /**
+       * @return the total number of gap in the top and bottom alignment.
+       */
       int getTotalGaps() const { return numgaps1+numgaps2; }
+      bool hasGap() const {
+         return getTotalGaps() > 0;
+      }
       /**
        * @return the total number of gaps for both sequences.
        */
@@ -617,7 +624,48 @@ class Dynaln {
        */
       //bool fixStaggerZag(alniterator& itTop, alniterator itBottom);
       bool fixStaggerZag(alniterator& itTop, int d);
-
+      bool fix1M() {
+         if (!hasGap()) return false;
+         auto it=std::next(begin());
+         auto beforeEnd = std::prev(end());
+         // first scan top gap
+         while (it != beforeEnd) {
+            if (it->first == -1) {
+               auto itB=it; // first gap
+               ++it;
+               while (it != beforeEnd && it->first == -1) {
+                  ++it;
+               }
+               if (it == beforeEnd) return false;
+               auto itE=it; // itB first gap, itE after last gap
+               ++it;
+               if (it != beforeEnd && it->first == -1) {
+                  auto ittB = it;
+                  ++it;
+                  while (it != end() && it->first == -1) {
+                     ++it;
+                  }
+                  if (it == end()) {
+                     throw logic_error("alignment last position is gap!");
+                  }
+                  auto ittE = it;
+                  auto numgapL=std::distance(itB, itE);
+                  auto numgapR=std::distance(ittB, ittE);
+                  if (numgapL > numgapR) { // eliminate right gap
+                     auto x = prev(ittE);
+                     x->first = itE->first;
+                     itE->first = -1;
+                  }
+                  else {
+                     itB->first = itE->first;
+                     itE->first = -1;
+                  }
+                  ++it;
+               }
+            }
+            else ++it;
+         }
+      }
       /**
        * Not sure we need to update tracing algorithm to eliminate
        * the staggered gaps or this is inheriant problem of the
@@ -1905,6 +1953,7 @@ void Dynaln<T>::buildResult(const int delta1, const int delta2) {
  * marking at every 10 this could become a parameter if you
  * use very long sequence to do the alignment
  * No longer count gaps, these two operations are now separated.
+ * Caller needs to update gap info: numgaps1, 2; gaplen1, 2.
  */
 template<class T>
 void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
@@ -2564,7 +2613,6 @@ bool Dynaln<T>::fixStaggerZag(alniterator& itTop, int d) {
    if (reduceGap(diff)) return true;
    return false;
 }
-
 
 template<class T> bool Dynaln<T>::fixStagger() {
    if (numgaps1 < 1 || numgaps2 < 1) return false;
