@@ -599,6 +599,60 @@ TEST_F(DynalnTest, fixstagger) {
    cout << aligner.getMDString1() << endl;
 }
 
+TEST_F(DynalnTest, fixStaggerGap) {
+   DNA seq1("topseq", "GCTTTAGGAATCGGATACTTAGCCAAATTAAAAGGCAAAAGATAAACCAGGAAATACACTTTTAATAAATAAGCCAAAAGATAACTGTTTTTGATATGTAAAGAAGTCAATAGGGGTGGGGCACAGTGGCTCATGCCTATAATTCCAGCACTTTGGGAGGCTGAGACGGGCGGATCTCTTG");
+   DNA qseq("queryseq", "ATTCCTTGGAAGCAGGACAGGAATTGAGTCATATCCACTCATGGCACCAGGTGCCATAATAGGCGCTCAATAAATGTTTGCTGTGGCAGGGCGCGGTGGCTCATGCCTATAATTCCAGCAC");
+// 81        91        101       111       118       128       138       148
+// +         +         +         +         +         +         +         +         
+// ATAACTGTTTTTGATATGTAAAGAAGTCAATA---GGGGTGGGGCACAGTGGCTCATGCCTATAATTCCAGCAC
+// |||| |   |||                       | ||  |||| | ||||||||||||||||||||||||||
+// ATAAAT--GTTT--------------------GCTGTGGCAGGGCGCGGTGGCTCATGCCTATAATTCCAGCAC
+// +         +         +         +         +         +         +         +  
+// 70        78                            88        98        108       118
+
+   SimpleScoreMethod ssm(10, -11, -40, -1);
+   Dynaln<SimpleScoreMethod> aligner(ssm);
+   aligner.setseq(seq1, qseq);
+   aligner.runlocal();
+   aligner.printAlign(cout, 80);
+   cout << "nogap identity=" << aligner.getNogapIdentity() << endl;
+   ASSERT_TRUE(aligner.fixStaggerGap());
+   cout << "after fix stagger\n";
+   aligner.printAlign(cout, 80);
+   vector<pair<char,int>> cigar=aligner.getCigar1();
+   cout << "Cigar:\n";
+   for (auto& p : cigar) {
+      cout << p.second << p.first;
+   }
+   cout << endl;
+   cout << aligner.getMDString1() << endl;
+   // test zag configuration
+//102                           124       134       144       154       164
+//+         +         +         +         +         +         +         +
+//GAGGGATGG--GGA-GGA-----CATGACCCCCCGAGCCACCTTCCCTGCCGGGCCTTTCCAGCCGTCCCAGAGCCAGTC
+//|| ||| ||  ||| |||          ||||||||||||||||||| |||||||||| ||||||||||| ||||| |||
+//GACGGACGGACGGACGGACGGGG-----CCCCCCGAGCCACCTTCCCCGCCGGGCCTTCCCAGCCGTCCCGGAGCCGGTC
+//+         +         +         +         +         +         +         +
+//69        79        89        94        104       114       124       134
+
+   seq1.setSequence("CCCGGGATTCTGCGAGTGCTACTGCTGAGGGACTGTAACACTCGGGGTGTGGCCCAGCTCACCCCCCTCCAGAGGGATGGGGAGGACATGACCCCCCGAGCCACCTTCCCTGCCGGGCCTTTCCAGCCGTCCCAGAGCCAGTCACGGCGCAGCACCACAGTGGAAATGCATCTGGCGGTGG");
+   qseq.setSequence("CGCCCCGACCCGCGCGCCCTCCCGCGGGAGGACGCGGGGCCGGGGGGCGGAGACGGGGGAGGAGGACGGACGGACGGACGGACGGACGGGGCCCCCCGAGCCACCTTCCCCGCCGGGCCTTCCCAGCCGTCCCGGAGCCGGTCGCGGCGCA");
+   aligner.setseq(seq1, qseq);
+   aligner.runlocal();
+   aligner.printAlign(cout, 80);
+   ASSERT_TRUE(aligner.fixStaggerGap());
+   cout << "after fix stagger gap\n";
+   aligner.printAlign(cout, 80);
+   cigar=aligner.getCigar1();
+   cout << "Cigar:\n";
+   for (auto& p : cigar) {
+      cout << p.second << p.first;
+   }
+   cout << endl;
+   cout << aligner.getMDString1() << endl;
+}
+
+
 TEST_F(DynalnTest, fix1M) {
    DNA seq1("refseq", "AAAATGTCTAAGCAAGTCAAAGAGCATTTATGAATAATAGGCCTGTGAGAAAACTTTTATGAATGATCAGG");
    DNA seq2("queryseq", "AAAATTAATAACAAATTAAAATATCATTTATCAAAAAAAAAAAAAATAAAAAACTTTTATGAATGATCAGG");
@@ -615,8 +669,11 @@ TEST_F(DynalnTest, fix1M) {
    else {
       ASSERT_TRUE(false);
    }
-   cout << endl << "after fixing stagger\n";
    aligner.fixStagger();
+   cout << endl << "after fixing stagger\n";
+   aligner.printAlign(cout, 80);
+   aligner.fixStaggerGap();
+   cout << endl << "after fixing stagger gap\n";
    aligner.printAlign(cout, 80);
    //aligner.setseq(seq1, qseq);
    //aligner.runlocal();
