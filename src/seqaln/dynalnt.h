@@ -785,7 +785,6 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
                ++it;
                while (it != beforeE && it->second == -1) { ++it; }
                auto itE=it;
-               cerr << "itE at " << (itE->first == -1 ? '-' : (*seq1)[itE->first]) << "," << (*seq2)[itE->second] << endl;
                auto ittB=end();
                if (it->first == -1) {
                   ittB=it;
@@ -806,7 +805,6 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
                   ++it;
                   while (it != beforeE && it->first == -1) ++it;
                   auto ittE = it;
-                  cerr << "ittE at " << (ittE->first == -1 ? '-' : (*seq1)[ittE->first]) << "," << (*seq2)[ittE->second] << endl;
                   ++numstagger;
                   ++it;
                   fixZigGap(ittB, ittE, itB, itE);
