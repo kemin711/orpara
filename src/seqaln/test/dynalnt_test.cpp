@@ -599,6 +599,30 @@ TEST_F(DynalnTest, fixstagger) {
    cout << aligner.getMDString1() << endl;
 }
 
+TEST_F(DynalnTest, fix1M) {
+   DNA seq1("refseq", "AAAATGTCTAAGCAAGTCAAAGAGCATTTATGAATAATAGGCCTGTGAGAAAACTTTTATGAATGATCAGG");
+   DNA seq2("queryseq", "AAAATTAATAACAAATTAAAATATCATTTATCAAAAAAAAAAAAAATAAAAAACTTTTATGAATGATCAGG");
+   SimpleScoreMethodN ssm(10, -11, -40, -1);
+   Dynaln<SimpleScoreMethodN> aligner(ssm);
+   aligner.setseq(seq1, seq2);
+   aligner.runlocal();
+   aligner.printAlign(cout, 80);
+   bool fixed=aligner.fix1M();
+   if (fixed) {
+      cout << "after fixing 1M problem\n";
+      aligner.printAlign(cout, 80);
+   }
+   else {
+      ASSERT_TRUE(false);
+   }
+   cout << endl << "after fixing stagger\n";
+   aligner.fixStagger();
+   aligner.printAlign(cout, 80);
+   //aligner.setseq(seq1, qseq);
+   //aligner.runlocal();
+   //aligner.printAlign(cout, 80);
+}
+
 TEST_F(DynalnTest, trimLeft) {
    DNA seq1("refseq", "TGTTAGCTTCATATTAAAGCTGTTTTGTTTCATGGTCAAAAGATAGATGCCAATGGTGGCAATGGATGCCTAGCAGGACAGAGACTCACTACACACACAAACACACACACACACACACACACACACACACACACACACACACAAAGTAGAT");
    DNA seq2("query", "TTTTTTATATATATTTATTATCTTTTTTTTCTTTTTTTCAAAATAGATATCACCCTTGTGTCTCTATTTCTCGCTCTAGAGAGAGAGACACTAAACACACACACACACACACACACACACACACACACACACACACACACACACCCTTTTC");
@@ -708,6 +732,7 @@ GCCAGGGGGTCCCTGAACACCAACAGGGCC
    aligner.printAlign(cout, 80);
    ASSERT_TRUE(aligner.getNumgaps1() == 2 && aligner.getNumgaps2() == 3);
    cout << "nogap identity=" << aligner.getNogapIdentity() << endl;
+   // testing trim left
    aligner.trimLeft(0.85);
    cout << "after left trimming. gaplen2=" << aligner.getGaplen2() << "\n";
 /*

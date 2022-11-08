@@ -604,6 +604,7 @@ class Dynaln {
        * AGCTGCAA---ACT
        * AGC----AGTTACT
        *       |itBottom
+       * where top gap is after bottom gap.
        * @param itTop will be updated to the one at the shorter
        *    of the top or bottom gap length after itTop
        * @return true if gap from least one sequence is zero
@@ -618,16 +619,34 @@ class Dynaln {
        * ACG-----ATCGCCACTT
        * ACGGGCACAT---CACTT
        *           |itBottom
+       * where top gap before bottom gap.
        * @param itTop is the top iterator for the last gap
        * @param d id the distance between itBottom and itTop
        *    The example d=2
        */
       //bool fixStaggerZag(alniterator& itTop, alniterator itBottom);
       bool fixStaggerZag(alniterator& itTop, int d);
+      /**
+       * fix alignment with --M--- single resisule match
+       * flanked by deletion on either end for both top
+       * and bottom strand. If seeing from the other direction
+       * the deletion is insertion. 
+       */
       bool fix1M() {
          if (!hasGap()) return false;
+         bool fixed=false;
+         if (numgaps1 > 1)
+            if (fixTop1M()) fixed=true;
+         if (numgaps2 > 1)
+            if (fixBottom1M()) fixed=true;
+         if (fixed)
+            buildAlnInfo();
+         return fixed;
+      }
+      bool fixTop1M() {
          auto it=std::next(begin());
          auto beforeEnd = std::prev(end());
+         int numgapfix=0;
          // first scan top gap
          while (it != beforeEnd) {
             if (it->first == -1) {
@@ -660,11 +679,59 @@ class Dynaln {
                      itB->first = itE->first;
                      itE->first = -1;
                   }
+                  --numgaps1;
+                  ++numgapfix;
                   ++it;
                }
             }
             else ++it;
          }
+         return numgapfix > 0;
+      }
+      bool fixBottom1M() {
+         auto it=std::next(begin());
+         auto beforeEnd = std::prev(end());
+         int numgapfix=0;
+         // first scan top gap
+         while (it != beforeEnd) {
+            if (it->second == -1) {
+               auto itB=it; // first gap
+               ++it;
+               while (it != beforeEnd && it->second == -1) {
+                  ++it;
+               }
+               if (it == beforeEnd) return false;
+               auto itE=it; // itB first gap, itE after last gap
+               ++it;
+               if (it != beforeEnd && it->second == -1) {
+                  auto ittB = it;
+                  ++it;
+                  while (it != end() && it->second == -1) {
+                     ++it;
+                  }
+                  if (it == end()) {
+                     throw logic_error("alignment last position is gap!");
+                  }
+                  auto ittE = it;
+                  auto numgapL=std::distance(itB, itE);
+                  auto numgapR=std::distance(ittB, ittE);
+                  if (numgapL > numgapR) { // eliminate right gap
+                     auto x = prev(ittE);
+                     x->second = itE->second;
+                     itE->second = -1;
+                  }
+                  else {
+                     itB->second = itE->second;
+                     itE->second = -1;
+                  }
+                  --numgaps2;
+                  ++numgapfix;
+                  ++it;
+               }
+            }
+            else ++it;
+         }
+         return numgapfix > 0;
       }
       /**
        * Not sure we need to update tracing algorithm to eliminate
@@ -673,6 +740,119 @@ class Dynaln {
        * @return true if fixed at least one stagger gap
        */
       bool fixStagger();
+      /**
+       * ACG-----CTGCGTT top before bottom is zag
+       * ACGTACAG---CGTT
+       *
+       * ACGTACAG----TGCCA zig
+       * ACG-----CCTTTGCCA
+       */
+      bool fixStaggerGap() {
+         static const unsigned short staggercut=4;
+         if (numgaps1 < 1 || numgaps2 < 1) return false;
+         auto it=std::next(begin());
+         auto beforeE = std::prev(end());
+         int numstagger=0;
+         while (it != beforeE) {
+            if (it->first == -1) { // detect zag ---/---
+               auto itB=it;
+               ++it;
+               while (it != beforeE && it->first == -1) { ++it; }
+               auto itE=it;
+               auto ittB=end();
+               if (it->second == -1) { ittB=it; }
+               else {
+                  unsigned short k=0;
+                  while (it != beforeE && k < staggercut && it->second != -1) {
+                     ++k; ++it;
+                  }
+                  if (it == beforeE) break;
+                  if (it->second == -1) { ittB=it; }
+               }
+               // now ittB maybe at start of bottom gap
+               if (ittB != end()) {
+                  ++it;
+                  while (it != beforeE && it->second == -1) ++it;
+                  auto ittE = it;
+                  ++numstagger;
+                  ++it;
+                  fixZagGap(itB, itE, ittB, ittE);
+               }
+            }
+            else if (it->second == -1) {
+               auto itB=it;
+               ++it;
+               while (it != beforeE && it->second == -1) { ++it; }
+               auto itE=it;
+               auto ittB=end();
+               if (it->first == -1) {
+                  ittB=it;
+               }
+               else {
+                  unsigned short k=0;
+                  while (it != beforeE && k < staggercut && it->first != -1) {
+                     ++k; ++it;
+                  }
+                  if (it == beforeE) break;
+                  if (it->first == -1) { ittB=it; }
+               }
+               // now ittB maybe at start of bottom gap
+               if (ittB != end()) {
+                  ++it;
+                  while (it != beforeE && it->first == -1) ++it;
+                  auto ittE = it;
+                  ++numstagger;
+                  ++it;
+                  fixZigGap(itB, itE, ittB, ittE);
+               }
+            }
+            else ++it;
+         }
+      }
+      /**  
+       *  t  t
+       *  |  | 
+       * G---TGATCAGAT    G----TGATCAGAT
+       * GCAG----CAGAT    GCAGCT--TCAGAT
+       *     |  |
+       *     b  b
+       *
+       * GTGATCAGAT
+       * GCAG-CAGAT
+       */
+      void fixZagGap(alniterator itop1, alniterator itop2, alniterator ibottom1, alniterator ibottom2) {
+         auto ngL=distance(itop1, itop2);
+         auto ngR=distance(ibottom2, ibottom1);
+         if (ngL < ngR) {
+            auto b = ibottom1;
+            while (itop1 != ibottom1) {
+               itop1->first = b->first;
+               ++itop1; ++b;
+            }
+            alnidx.erase(ibottom1, b);
+            --numgaps1;
+            gaplen1 -= ngL;
+            gaplen2 -= ngL;
+         }
+         else { 
+            auto b = ibottom1;
+            while (itop1 != ibottom1) {
+               itop1->first = b->first;
+               ++itop1; ++b;
+            }
+            alnidx.erase(ibottom1, b);
+            --numgaps1;
+            gaplen1 -= ngL;
+            gaplen2 -= ngL;
+         }
+      }
+      /**
+       *     ------
+       * ----
+       */
+      void fixZigGap(alniterator itop1, alniterator itop2, alniterator ibottom1, alniterator ibottom2) {
+      }
+
       // 151       161       171       181                 
       // +         +         +         +         +         +         +         +         
       // ATTTATTTTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTT-A
