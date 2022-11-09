@@ -650,6 +650,19 @@ TEST_F(DynalnTest, fixStaggerGap) {
    }
    cout << endl;
    cout << aligner.getMDString1() << endl;
+   /*
+    * TCTTC--AGGTGATATTCCAGATACCATG
+    * |||||   |||||||||||||||||||||
+    * TCTTCGT-GGTGATATTCCAGATACCATG
+    */
+   seq1.setSequence("CAAGCCATTTCCAGCCATTTGATTTTCTTCAGGTGATATTCCAGATACCATGAAACAGTGACAAGCCATCCCCATGAAGTCCTGTCTAAATTCTTGACCCAT");
+   qseq.setSequence("GATCTTCGTGGTGATATTCCAGATACCATGAAACAGTGACAAGCCATCCCCATGAAGTCCTGTCTAAATTCTTGACCCAT");
+   aligner.setseq(seq1, qseq);
+   aligner.runlocal();
+   aligner.printAlign(cout, 80);
+   ASSERT_TRUE(aligner.fixStaggerGap());
+   cout << "after fix stagger gap\n";
+   aligner.printAlign(cout, 80);
 }
 
 

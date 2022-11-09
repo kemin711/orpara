@@ -759,6 +759,7 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
                ++it;
                while (it != beforeE && it->first == -1) { ++it; }
                auto itE=it;
+               cerr << __LINE__ << ": itE" << (*seq1)[itE->first] << ',' << (itE->second == -1 ? '-' : (*seq2)[itE->second]) << endl;
                auto ittB=end();
                if (it->second == -1) { ittB=it; }
                else {
@@ -775,6 +776,7 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
                   ++it;
                   while (it != beforeE && it->second == -1) ++it;
                   auto ittE = it;
+                  cerr << __LINE__ << ": itE" << (ittE->first == -1 ? '-' : (*seq1)[ittE->first]) << ',' <<  (*seq2)[ittE->second] << endl;
                   ++numstagger;
                   ++it;
                   fixZagGap(itB, itE, ittB, ittE);
@@ -828,10 +830,15 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
        *
        * GTGATCAGAT
        * GCAG-CAGAT
+       *
+       * TCTTC--AGGTGATATTCC
+       * |||||   |||||||||||
+       * TCTTCGT-GGTGATATTCC
+       *
        */
       void fixZagGap(alniterator itop1, alniterator itop2, alniterator ibottom1, alniterator ibottom2) {
          auto ngL=distance(itop1, itop2);
-         auto ngR=distance(ibottom2, ibottom1);
+         auto ngR=distance(ibottom1, ibottom2);
          if (ngL <= ngR) {
             while (itop1 != ibottom1) {
                itop1->first = itop2->first;
@@ -866,7 +873,7 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
        */
       void fixZigGap(alniterator itop1, alniterator itop2, alniterator ibottom1, alniterator ibottom2) {
          auto ngR=distance(itop1, itop2);
-         auto ngL=distance(ibottom2, ibottom1);
+         auto ngL=distance(ibottom1, ibottom2);
          if (ngL <= ngR) {
             while (ibottom1 != itop1) {
                ibottom1->second = ibottom2->second;
