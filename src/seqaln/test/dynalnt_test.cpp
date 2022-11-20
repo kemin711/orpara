@@ -688,9 +688,49 @@ TEST_F(DynalnTest, fix1M) {
    aligner.fixStaggerGap();
    cout << endl << "after fixing stagger gap\n";
    aligner.printAlign(cout, 80);
-   //aligner.setseq(seq1, qseq);
-   //aligner.runlocal();
-   //aligner.printAlign(cout, 80);
+   /*
+CTTATTTATT--T-ATAGCTCCTATCATTATTATTTCCTCCCTCTTATAACTTTAGGT
+||| || |||    | |||||||||||||||| |||||||||||||||||||||||||
+CTTTTTAATTGA-AACAGCTCCTATCATTATTTTTTCCTCCCTCTTATAACTTTAGGT
+*/
+   seq1.setSequence("TGACAGTTTTGCCTGTTTTAATTAGCTGTTTCAAATAACAAGCTCCTGGCACATTTATTTAAATTTCATGACATGTTTTCTTATTTATTTATAGCTCCTATCATTATTATTTCCTCCCTCTTATAACTTTAGGTTTGTTGTTTTTGCTGTTCTTTTTCATATGTGAAATGGAATGGTTTTTTTGATAATGTTGACATTTTTAAA");
+   seq2.setSequence("AAGAAATTTACATAAATGTGCCAGCAGCTTTTTAATTGAAACAGCTCCTATCATTATTTTTTCCTCCCTCTTATAACTTTAGGT");
+   aligner.setseq(seq1, seq2);
+   aligner.runlocal();
+   aligner.printAlign(cout, 80);
+   aligner.fix1M();
+   cout << endl << "after fixing 1M\n";
+   aligner.printAlign(cout, 80);
+   /*
+1         11        21        27        36        45        55        65        75
++         +         +         +         +         +         +         +         +
+TTTTGTTTTTCCCTCTCATTCTCCTT----ACAGCTC-TACCCACT-CCTTCTTTCTTCAACAGATATTTACTGAGTATTTT
+||||||||||   ||| |||||  ||    | ||    ||   |     || |||  |  | ||||||| | ||||||||||
+TTTTGTTTTTAGATCTGATTCTAATTTAATATAGAAAATAT--A--A--TTATTTAGTAGAAAGATATTGAATGAGTATTTT
++         +         +         +         +         +         +         +         +
+1         11        21        31        41        45        55        65        75
+*/
+   seq1.setSequence("TTTTGTTTTTCCCTCTCATTCTCCTTACAGCTCTACCCACTCCTTCTTTCTTCAACAGATATTTACTGAGTATTTT");
+   seq2.setSequence("TTTTGTTTTTAGATCTGATTCTAATTTAATATAGAAAATATAATTATTTAGTAGAAAGATATTGAATGAGTATTTT");
+   aligner.setseq(seq1, seq2);
+   aligner.runlocal();
+   aligner.printAlign(cout, 90);
+   //ASSERT_TRUE(aligner.fixStaggerGap());
+   ASSERT_TRUE(aligner.fix1M());
+   cout << "after fix 1M\n";
+   aligner.printAlign(cout, 90);
+   /*
+1         11        21        27        36        46        56        66        76
++         +         +         +         +         +         +         +         +
+TTTTGTTTTTCCCTCTCATTCTCCTT----ACAGCTC-TACCCACTCCTTCTTTCTTCAACAGATATTTACTGAGTATTTT
+||||||||||   ||| |||||  ||    | ||    ||        || |||  |  | ||||||| | ||||||||||
+TTTTGTTTTTAGATCTGATTCTAATTTAATATAGAAAATATA-----ATTATTTAGTAGAAAGATATTGAATGAGTATTTT
++         +         +         +         +         +         +         +         +
+1         11        21        31        41        46        56        66        76
+*/
+   ASSERT_TRUE(aligner.fixStaggerGap());
+   cout << "after fix stagger gap\n";
+   aligner.printAlign(cout, 90);
 }
 
 TEST_F(DynalnTest, trimLeft) {
@@ -970,5 +1010,34 @@ ATTTATT----GTGTGTGTGTGTGTGTGTGTGTGTGTACAGA
    testlocal(seq1,seq2);
    alnssm.trimRight(0.8);
    cout << "After trim right at 0.8\n";
+   alnssm.printAlign(cout, 80);
+   cout << string(20, '-') << " trimRight() " << string(20, '-') << endl;
+   /*
+Score=379 gap length: 0 0 num gaps: 0 0 idencnt=72 simcnt=0 alnlen=103 identity=0.69903 similarity=0.69903
+21        31        41        51        61        71        81        91       
++         +         +         +         +         +         +         +         
+TGTGAGCCACTGTGCCAGGCCTGGCCTTTTCTTTTACTCATTGGACTTCGTGGTGACCCAATCCCGTTTCTTCCCCTGTT
+|||||||||||||||||||  |||  |||| |||   | ||||  ||| ||| | |   |||   |||| ||   || | 
+TGTGAGCCACTGTGCCAGGAATGGAATTTTATTTGTATAATTGCTCTTTGTGCTCAAAAAATAATGTTTATTAAACTCTG
++         +         +         +         +         +         +         +         
+1         11        21        31        41        51        61        71       
+
+101       111       121       1
++         +         +         +         +         +         +         +         
+AGAGGGCACATTTAGAATTACTT
+| |||  ||||| | ||||||||
+ACAGGCTACATTGACAATTACTT
++         +         +         +         +         +         +         +         
+81        91        101       1
+     test trimRight(0.91)
+*/
+   Dynaln<SimpleScoreMethod>::setTrimWidth(26);
+   seq1.setSequence("TGTGAGCCACTGTGCCAGGCCTGGCCTTTTCTTTTACTCATTGGACTTCGTGGTGACCCAATCCCGTTTCTTCCCCTGTTAGAGGGCACATTTAGAATTACTT");
+   seq2.setSequence("TGTGAGCCACTGTGCCAGGAATGGAATTTTATTTGTATAATTGCTCTTTGTGCTCAAAAAATAATGTTTATTAAACTCTGACAGGCTACATTGACAATTACTT");
+   testlocal(seq1,seq2);
+   alnssm.printAlign(cout,80);
+   cout << "above is before trimRight()\n";
+   alnssm.trimRight(0.89);
+   cout << "After trim right at 0.89\n";
    alnssm.printAlign(cout, 80);
 }
