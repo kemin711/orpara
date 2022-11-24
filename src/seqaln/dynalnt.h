@@ -811,8 +811,12 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
                   auto ittE = it;
                   //cerr << __LINE__ << ": itE" << (ittE->first == -1 ? '-' : (*seq1)[ittE->first]) << ',' <<  (*seq2)[ittE->second] << endl;
                   ++numstagger;
-                  ++it;
                   fixZagGap(itB, itE, ittB, ittE);
+                  if (std::prev(ittE)->second == -1) {
+                     it = std::prev(ittE);
+                     continue;
+                  }
+                  else ++it;
                }
             }
             else if (it->second == -1) { // detect zig
@@ -824,7 +828,7 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
                if (it->first == -1) {
                   ittB=it;
                }
-               else {
+               else { // scan for top gap
                   unsigned short k=0;
                   while (it != beforeE && k < staggercut && it->first != -1) {
                      if (it->second == -1) { 
@@ -833,16 +837,23 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
                      ++k; ++it;
                   }
                   if (it == beforeE) break;
-                  if (it->first == -1) { ittB=it; }
+                  if (it->first == -1) { 
+                     ittB=it; 
+                     cerr << "found top gap with k=" << k << endl;
+                  }
                }
                // now ittB maybe at start of bottom gap
-               if (ittB != end()) { // top
+               if (ittB != beforeE) { // top
                   ++it;
                   while (it != beforeE && it->first == -1) ++it;
                   auto ittE = it;
                   ++numstagger;
-                  ++it;
                   fixZigGap(ittB, ittE, itB, itE);
+                  if (prev(ittE)->first == -1) { // top gap longer for fixed stagger
+                      it = prev(ittE);
+                      continue; // same as goto but looks better
+                  }
+                  else ++it;
                }
             }
             else ++it;

@@ -663,6 +663,33 @@ TEST_F(DynalnTest, fixStaggerGap) {
    ASSERT_TRUE(aligner.fixStaggerGap());
    cout << "after fix stagger gap\n";
    aligner.printAlign(cout, 80);
+   /* 
+44        54        64        74        82        92        102       112      
++         +         +         +         +         +         +         +         
+TGGAAAGGAATGGAATAGAATGGAATCTTCCTGAGA--GGAATGGAATGGAATGGAATGGAATGGAATGGAATGGAATGG
+|| |||||||||||| |||||  ||||    ||| |   | |||||||||| ||||||||||||||||||||||||||||
+TGAAAAGGAATGGAAGAGAATAAAATCCAG-TGAAATT-GGATGGAATGGATTGGAATGGAATGGAATGGAATGGAATGG
++         +         +         +         +         +         +         +         
+5         15        25        31        43        53        63        73       
+After fix generates another stagger
+
+44        54        64        74        83        93        103       113
++         +         +         +         +         +         +         +
+TGGAAAGGAATGGAATAGAATGGAATCTTCCTGAGA-GGAATGGAATGGAATGGAATGGAATGGAATGGAATGGAATGGA
+|| |||||||||||| |||||  ||||      |    | |||||||||| |||||||||||||||||||||||||||||
+TGAAAAGGAATGGAAGAGAATAAAATCCAGTGAAATT-GGATGGAATGGATTGGAATGGAATGGAATGGAATGGAATGGA
++         +         +         +         +         +         +         +
+5         15        25        35        44        54        64        74
+
+*/
+   seq1.setSequence("TGGAAAGGAATGGAATAGAATGGAATCTTCCTGAGAGGAATGGAATGGAATGGAATGGAATGGAATGGAATGGAATGG");
+   qseq.setSequence("TGAAAAGGAATGGAAGAGAATAAAATCCAGTGAAATTGGATGGAATGGATTGGAATGGAATGGAATGGAATGGAATGG");
+   aligner.setseq(seq1, qseq);
+   aligner.runlocal();
+   aligner.printAlign(cout, 80);
+   ASSERT_TRUE(aligner.fixStaggerGap());
+   cout << "after fix stagger gap\n";
+   aligner.printAlign(cout, 80);
 }
 
 
