@@ -839,7 +839,7 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
                   if (it == beforeE) break;
                   if (it->first == -1) { 
                      ittB=it; 
-                     cerr << "found top gap with k=" << k << endl;
+                     //cerr << "found top gap with k=" << k << endl;
                   }
                }
                // now ittB maybe at start of bottom gap
