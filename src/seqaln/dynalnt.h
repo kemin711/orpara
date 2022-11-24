@@ -843,7 +843,7 @@ STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
                   }
                }
                // now ittB maybe at start of bottom gap
-               if (ittB != beforeE) { // top
+               if (ittB != end()) { // top
                   ++it;
                   while (it != beforeE && it->first == -1) ++it;
                   auto ittE = it;

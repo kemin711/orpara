@@ -690,6 +690,37 @@ TGAAAAGGAATGGAAGAGAATAAAATCCAGTGAAATT-GGATGGAATGGATTGGAATGGAATGGAATGGAATGGAATGGA
    ASSERT_TRUE(aligner.fixStaggerGap());
    cout << "after fix stagger gap\n";
    aligner.printAlign(cout, 80);
+   /**
+    * Fixing algorithm crashed
+177       187       197       207       217       227       237       247
++         +         +         +         +         +         +         +
+GAGTGGAATGGAATGGAACGAAATGGAATAGAATGGAACGGAATGCAATGGAATGGATGGAAATTGAATGGAAAGGAATA
+|||||||||||||||||| |||||||||                     ||||||||      | |||||     |||
+GAGTGGAATGGAATGGAATGAAATGGAA--------------------AGGAATGGAA-----TAGAATG-----GAA--
++         +         +         +         +         +         +         +
+1         11        21        31        41        31        61        71
+
+257       267       275       285       295       305
++         +         +         +         +         + 
+AAAACAAGTGAAAT--TGGATGGAATGGATTGGAATGGAATGGAATGGAAT
+             |  | || |||||||| |||||||||||||||||||||
+----------TCTTCCTAGA-GGAATGGAATGGAATGGAATGGAATGGAAT
++         +         +         +         +         + 
+81        49        101       68        78        88
+
+*/
+   seq1.setSequence("GAGTGGAATGGAATGGAACGAAATGGAATAGAATGGAACGGAATGCAATGGAATGGATGGAAATTGAATGGAAAGGAATAAAAACAAGTGAAATTGGATGGAATGGATTGGAATGGAATGGAATGGAAT");
+   qseq.setSequence("GAGTGGAATGGAATGGAATGAAATGGAAAGGAATGGAATAGAATGGAATCTTCCTAGAGGAATGGAATGGAATGGAATGGAATGGAAT");
+   aligner.setseq(seq1, qseq);
+   aligner.runlocal();
+   aligner.printAlign(cout, 80);
+   aligner.fix1M();
+   cout << "after fix1M()\n";
+   aligner.printAlign(cout, 80);
+   ASSERT_TRUE(aligner.fixStaggerGap());
+   cout << "after fix stagger gap\n";
+   aligner.printAlign(cout, 80);
+
 }
 
 
