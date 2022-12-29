@@ -554,6 +554,9 @@ class Dynaln {
        * @return number of gaps in the second sequence.
        */
       int getNumgaps2() const { return numgaps2; }
+      /**
+       * @return the total indel in this alignment.
+       */
       int getTotalGaps() const { return numgaps1+numgaps2; }
       /**
        * @return the total number of gaps for both sequences.
