@@ -191,7 +191,8 @@ int randomSelectIterative(vector<T> &arr, int p, int r, int i) {
 
 /**
  * Algorithm object to calculate the median for
- * a given data.
+ * a given data. Can be used by STD in iterator context
+ * because implemented the operator.
  */
 template<class T>
 class FindMedian {
