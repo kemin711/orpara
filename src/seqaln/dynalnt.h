@@ -312,7 +312,8 @@ class Dynaln {
        * topaln, buttaln, and middle string will be filled.
        * Furthermore, the identical member will be correctly
        * recalculated by this function; but the gap values
-       * will not be updated.
+       * will not be updated. Usually when fixStagger() and fix1M()
+       * are used, then need to rebuild the alignment.
        *
        * This method more generic, derived class don't have
        * to implement this. The linear space version use this 
@@ -555,9 +556,12 @@ class Dynaln {
        */
       int getNumgaps2() const { return numgaps2; }
       /**
-       * @return the total indel in this alignment.
+       * @return the total number of gap in the top and bottom alignment.
        */
       int getTotalGaps() const { return numgaps1+numgaps2; }
+      bool hasGap() const {
+         return getTotalGaps() > 0;
+      }
       /**
        * @return the total number of gaps for both sequences.
        */
@@ -600,6 +604,7 @@ class Dynaln {
        * AGCTGCAA---ACT
        * AGC----AGTTACT
        *       |itBottom
+       * where top gap is after bottom gap.
        * @param itTop will be updated to the one at the shorter
        *    of the top or bottom gap length after itTop
        * @return true if gap from least one sequence is zero
@@ -614,13 +619,153 @@ class Dynaln {
        * ACG-----ATCGCCACTT
        * ACGGGCACAT---CACTT
        *           |itBottom
+       * where top gap before bottom gap.
        * @param itTop is the top iterator for the last gap
        * @param d id the distance between itBottom and itTop
        *    The example d=2
        */
       //bool fixStaggerZag(alniterator& itTop, alniterator itBottom);
       bool fixStaggerZag(alniterator& itTop, int d);
-
+      /**
+       * fix alignment with --M--- single resisule match
+       * flanked by deletion on either end for both top
+       * and bottom strand. If seeing from the other direction
+       * the deletion is insertion. 
+       */
+      bool fix1M() {
+         if (!hasGap()) return false;
+         bool fixed=false;
+         if (numgaps1 > 1)
+            if (fixTop1M()) fixed=true;
+         if (numgaps2 > 1)
+            if (fixBottom1M()) fixed=true;
+         if (fixed)
+            buildAlnInfo();
+         return fixed;
+      }
+      /**
+       * Spacial case
+       * CTTATTTATT--T-ATAGCTCCTATCATTATTATTTCCTCCCTCTTATAACTTTAGGT
+       * ||| || |||    | |||||||||||||||| |||||||||||||||||||||||||
+       * CTTTTTAATTGA-AACAGCTCCTATCATTATTTTTTCCTCCCTCTTATAACTTTAGGT
+       */
+      bool fixTop1M() {
+         auto it=std::next(begin());
+         auto beforeEnd = std::prev(end());
+         int numgapfix=0;
+         // first scan top gap
+         while (it != beforeEnd) {
+            if (it->first == -1) {
+               auto itB=it; // first gap
+               ++it;
+               while (it != beforeEnd && it->first == -1) { ++it; }
+               if (it == beforeEnd) return false;
+               auto itE=it; // itB first gap, itE after last gap
+               ++it;
+               if (it != beforeEnd && it->first == -1) {
+                  auto ittB = it;
+                  ++it;
+                  while (it != beforeEnd && it->first == -1) {
+                     ++it;
+                  }
+                  //if (it == end()) {
+                  //   throw logic_error("alignment last position is gap!");
+                  //}
+                  auto ittE = it;
+                  auto numgapL=std::distance(itB, itE);
+                  auto numgapR=std::distance(ittB, ittE);
+                  if (numgapL > numgapR) { // eliminate right gap
+                     auto x = prev(ittE);
+                     x->first = itE->first;
+                     if (itE->second == -1) {
+                        alnidx.erase(itE, std::next(itE));
+                        --gaplen1;
+                        --gaplen2;
+                     }
+                     else itE->first = -1;
+                  }
+                  else {
+                     itB->first = itE->first;
+                     if (itE->second == -1) {
+                        alnidx.erase(itE, std::next(itE));
+                        --gaplen1;
+                        --gaplen2;
+                     }
+                     else itE->first = -1;
+                  }
+                  --numgaps1;
+                  ++numgapfix;
+                  //++it;
+                  it=std::next(itB);
+               }
+            }
+            else ++it;
+         }
+         return numgapfix > 0;
+      }
+      /**
+       * More complicated case
+125       135       145       151       160       169       179       189
++         +         +         +         +         +         +         +
+TTTGTTTTTCCCTCTCATTCTCCTT----ACAGCTC-TACCCACT-CCTTCTTTCTTCAACAGATATTTACTGAGTATTT
+|||||||||   ||| |||||  ||    | ||    ||   |     || |||  |  | ||||||| | |||||||||
+TTTGTTTTTAGATCTGATTCTAATTTAATATAGAAAATAT--A--A--TTATTTAGTAGAAAGATATTGAATGAGTATTT
++         +         +         +         +         +         +         +
+81        91        101       111       132       125       135       145
+*/
+      bool fixBottom1M() {
+         auto it=std::next(begin());
+         auto beforeEnd = std::prev(end());
+         int numgapfix=0;
+         // first scan top gap
+         while (it != beforeEnd) {
+            if (it->second == -1) {
+               auto itB=it; // first gap
+               ++it;
+               while (it != beforeEnd && it->second == -1) {
+                  ++it;
+               }
+               if (it == beforeEnd) return false;
+               auto itE=it; // itB first gap, itE after last gap
+               ++it;
+               if (it != beforeEnd && it->second == -1) {
+                  auto ittB = it;
+                  ++it;
+                  while (it != beforeEnd && it->second == -1) {
+                     ++it;
+                  }
+                  auto ittE = it;
+                  auto numgapL=std::distance(itB, itE);
+                  auto numgapR=std::distance(ittB, ittE);
+                  if (numgapL > numgapR) { // eliminate right gap
+                     auto x = prev(ittE);
+                     x->second = itE->second;
+                     if (itE->first == -1) {
+                        alnidx.erase(itE, std::next(itE));
+                        --gaplen1;
+                        --gaplen2;
+                     }
+                     else itE->second = -1;
+                  }
+                  else {
+                     itB->second = itE->second;
+                     if (itE->first == -1) {
+                        alnidx.erase(itE, std::next(itE));
+                        --gaplen1;
+                        --gaplen2;
+                     }
+                     else itE->second = -1;
+                  }
+                  --numgaps2;
+                  ++numgapfix;
+                  //++it; // try again
+                  it=std::next(itB);
+               }
+            }
+            else ++it;
+         }
+         return numgapfix > 0;
+      }
       /**
        * Not sure we need to update tracing algorithm to eliminate
        * the staggered gaps or this is inheriant problem of the
@@ -628,6 +773,198 @@ class Dynaln {
        * @return true if fixed at least one stagger gap
        */
       bool fixStagger();
+      /**
+       * ACG-----CTGCGTT top before bottom is zag
+       * ACGTACAG---CGTT
+       *
+       * ACGTACAG----TGCCA zig
+       * ACG-----CCTTTGCCA
+       */
+      bool fixStaggerGap() {
+         static const unsigned short staggercut=5;
+         if (numgaps1 < 1 || numgaps2 < 1) return false;
+         auto it=std::next(begin());
+         auto beforeE = std::prev(end());
+         int numstagger=0;
+         while (it != beforeE) {
+STARTAGAIN:    if (it->first == -1) { // detect zag ---/---
+               auto itB=it;
+               ++it;
+               while (it != beforeE && it->first == -1) { ++it; }
+               auto itE=it;
+               //cerr << __LINE__ << ": itE" << (*seq1)[itE->first] << ',' << (itE->second == -1 ? '-' : (*seq2)[itE->second]) << endl;
+               auto ittB=end();
+               if (it->second == -1) { ittB=it; }
+               else {
+                  unsigned short k=0;
+                  while (it != beforeE && k < staggercut && it->second != -1) {
+                     if (it->first == -1) { goto STARTAGAIN; }
+                     ++k; ++it;
+                  }
+                  if (it == beforeE) break;
+                  if (it->second == -1) { ittB=it; }
+               }
+               // now ittB maybe at start of bottom gap
+               if (ittB != end()) {
+                  ++it;
+                  while (it != beforeE && it->second == -1) ++it;
+                  auto ittE = it;
+                  //cerr << __LINE__ << ": itE" << (ittE->first == -1 ? '-' : (*seq1)[ittE->first]) << ',' <<  (*seq2)[ittE->second] << endl;
+                  ++numstagger;
+                  fixZagGap(itB, itE, ittB, ittE);
+                  if (std::prev(ittE)->second == -1) {
+                     it = std::prev(ittE);
+                     continue;
+                  }
+                  else ++it;
+               }
+            }
+            else if (it->second == -1) { // detect zig
+               auto itB=it; // bottom
+               ++it;
+               while (it != beforeE && it->second == -1) { ++it; }
+               auto itE=it;
+               auto ittB=end();
+               if (it->first == -1) {
+                  ittB=it;
+               }
+               else { // scan for top gap
+                  unsigned short k=0;
+                  while (it != beforeE && k < staggercut && it->first != -1) {
+                     if (it->second == -1) { 
+                        goto STARTAGAIN; // start a new search, saw another bottom gap
+                     }
+                     ++k; ++it;
+                  }
+                  if (it == beforeE) break;
+                  if (it->first == -1) { 
+                     ittB=it; 
+                     //cerr << "found top gap with k=" << k << endl;
+                  }
+               }
+               // now ittB maybe at start of bottom gap
+               if (ittB != end()) { // top
+                  ++it;
+                  while (it != beforeE && it->first == -1) ++it;
+                  auto ittE = it;
+                  ++numstagger;
+                  fixZigGap(ittB, ittE, itB, itE);
+                  if (prev(ittE)->first == -1) { // top gap longer for fixed stagger
+                      it = prev(ittE);
+                      continue; // same as goto but looks better
+                  }
+                  else ++it;
+               }
+            }
+            else ++it;
+         }
+         if (numstagger > 0) {
+            buildAlnInfo();
+            return true;
+         }
+         return false;
+      }
+      /**  
+       *  t  t                 itop2
+       *  |  |             t   | 
+       * G---TGATCAGAT    G----TGATCAGAT
+       * GCAG----CAGAT    GCAGCT--TCAGAT
+       *     |  |            ***| | 
+       *     b  b           1  21 ibobttom2
+       *
+       * GTGATCAGAT
+       * GCAG-CAGAT
+       *
+       * TCTTC--AGGTGATATTCC
+       * |||||   |||||||||||
+       * TCTTCGT-GGTGATATTCC
+       *
+       */
+      void fixZagGap(alniterator itop1, alniterator itop2, alniterator ibottom1, alniterator ibottom2) {
+         auto ngL=distance(itop1, itop2);
+         auto ngR=distance(ibottom1, ibottom2);
+         if (ngL <= ngR) {
+            while (itop1 != ibottom1) {
+               itop1->first = itop2->first;
+               ++itop1; ++itop2;
+            }
+            alnidx.erase(itop1, itop2);
+            --numgaps1;
+            gaplen1 -= ngL;
+            gaplen2 -= ngL;
+         }
+         else { 
+            --ibottom1; --ibottom2;
+            --itop2;
+            while (ibottom2 != itop2) {
+               ibottom2->second = ibottom1->second;
+               --ibottom1; --ibottom2;
+            }
+            alnidx.erase(std::next(ibottom1), std::next(ibottom2));
+            --numgaps2;
+            gaplen1 -= ngR;
+            gaplen2 -= ngR;
+         }
+      }
+      /**       t1   t2
+       * TCACGAT-----CT
+       * TCA--ATTCCAGCT
+       *    1 2
+       *         t1 2
+       * TCACGATAT--CT
+       * TCA----ATAGCT
+       *    1   2
+       */
+      void fixZigGap(alniterator itop1, alniterator itop2, alniterator ibottom1, alniterator ibottom2) {
+         auto ngR=distance(itop1, itop2);
+         auto ngL=distance(ibottom1, ibottom2);
+         if (ngL <= ngR) {
+            while (ibottom1 != itop1) {
+               ibottom1->second = ibottom2->second;
+               ++ibottom1; ++ibottom2;
+            }
+            alnidx.erase(ibottom1, ibottom2);
+            --numgaps2;
+            gaplen1 -= ngL;
+            gaplen2 -= ngL;
+         }
+         else { 
+            --itop1; --itop2;
+            --ibottom2;
+            while (itop2 != ibottom2) {
+               itop2->first = itop1->first;
+               --itop1; --itop2;
+            }
+            alnidx.erase(std::next(itop1), std::next(itop2));
+            --numgaps1;
+            gaplen1 -= ngR;
+            gaplen2 -= ngL;
+         }
+      }
+
+      // 151       161       171       181                 
+      // +         +         +         +         +         +         +         +         
+      // ATTTATTTTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTT-A
+      // |||||||    ||||||||||||||||||||||||||    |
+      // ATTTATT----GTGTGTGTGTGTGTGTGTGTGTGTGTACAGA
+      // +         +         +         +         +         +         +         +         
+      // 79                  95        105       115       
+      bool hasEndGap() const {
+         auto it = std::prev(alnidx.cend());
+         --it;
+         if (it->first == -1 || it->second == -1)
+            return true;
+         --it;
+         if (it->first == -1 || it->second == -1)
+            return true;
+         it = std::next(alnidx.cbegin());
+         if (it->first == -1 || it->second == -1)
+            return true;
+         ++it;
+         if (it->first == -1 || it->second == -1)
+            return true;
+         return false;
+      }
       /** 
        * |--window--|  front
        * | it
@@ -656,6 +993,11 @@ class Dynaln {
        *  subtracted from the total.
        */
       bool trimLeft(float ngidentitycut);
+      /**
+       * trim gap and low-ientity regions then update alignment
+       * result information to be used again.
+       * @return try if trimming is successful.
+       */
       bool trimRight(float ngidentitycut);
 
       /**
@@ -933,6 +1275,9 @@ class Dynaln {
          }
          cerr << endl;
       }
+      static void setTrimWidth(int tw) {
+         trimwidth=tw;
+      }
 
    protected:
       /** 
@@ -1120,6 +1465,7 @@ class Dynaln {
        */
       string topruler, bottomruler;
       ALNTYPE alntype;
+      static int trimwidth;
 };
 
 /** Class LSDynaln
@@ -1250,6 +1596,7 @@ class LSDynaln : public Dynaln<T> {
 
 // need to define const members
 template<class T> const char Dynaln<T>::gapchar='-';
+template<class T> int Dynaln<T>::trimwidth=22;
 
 template<class T>
 Dynaln<T>::~Dynaln<T>() {
@@ -1878,6 +2225,7 @@ void Dynaln<T>::buildResult(const int delta1, const int delta2) {
  * marking at every 10 this could become a parameter if you
  * use very long sequence to do the alignment
  * No longer count gaps, these two operations are now separated.
+ * Caller needs to update gap info: numgaps1, 2; gaplen1, 2.
  */
 template<class T>
 void Dynaln<T>::buildAlnInfo(const int delta1, const int delta2) {
@@ -2216,7 +2564,8 @@ template<class T> vector<pair<char,int>> Dynaln<T>::getCigar1() const {
       }
       else { // seq1 is gap, seq2 cannot be gap
          if (i->second == -1) {
-            throw runtime_error("not possible for two gaps to algin");
+            printAlign(cerr, 80);
+            throw runtime_error("logical error for having two gaps to algin");
          }
          C='I';
          while (i != alnidx.cend() && i->first == -1 && i->second > -1) {
@@ -2630,9 +2979,10 @@ template<class T> string Dynaln<T>::getMDString1() const {
          //cerr << "I state identicalSeg=" << identicalSeg << endl;
          //lastState='i'; // query insert state ignored
       }
-      else if (it->first > -1 && it->second == -1) { 
+      else if (it->first > -1 && it->second == -1) { // seq2 del, seq1 ins
          // seq 2 has deletion need to report
          if (lastState == 'n') ost << identicalSeg;
+         else if (lastState == 'm') ost << 0; // previous is mismatch padd with 0
          identicalSeg = 0;
          ost << '^';
          while (it != cend() && it->first > -1 && it->second == -1) {
@@ -2703,13 +3053,15 @@ void Dynaln<T>::trimGapInfo(alniterator it, char& ms, int& gpl1, int& gpl2, int&
 // +         +         +         +         +         +         +         +
 // 89        99        109       119       129       139       149
 template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
-   if (getAlnlen() < 25) {
-      cerr << "Alignment too short for trimming\n";
+   if (getAlnlen() < 25 || getAlnlen() < trimwidth) {
+      //cerr << __FILE__ << ":" << __LINE__ << ": Alignment alnlen=" << getAlnlen() << " too short for trimming\n";
       return false;
    }
    // there is no need to update identical value.
-   if (getNogapIdentity() < ngidentitycut) ngidentitycut=getNogapIdentity();
-   int cutcnt = int(ceil(20*ngidentitycut));
+   //if (getNogapIdentity() < ngidentitycut) 
+   //   ngidentitycut=getNogapIdentity();
+   if (ngidentitycut >= 1) ngidentitycut=0.99;
+   int cutcnt = int(ceil(trimwidth*ngidentitycut));
    //cout << "cutoff for this operation cutcnt=" << cutcnt << endl;
    int samecnt=0;
    int ginw=0; // gap in window
@@ -2725,7 +3077,7 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    // Should be positive value these values will be subtracted
    // from the total gaps in the original alignment for only counted on the itB.
    int gplen1=0, gplen2=0, ngp1=0, ngp2=0;
-   for (size_t i=0; i < 20; ++i) {
+   for (int i=0; i < trimwidth; ++i) {
       while (it != end() && (it->first == -1 || it->second == -1)) {
          ++ginw; ++it;
       }
@@ -2763,7 +3115,7 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
       return true;
    }
 #ifdef DEBUG
-   cerr << "first 20 same count: " << samecnt << " gplen1=" << gplen1 
+   cerr << "first " << trimwidth << " same count: " << samecnt << " gplen1=" << gplen1 
       << " gplen2=" << gplen2 << " ginw=" << ginw << " window front: " 
       << it->first << "," << it->second << endl;
 #endif
@@ -2771,7 +3123,8 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    // itB     it (front)
    // |-------|
    // ---W----
-   while (it != end() && (samecnt < cutcnt || ginw > 0) && (samecnt < 19 || ginw > 1)) {
+   //while (it != end() && (samecnt < cutcnt || ginw > 0) && (samecnt < 19 || ginw > 1)) {
+   while (it != end() && (samecnt < cutcnt || ginw > 0)) {
       //cerr << samecnt << " less than " << cutcnt << endl;
       bool itmoved=false;
       while (it != end() && (it->first == -1 || it->second == -1)) {
@@ -2797,8 +3150,8 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
       if (!itbmoved) ++itB; 
    }
    if (it == end()) { // never reached cutoff
-      printAlign(cerr, 80);
-      cerr << __FILE__ << ":" << __LINE__ << ":WARN whole sequence trimmed away out\n";
+      //printAlign(cerr, 80);
+      //cerr << __FILE__ << ":" << __LINE__ << ":WARN whole sequence trimmed away out\n";
       //throw runtime_error("matched count never reached cutoff within window");
       return false;
    }
@@ -2843,23 +3196,26 @@ template<class T> bool Dynaln<T>::trimLeft(float ngidentitycut) {
    return true;
 }
 
+// window only count matched position
 template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
-   if (getAlnlen() < 25) {
-      cerr << __FILE__ << ":" << __LINE__ << ":DEBUG Alignment too short for trimming\n";
+   if (getAlnlen() < 25 || getAlnlen() < trimwidth) {
+      //cerr << __FILE__ << ":" << __LINE__ << ":DEBUG Alignment too short for trimming\n";
       return false;
    }
-   if (getNogapIdentity() < ngidentitycut) {
-      ngidentitycut = getNogapIdentity();
-   }
-   //cerr << "nogap identity cut=" << ngidentitycut << endl;
-   int cutcnt = int(ceil(20*ngidentitycut));
+   // lower cutoff such that the whole alignment will not be trimmed out?
+   //if (getNogapIdentity() < ngidentitycut) {
+   //   ngidentitycut = getNogapIdentity();
+   //}
+   //cerr << "nogap identity cut=" << ngidentitycut << " noidentity=" << getNogapIdentity() << endl;
+   if (ngidentitycut >=1) ngidentitycut=0.99; // upper limit
+   int cutcnt = int(ceil(trimwidth*ngidentitycut));
    int samecnt=0;
    int gapinwindow=0; // total gap align (top or bottom) in window
    alniterator it = prev(end());
    char mstate='b';
    int gplen1=0, gplen2=0, ngp1=0, ngp2=0; // gap info inside window
-   // initialize window
-   for (size_t i=0; i < 20; ++i) {
+   // initialize window, one gap counts as one event
+   for (int i=0; i < trimwidth; ++i) {
       while (it != begin() && (it->first == -1 || it->second == -1)) {
          ++gapinwindow; --it;
       }
@@ -2868,6 +3224,7 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
       }
       --it;
    }
+   //cerr << "samecnt=" << samecnt << " cutcnt=" << cutcnt << endl;
    if (samecnt >= cutcnt) { // skip initial gap or mismatch
       alniterator b = std::prev(end());
       while (b != it) {
@@ -2893,16 +3250,18 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
       buildAlnInfo();
       return true;
    }
-   //cerr << "same count: " << samecnt << endl;
-   //cerr << "first 20 same count: " << samecnt << " gplen1=" << gplen1 
+   //cerr << __LINE__ << ": same count: " << samecnt << endl;
+   //cerr << "first " << trimwidth << " same count: " << samecnt << " gplen1=" << gplen1 
    //   << " gplen2=" << gplen2 << endl;
    alniterator itB=prev(end());
    // it      itB
    // |-------| ignoring gap
    // ---W----
-   while (it != begin() && (samecnt < cutcnt || gapinwindow > 0) && (samecnt < 19 || gapinwindow > 1)) 
+   //while (it != begin() && (samecnt < cutcnt || gapinwindow > 0) && (samecnt < 19 || gapinwindow > 1)) 
+   while (it != begin() && (samecnt < cutcnt || gapinwindow > 0)) 
    {
-      //cerr << samecnt << " less than " << cutcnt << " or gaps in window: " << gapinwindow << endl;
+      //cerr << __LINE__ << ": samecnt=" << samecnt << " less than cutcnt=" << cutcnt 
+      //   << " or " << gapinwindow << " gapinwindow\n";
       bool itmoved=false;
       while (it != begin() && (it->first == -1 || it->second == -1)) { 
          ++gapinwindow; --it;
@@ -2927,8 +3286,8 @@ template<class T> bool Dynaln<T>::trimRight(float ngidentitycut) {
    //  << " " << (*seq1)[itB->first] << "/" << (*seq2)[itB->second]
    //      << " Lead  " << (*seq1)[it->first] << "/" << (*seq2)[it->second] << endl;
    if (it == begin()) {
-      cerr << __FILE__ << ":" << __LINE__ << ":WARN samecnt=" << samecnt
-         << " never above cutoff=" << cutcnt << " whole align is trimmed!\n";
+      //cerr << __FILE__ << ":" << __LINE__ << ":WARN samecnt=" << samecnt
+      //   << " below cutoff=" << cutcnt << " whole align is trimmed!\n";
       return false;
       //throw runtime_error("samecnt never above cutoff");
    }

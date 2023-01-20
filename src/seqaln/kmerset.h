@@ -7,7 +7,13 @@
 using namespace std;
 
 namespace orpara {
-
+/**
+ * Convert one or more sequences into a set of kmers.
+ * This object can compare with another ojbect to see
+ * the number of shared kmers with the common method.
+ * Could be used for fast comparisons between a sequece
+ * and a database of genomes.
+ */
 template<int K> 
 class KmerSet : public KmerBase<K> {
    public:

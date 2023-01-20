@@ -20,6 +20,7 @@ class Nucleotide {
        * and any other base to 0 (A).
        * This should be represented by 2-bits of information.
        * For speed, we remove the exception checking.
+       * Caller must make sure only 4 canoical bases in the input.
        */
       static unsigned int base2int(const char ch) {
          switch (ch) {

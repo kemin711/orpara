@@ -20,7 +20,11 @@ namespace orpara {
  * Sequence should be free of ambiguous bases.
  * Template parameter 
  *   K is kmer length should be < 32
- *   S sketch size should be < input string length
+ *   S sketch size should be < input string length.
+ *   Usually input sequence is a whole genome sequence of
+ *   a bacteria or fugus. Or human. A large input file
+ *   containing large number of short reads can also be 
+ *   used.
  *   BHF base to integer [0-4] hashing function default is
  *   KmerBase<K>::base2int we can use a different hashing
  *   function to get more accurate estimate of similarity.
